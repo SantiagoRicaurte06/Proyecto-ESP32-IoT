@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "author": "Santiago Ricaurte",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-esp32-devkit-v1", "id": "esp", "top": 0, "left": 0, "attrs": {} },
+    { "type": "wokwi-hc-sr04", "id": "nivel", "top": -160, "left": -40, "attrs": { "distance": "20" } },
+    { "type": "wokwi-dht22", "id": "dht", "top": -150, "left": 140, "attrs": {} },
+    { "type": "wokwi-potentiometer", "id": "suelo", "top": 230, "left": -150, "attrs": {} },
+    { "type": "wokwi-pir-motion-sensor", "id": "pir", "top": -150, "left": 260, "attrs": {} },
+    { "type": "wokwi-pushbutton", "id": "ir", "top": 240, "left": 40, "attrs": { "color": "black", "label": "IR obstaculo" } },
+    { "type": "wokwi-pushbutton", "id": "tactil", "top": 240, "left": 150, "attrs": { "color": "blue", "label": "Tactil" } },
+    { "type": "wokwi-servo", "id": "servo", "top": 60, "left": 330, "attrs": {} },
+    { "type": "wokwi-relay-module", "id": "rele", "top": 190, "left": 330, "attrs": {} },
+    { "type": "wokwi-led", "id": "ledV", "top": -60, "left": -170, "attrs": { "color": "green" } },
+    { "type": "wokwi-led", "id": "ledA", "top": -60, "left": -140, "attrs": { "color": "yellow" } },
+    { "type": "wokwi-led", "id": "ledN", "top": -60, "left": -110, "attrs": { "color": "orange" } },
+    { "type": "wokwi-led", "id": "ledR", "top": -60, "left": -80, "attrs": { "color": "red" } },
+    { "type": "board-ssd1306", "id": "oled", "top": 120, "left": -180, "attrs": {} }
+  ],
+  "connections": [
+    [ "esp:TX0", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX0", "$serialMonitor:TX", "", [] ],
+
+    [ "nivel:VCC", "esp:VIN", "red", [] ],
+    [ "nivel:GND", "esp:GND.1", "black", [] ],
+    [ "nivel:TRIG", "esp:D5", "orange", [] ],
+    [ "nivel:ECHO", "esp:D18", "purple", [] ],
+
+    [ "dht:VCC", "esp:3V3", "red", [] ],
+    [ "dht:GND", "esp:GND.1", "black", [] ],
+    [ "dht:SDA", "esp:D4", "green", [] ],
+
+    [ "suelo:VCC", "esp:3V3", "red", [] ],
+    [ "suelo:GND", "esp:GND.2", "black", [] ],
+    [ "suelo:SIG", "esp:D34", "green", [] ],
+
+    [ "pir:VCC", "esp:VIN", "red", [] ],
+    [ "pir:GND", "esp:GND.1", "black", [] ],
+    [ "pir:OUT", "esp:D27", "green", [] ],
+
+    [ "ir:1.l", "esp:D26", "green", [] ],
+    [ "ir:2.l", "esp:GND.2", "black", [] ],
+
+    [ "tactil:1.l", "esp:D33", "blue", [] ],
+    [ "tactil:2.l", "esp:3V3", "red", [] ],
+
+    [ "servo:V+", "esp:VIN", "red", [] ],
+    [ "servo:GND", "esp:GND.1", "black", [] ],
+    [ "servo:PWM", "esp:D13", "orange", [] ],
+
+    [ "rele:VCC", "esp:VIN", "red", [] ],
+    [ "rele:GND", "esp:GND.1", "black", [] ],
+    [ "rele:IN", "esp:D23", "orange", [] ],
+
+    [ "ledV:A", "esp:D19", "green", [] ],
+    [ "ledV:C", "esp:GND.1", "black", [] ],
+    [ "ledA:A", "esp:TX2", "yellow", [] ],
+    [ "ledA:C", "esp:GND.1", "black", [] ],
+    [ "ledN:A", "esp:RX2", "orange", [] ],
+    [ "ledN:C", "esp:GND.1", "black", [] ],
+    [ "ledR:A", "esp:D25", "red", [] ],
+    [ "ledR:C", "esp:GND.1", "black", [] ],
+
+    [ "oled:VCC", "esp:3V3", "red", [] ],
+    [ "oled:GND", "esp:GND.2", "black", [] ],
+    [ "oled:SDA", "esp:D21", "blue", [] ],
+    [ "oled:SCL", "esp:D22", "purple", [] ]
+  ],
+  "dependencies": {}
+}

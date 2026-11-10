@@ -1,12 +1,14 @@
-# Proyecto ESP32 · IoT + App Android + Agente IA
+# Centinela Cravo Sur · alerta temprana de crecientes
 
-Proyecto formativo SENA (ADSO), Yopal, Casanare. Todo en español (código e identificadores pueden ir en inglés).
+Proyecto formativo SENA (ADSO), Yopal, Casanare. Todo en español: textos, identificadores y comentarios.
 
 ## Contexto técnico
 
-- ESP32 DevKit v1 (38 pines). Firmware en `firmware/` (PlatformIO, framework Arduino).
-- MQTT con TLS (HiveMQ Cloud por defecto). Topics y JSON se documentan en `docs/` antes de implementarlos.
-- Backend en `backend/` (puente MQTT → BD, API, notificaciones). App Android en `app/`. Hardware en `hardware/`.
+- Documento del proyecto: `docs/02-fase2.md` (topics MQTT, API, agente). Guía: `docs/03-puesta-en-marcha.md`.
+- `firmware/`: ESP32 DevKit v1, PlatformIO + Arduino. Pines y umbrales en `include/config.h`. Compila con `~/.platformio/penv/Scripts/pio.exe run` (entornos `esp32dev` y `wokwi`).
+- `backend/`: Node.js 22+ ESM, sin framework (`node:http`, `node:sqlite`), `mqtt`, `@anthropic-ai/sdk`, `nodemailer`. `npm test`; `npm run simular` simula la estación.
+- `app/`: Expo SDK 58 (React Native, JS). Antes de tocar APIs de Expo lee `app/AGENTS.md`. Instala paquetes con `npx expo install`. El APK se compila en GitHub Actions (`apk.yml`).
+- Si cambias un topic, un mensaje o una ruta, actualiza a la vez firmware, simulador, backend, app y `docs/02-fase2.md`.
 - Hardware disponible: DHT11, HC-SR04, PIR, humedad de suelo, IR de obstáculos, táctil capacitivo, SG90, relé 1 canal, OLED I2C, LCD 16x2, joystick KY-023. Matriz 8x8 y display de 4 dígitos sin driver: descartados por consumo de GPIO.
 
 ## Reglas de hardware (no negociables)

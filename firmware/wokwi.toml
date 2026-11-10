@@ -1,0 +1,5 @@
+# Simulación en Wokwi (extensión de VS Code): compila primero con `pio run -e wokwi`
+[wokwi]
+version = 1
+firmware = ".pio/build/wokwi/firmware.bin"
+elf = ".pio/build/wokwi/firmware.elf"
