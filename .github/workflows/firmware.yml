@@ -1,0 +1,32 @@
+# Compila el firmware del ESP32 con PlatformIO en cada PR y push a main/develop.
+name: Firmware
+
+on:
+  pull_request:
+  push:
+    branches: [main, develop]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Compilar ESP32
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verificar proyecto PlatformIO
+        id: pio
+        run: |
+          if [ -f firmware/platformio.ini ]; then echo "existe=1" >> "$GITHUB_OUTPUT"; else echo "Sin firmware/platformio.ini todavía; se omite."; fi
+      - uses: actions/setup-python@v5
+        if: steps.pio.outputs.existe == '1'
+        with:
+          python-version: '3.x'
+      - name: Compilar
+        if: steps.pio.outputs.existe == '1'
+        working-directory: firmware
+        run: |
+          pip install platformio
+          [ -f include/secrets.h ] || cp include/secrets.example.h include/secrets.h
+          pio run
