@@ -68,7 +68,8 @@ export function conectarMqtt() {
       if (Date.now() - ts < 30_000) ponerOnline(true);
     } else if (sub === "evento") {
       guardarEvento(ts, msg);
-      alEvento(msg, prediccion);
+      // Los eventos que llegan del respaldo (estación sin internet) se guardan pero no se notifican tarde
+      if (Date.now() - ts < 120_000) alEvento(msg, prediccion);
     } else if (sub === "estado") {
       estado.info = { ...estado.info, ...msg };
       if (msg.online === false) ponerOnline(false);
