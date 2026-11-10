@@ -1,0 +1,139 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 900" width="1240" height="900" font-family="Inter, Segoe UI, Arial, sans-serif">
+<rect width="1240" height="900" fill="#F3F4F6"/>
+<text x="40.0" y="48.0" font-size="22" fill="#111827" text-anchor="start" font-weight="700">Centinela Cravo Sur · Plano eléctrico</text>
+<text x="40.0" y="72.0" font-size="13" fill="#6B7280" text-anchor="start" font-weight="400">ESP32 DevKit v1 · señales en azul, alimentación en gris · todas las entradas del ESP32 a 3,3 V</text>
+<rect x="500.0" y="110.0" width="240.0" height="640.0" rx="10" fill="#FFFFFF" stroke="#374151" stroke-width="1.5"/>
+<text x="620.0" y="140.0" font-size="18" fill="#111827" text-anchor="middle" font-weight="700">ESP32</text>
+<text x="620.0" y="160.0" font-size="11" fill="#6B7280" text-anchor="middle" font-weight="400">DevKit v1 · WROOM-32</text>
+<circle cx="500" cy="205" r="4" fill="#1D4ED8"/>
+<text x="512.0" y="209.0" font-size="13" fill="#1D4ED8" text-anchor="start" font-weight="700">D34</text>
+<line x1="500.0" y1="205.0" x2="340.0" y2="205.0" stroke="#1D4ED8" stroke-width="1.5"/>
+<rect x="80.0" y="183.0" width="260.0" height="44.0" rx="6" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<text x="94.0" y="202.0" font-size="13" fill="#111827" text-anchor="start" font-weight="600">Humedad de suelo</text>
+<text x="94.0" y="218.0" font-size="11" fill="#6B7280" text-anchor="start" font-weight="400">AO · ADC1</text>
+<text x="330.0" y="218.0" font-size="10" fill="#374151" text-anchor="end" font-weight="400">3,3 V</text>
+<circle cx="500" cy="263" r="4" fill="#1D4ED8"/>
+<text x="512.0" y="267.0" font-size="13" fill="#1D4ED8" text-anchor="start" font-weight="700">D32</text>
+<line x1="500.0" y1="263.0" x2="340.0" y2="263.0" stroke="#1D4ED8" stroke-width="1.5"/>
+<rect x="80.0" y="241.0" width="260.0" height="44.0" rx="6" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<text x="94.0" y="260.0" font-size="13" fill="#111827" text-anchor="start" font-weight="600">Joystick (opcional)</text>
+<text x="94.0" y="276.0" font-size="11" fill="#6B7280" text-anchor="start" font-weight="400">VRx · ADC1</text>
+<text x="330.0" y="276.0" font-size="10" fill="#374151" text-anchor="end" font-weight="400">3,3 V</text>
+<circle cx="500" cy="321" r="4" fill="#1D4ED8"/>
+<text x="512.0" y="325.0" font-size="13" fill="#1D4ED8" text-anchor="start" font-weight="700">D14</text>
+<line x1="500.0" y1="321.0" x2="340.0" y2="321.0" stroke="#1D4ED8" stroke-width="1.5"/>
+<rect x="80.0" y="299.0" width="260.0" height="44.0" rx="6" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<text x="94.0" y="318.0" font-size="13" fill="#111827" text-anchor="start" font-weight="600">Joystick (opcional)</text>
+<text x="94.0" y="334.0" font-size="11" fill="#6B7280" text-anchor="start" font-weight="400">SW</text>
+<text x="330.0" y="334.0" font-size="10" fill="#374151" text-anchor="end" font-weight="400">3,3 V</text>
+<circle cx="500" cy="379" r="4" fill="#1D4ED8"/>
+<text x="512.0" y="383.0" font-size="13" fill="#1D4ED8" text-anchor="start" font-weight="700">D33</text>
+<line x1="500.0" y1="379.0" x2="340.0" y2="379.0" stroke="#1D4ED8" stroke-width="1.5"/>
+<rect x="80.0" y="357.0" width="260.0" height="44.0" rx="6" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<text x="94.0" y="376.0" font-size="13" fill="#111827" text-anchor="start" font-weight="600">Táctil TTP223</text>
+<text x="94.0" y="392.0" font-size="11" fill="#6B7280" text-anchor="start" font-weight="400">SIG (HIGH = tocado)</text>
+<text x="330.0" y="392.0" font-size="10" fill="#374151" text-anchor="end" font-weight="400">3,3 V</text>
+<circle cx="500" cy="437" r="4" fill="#1D4ED8"/>
+<text x="512.0" y="441.0" font-size="13" fill="#1D4ED8" text-anchor="start" font-weight="700">D26</text>
+<line x1="500.0" y1="437.0" x2="340.0" y2="437.0" stroke="#1D4ED8" stroke-width="1.5"/>
+<rect x="80.0" y="415.0" width="260.0" height="44.0" rx="6" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<text x="94.0" y="434.0" font-size="13" fill="#111827" text-anchor="start" font-weight="600">IR obstáculos</text>
+<text x="94.0" y="450.0" font-size="11" fill="#6B7280" text-anchor="start" font-weight="400">OUT (LOW = objeto)</text>
+<text x="330.0" y="450.0" font-size="10" fill="#374151" text-anchor="end" font-weight="400">3,3 V</text>
+<circle cx="500" cy="495" r="4" fill="#1D4ED8"/>
+<text x="512.0" y="499.0" font-size="13" fill="#1D4ED8" text-anchor="start" font-weight="700">D27</text>
+<line x1="500.0" y1="495.0" x2="340.0" y2="495.0" stroke="#1D4ED8" stroke-width="1.5"/>
+<rect x="80.0" y="473.0" width="260.0" height="44.0" rx="6" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<text x="94.0" y="492.0" font-size="13" fill="#111827" text-anchor="start" font-weight="600">PIR HC-SR501</text>
+<text x="94.0" y="508.0" font-size="11" fill="#6B7280" text-anchor="start" font-weight="400">OUT</text>
+<text x="330.0" y="508.0" font-size="10" fill="#374151" text-anchor="end" font-weight="400">5 V</text>
+<circle cx="500" cy="553" r="4" fill="#1D4ED8"/>
+<text x="512.0" y="557.0" font-size="13" fill="#1D4ED8" text-anchor="start" font-weight="700">D25</text>
+<line x1="500.0" y1="553.0" x2="340.0" y2="553.0" stroke="#1D4ED8" stroke-width="1.5"/>
+<rect x="80.0" y="531.0" width="260.0" height="44.0" rx="6" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<text x="94.0" y="550.0" font-size="13" fill="#111827" text-anchor="start" font-weight="600">LED rojo</text>
+<text x="94.0" y="566.0" font-size="11" fill="#6B7280" text-anchor="start" font-weight="400">220 Ω → ánodo</text>
+<circle cx="500" cy="611" r="4" fill="#1D4ED8"/>
+<text x="512.0" y="615.0" font-size="13" fill="#1D4ED8" text-anchor="start" font-weight="700">D13</text>
+<line x1="500.0" y1="611.0" x2="340.0" y2="611.0" stroke="#1D4ED8" stroke-width="1.5"/>
+<rect x="80.0" y="589.0" width="260.0" height="44.0" rx="6" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<text x="94.0" y="608.0" font-size="13" fill="#111827" text-anchor="start" font-weight="600">Servo SG90</text>
+<text x="94.0" y="624.0" font-size="11" fill="#6B7280" text-anchor="start" font-weight="400">señal (cable naranja)</text>
+<text x="330.0" y="624.0" font-size="10" fill="#374151" text-anchor="end" font-weight="400">5 V ext.</text>
+<circle cx="740" cy="205" r="4" fill="#1D4ED8"/>
+<text x="728.0" y="209.0" font-size="13" fill="#1D4ED8" text-anchor="end" font-weight="700">D23</text>
+<line x1="740.0" y1="205.0" x2="900.0" y2="205.0" stroke="#1D4ED8" stroke-width="1.5"/>
+<rect x="900.0" y="183.0" width="260.0" height="44.0" rx="6" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<text x="914.0" y="202.0" font-size="13" fill="#111827" text-anchor="start" font-weight="600">Relé 1 canal</text>
+<text x="914.0" y="218.0" font-size="11" fill="#6B7280" text-anchor="start" font-weight="400">IN → sirena / baliza</text>
+<text x="1150.0" y="218.0" font-size="10" fill="#374151" text-anchor="end" font-weight="400">5 V ext.</text>
+<circle cx="740" cy="263" r="4" fill="#1D4ED8"/>
+<text x="728.0" y="267.0" font-size="13" fill="#1D4ED8" text-anchor="end" font-weight="700">D22</text>
+<line x1="740.0" y1="263.0" x2="900.0" y2="263.0" stroke="#1D4ED8" stroke-width="1.5"/>
+<rect x="900.0" y="241.0" width="260.0" height="44.0" rx="6" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<text x="914.0" y="260.0" font-size="13" fill="#111827" text-anchor="start" font-weight="600">OLED I2C</text>
+<text x="914.0" y="276.0" font-size="11" fill="#6B7280" text-anchor="start" font-weight="400">SCL</text>
+<text x="1150.0" y="276.0" font-size="10" fill="#374151" text-anchor="end" font-weight="400">3,3 V</text>
+<circle cx="740" cy="321" r="4" fill="#1D4ED8"/>
+<text x="728.0" y="325.0" font-size="13" fill="#1D4ED8" text-anchor="end" font-weight="700">D21</text>
+<line x1="740.0" y1="321.0" x2="900.0" y2="321.0" stroke="#1D4ED8" stroke-width="1.5"/>
+<rect x="900.0" y="299.0" width="260.0" height="44.0" rx="6" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<text x="914.0" y="318.0" font-size="13" fill="#111827" text-anchor="start" font-weight="600">OLED I2C</text>
+<text x="914.0" y="334.0" font-size="11" fill="#6B7280" text-anchor="start" font-weight="400">SDA</text>
+<text x="1150.0" y="334.0" font-size="10" fill="#374151" text-anchor="end" font-weight="400">3,3 V</text>
+<circle cx="740" cy="379" r="4" fill="#1D4ED8"/>
+<text x="728.0" y="383.0" font-size="13" fill="#1D4ED8" text-anchor="end" font-weight="700">D19</text>
+<line x1="740.0" y1="379.0" x2="900.0" y2="379.0" stroke="#1D4ED8" stroke-width="1.5"/>
+<rect x="900.0" y="357.0" width="260.0" height="44.0" rx="6" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<text x="914.0" y="376.0" font-size="13" fill="#111827" text-anchor="start" font-weight="600">LED verde</text>
+<text x="914.0" y="392.0" font-size="11" fill="#6B7280" text-anchor="start" font-weight="400">220 Ω → ánodo</text>
+<circle cx="740" cy="437" r="4" fill="#1D4ED8"/>
+<text x="728.0" y="441.0" font-size="13" fill="#1D4ED8" text-anchor="end" font-weight="700">D18</text>
+<line x1="740.0" y1="437.0" x2="900.0" y2="437.0" stroke="#1D4ED8" stroke-width="1.5"/>
+<rect x="900.0" y="415.0" width="260.0" height="44.0" rx="6" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<text x="914.0" y="434.0" font-size="13" fill="#111827" text-anchor="start" font-weight="600">HC-SR04</text>
+<text x="914.0" y="450.0" font-size="11" fill="#6B7280" text-anchor="start" font-weight="400">ECHO vía divisor 1k / 2k</text>
+<text x="1150.0" y="450.0" font-size="10" fill="#374151" text-anchor="end" font-weight="400">5 V</text>
+<circle cx="740" cy="495" r="4" fill="#1D4ED8"/>
+<text x="728.0" y="499.0" font-size="13" fill="#1D4ED8" text-anchor="end" font-weight="700">D5</text>
+<line x1="740.0" y1="495.0" x2="900.0" y2="495.0" stroke="#1D4ED8" stroke-width="1.5"/>
+<rect x="900.0" y="473.0" width="260.0" height="44.0" rx="6" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<text x="914.0" y="492.0" font-size="13" fill="#111827" text-anchor="start" font-weight="600">HC-SR04</text>
+<text x="914.0" y="508.0" font-size="11" fill="#6B7280" text-anchor="start" font-weight="400">TRIG</text>
+<text x="1150.0" y="508.0" font-size="10" fill="#374151" text-anchor="end" font-weight="400">5 V</text>
+<circle cx="740" cy="553" r="4" fill="#1D4ED8"/>
+<text x="728.0" y="557.0" font-size="13" fill="#1D4ED8" text-anchor="end" font-weight="700">D17</text>
+<line x1="740.0" y1="553.0" x2="900.0" y2="553.0" stroke="#1D4ED8" stroke-width="1.5"/>
+<rect x="900.0" y="531.0" width="260.0" height="44.0" rx="6" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<text x="914.0" y="550.0" font-size="13" fill="#111827" text-anchor="start" font-weight="600">LED amarillo</text>
+<text x="914.0" y="566.0" font-size="11" fill="#6B7280" text-anchor="start" font-weight="400">TX2 · 220 Ω</text>
+<circle cx="740" cy="611" r="4" fill="#1D4ED8"/>
+<text x="728.0" y="615.0" font-size="13" fill="#1D4ED8" text-anchor="end" font-weight="700">D16</text>
+<line x1="740.0" y1="611.0" x2="900.0" y2="611.0" stroke="#1D4ED8" stroke-width="1.5"/>
+<rect x="900.0" y="589.0" width="260.0" height="44.0" rx="6" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<text x="914.0" y="608.0" font-size="13" fill="#111827" text-anchor="start" font-weight="600">LED naranja</text>
+<text x="914.0" y="624.0" font-size="11" fill="#6B7280" text-anchor="start" font-weight="400">RX2 · 220 Ω</text>
+<circle cx="740" cy="669" r="4" fill="#1D4ED8"/>
+<text x="728.0" y="673.0" font-size="13" fill="#1D4ED8" text-anchor="end" font-weight="700">D4</text>
+<line x1="740.0" y1="669.0" x2="900.0" y2="669.0" stroke="#1D4ED8" stroke-width="1.5"/>
+<rect x="900.0" y="647.0" width="260.0" height="44.0" rx="6" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<text x="914.0" y="666.0" font-size="13" fill="#111827" text-anchor="start" font-weight="600">DHT11</text>
+<text x="914.0" y="682.0" font-size="11" fill="#6B7280" text-anchor="start" font-weight="400">DATA</text>
+<text x="1150.0" y="682.0" font-size="10" fill="#374151" text-anchor="end" font-weight="400">3,3 V</text>
+<rect x="762.0" y="391.0" width="126.0" height="28.0" rx="4" fill="#EFF6FF" stroke="#1D4ED8" stroke-width="1"/>
+<text x="825.0" y="409.0" font-size="10" fill="#1D4ED8" text-anchor="middle" font-weight="400">1 kΩ serie · 2 kΩ a GND</text>
+<circle cx="540" cy="750" r="4" fill="#374151"/>
+<text x="540.0" y="740.0" font-size="11" fill="#374151" text-anchor="middle" font-weight="700">3V3</text>
+<circle cx="620" cy="750" r="4" fill="#374151"/>
+<text x="620.0" y="740.0" font-size="11" fill="#374151" text-anchor="middle" font-weight="700">VIN 5V</text>
+<circle cx="700" cy="750" r="4" fill="#374151"/>
+<text x="700.0" y="740.0" font-size="11" fill="#374151" text-anchor="middle" font-weight="700">GND</text>
+<line x1="540.0" y1="750.0" x2="540.0" y2="790.0" stroke="#374151" stroke-width="1.2" stroke-dasharray="4,3"/>
+<line x1="620.0" y1="750.0" x2="620.0" y2="790.0" stroke="#374151" stroke-width="1.2" stroke-dasharray="4,3"/>
+<line x1="700.0" y1="750.0" x2="700.0" y2="790.0" stroke="#374151" stroke-width="1.2" stroke-dasharray="4,3"/>
+<rect x="80.0" y="790.0" width="1080.0" height="92.0" rx="8" fill="#FFFFFF" stroke="#374151" stroke-width="1.2"/>
+<text x="100.0" y="814.0" font-size="14" fill="#111827" text-anchor="start" font-weight="700">Alimentación</text>
+<text x="100.0" y="836.0" font-size="12" fill="#374151" text-anchor="start" font-weight="400">• ESP32 por USB (computador o power bank). El pin 3V3 alimenta OLED, DHT11, táctil, IR y humedad de suelo (así su salida nunca pasa de 3,3 V).</text>
+<text x="100.0" y="854.0" font-size="12" fill="#374151" text-anchor="start" font-weight="400">• Fuente externa 5 V / 2 A (cargador de celular) al riel de 5 V: servo, relé, HC-SR04 y PIR. Condensador de 470–1000 µF en el riel. GND común con el ESP32.</text>
+<text x="100.0" y="872.0" font-size="12" fill="#374151" text-anchor="start" font-weight="400">• Relé activo en BAJO (la mayoría): RELE_ACTIVO_EN_ALTO = false en config.h. La sirena es un buzzer de 5 V o una baliza LED en COM / NO.</text>
+</svg>
