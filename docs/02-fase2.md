@@ -97,6 +97,8 @@ Simulación: [`firmware/diagram.json`](../firmware/diagram.json) para Wokwi (en 
 
 ![Maqueta](../hardware/maqueta.svg)
 
+Modelo 3D interactivo con el armado paso a paso: [`hardware/maqueta-3d.html`](../hardware/maqueta-3d.html) (ábrelo en el navegador).
+
 - **Base:** caja de MDF 3 mm de 60 × 40 × 15 cm. Adentro, el compartimiento de electrónica, con acceso por una puerta trasera.
 - **Río:** recipiente transparente de 30 × 15 × 15 cm empotrado en la tapa, con una ventana frontal y una regla en cm. El desborde está a 14 cm.
 - **Sobre la tapa:**

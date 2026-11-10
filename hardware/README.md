@@ -4,6 +4,7 @@
 |---|---|
 | [`plano-electrico.svg`](plano-electrico.svg) | Conexiones de cada componente al ESP32 y alimentación |
 | [`maqueta.svg`](maqueta.svg) | Vista superior y frontal con medidas, ubicación de componentes y materiales |
+| [`maqueta-3d.html`](maqueta-3d.html) | **Modelo 3D interactivo** (Three.js): armado en 7 pasos, medidas de cada pieza, lista de corte, vista por dentro y simulación de la creciente. Ábrelo con doble clic en el navegador |
 | [`../firmware/diagram.json`](../firmware/diagram.json) | Circuito para simular en **Wokwi** (VS Code) |
 
 ![Plano eléctrico](plano-electrico.svg)
