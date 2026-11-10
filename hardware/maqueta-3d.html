@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@500&display=swap">
 <style>
-/* Layout: escenario 3D a la izquierda, panel de armado a la derecha; en teléfono se apilan. */
+/* Layout: video renderizado en Blender a la izquierda, guía de armado a la derecha; en teléfono se apilan. */
 :root {
   --bg: #EEF1F5;
   --panel: #FFFFFF;
@@ -21,8 +21,7 @@
   --muted: #5B6676;
   --accent: #1D4ED8;
   --accent-soft: #E0E8FB;
-  --stage: #E6EAF0;
-  --verde: #15803D; --amarillo: #A16207; --naranja: #C2410C; --rojo: #B91C1C;
+  --stage: #DADFE6;
   --f-display: "Space Grotesk", "Segoe UI", Arial, sans-serif;
   --f-body: "Inter", "Segoe UI", Arial, sans-serif;
   --f-mono: "JetBrains Mono", Consolas, monospace;
@@ -30,569 +29,220 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #0E131B; --panel: #151C27; --line: #273243; --fg: #E6EBF2; --muted: #93A0B4;
-    --accent: #6E9BFF; --accent-soft: #1B2A47; --stage: #111824;
-    --verde: #4ADE80; --amarillo: #FACC15; --naranja: #FB923C; --rojo: #F87171;
+    --accent: #6E9BFF; --accent-soft: #1B2A47; --stage: #0B1018;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #0E131B; --panel: #151C27; --line: #273243; --fg: #E6EBF2; --muted: #93A0B4;
-  --accent: #6E9BFF; --accent-soft: #1B2A47; --stage: #111824;
-  --verde: #4ADE80; --amarillo: #FACC15; --naranja: #FB923C; --rojo: #F87171;
+  --accent: #6E9BFF; --accent-soft: #1B2A47; --stage: #0B1018;
   color-scheme: dark;
 }
-html, body { height: 100%; }
 body { background: var(--bg); color: var(--fg); font-family: var(--f-body); font-size: 14px; }
-.app { display: grid; grid-template-columns: minmax(0, 1fr) 380px; grid-template-rows: auto minmax(0, 1fr); height: 100%; }
-header { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px; padding-block: 12px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); border-bottom: 1px solid var(--line); background: var(--panel); }
-header h1 { font-family: var(--f-display); font-size: 20px; margin: 0; letter-spacing: -0.01em; }
-header p { margin: 0; color: var(--muted); font-size: 13px; }
-.stage { position: relative; min-width: 0; min-height: 0; background: var(--stage); }
-#lienzo { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
-.vistas { position: absolute; top: 12px; left: max(12px, env(safe-area-inset-left, 0px)); display: flex; flex-wrap: wrap; gap: 6px; max-width: calc(100% - 24px); }
-.chip { font: 500 12px var(--f-body); color: var(--fg); background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; cursor: pointer; }
-.chip:hover { border-color: var(--accent); }
-.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
-.chip:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.info { position: absolute; left: max(12px, env(safe-area-inset-left, 0px)); bottom: 12px; max-width: min(360px, calc(100% - 24px)); background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; box-shadow: 0 6px 24px rgba(15, 23, 42, 0.12); }
-.info h3 { margin: 0 0 4px; font-family: var(--f-display); font-size: 15px; }
-.info dl { margin: 6px 0 0; display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; font-size: 12.5px; }
-.info dt { color: var(--muted); }
-.info dd { margin: 0; font-family: var(--f-mono); font-size: 12px; }
-.info p { margin: 6px 0 0; font-size: 12.5px; color: var(--muted); line-height: 1.45; }
-.pista { position: absolute; right: 12px; bottom: 12px; font-size: 11.5px; color: var(--muted); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 4px 8px; }
-aside { min-width: 0; min-height: 0; overflow-y: auto; background: var(--panel); border-left: 1px solid var(--line); display: flex; flex-direction: column; }
-.tabs { display: flex; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: var(--panel); z-index: 1; }
-.tabs button { flex: 1; font: 600 13px var(--f-body); color: var(--muted); background: none; border: 0; border-bottom: 2px solid transparent; padding: 12px 8px; cursor: pointer; }
-.tabs button[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
-.tab { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.envoltura { max-width: 1320px; margin: 0 auto; padding-block: 20px 32px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 16px; }
+header h1 { font-family: var(--f-display); font-size: clamp(20px, 3vw, 28px); margin: 0; letter-spacing: -0.01em; text-wrap: balance; }
+header p { margin: 4px 0 0; color: var(--muted); max-width: 70ch; line-height: 1.5; }
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 16px; align-items: start; }
+.escenario { min-width: 0; display: grid; gap: 10px; }
+.pantalla { position: relative; aspect-ratio: 16 / 9; max-width: 100%; background: var(--stage); border-radius: 12px; overflow: hidden; border: 1px solid var(--line); }
+.pantalla video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.pantalla video[hidden] { display: none !important; }
+.rotulo { position: absolute; left: 12px; top: 12px; display: flex; align-items: center; gap: 8px; background: rgba(15, 23, 42, 0.78); color: #fff; padding: 6px 12px; border-radius: 999px; font-weight: 600; font-size: 13px; backdrop-filter: blur(4px); }
+.rotulo b { font-family: var(--f-mono); font-weight: 500; opacity: 0.8; }
+.cargando { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); font-size: 13px; }
+.controles { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.btn { font: 600 14px var(--f-body); border-radius: 10px; padding: 11px 16px; cursor: pointer; border: 1px solid var(--line); background: var(--panel); color: var(--fg); display: inline-flex; align-items: center; gap: 8px; }
+.btn:hover:not(:disabled) { border-color: var(--accent); }
+.btn:disabled { opacity: 0.45; cursor: default; }
+.btn.primario { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn:focus-visible, .paso:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.espacio { flex: 1; }
+.linea { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; }
+.linea button { height: 8px; border-radius: 4px; border: 0; background: var(--line); cursor: pointer; padding: 0; }
+.linea button.hecho { background: var(--accent); }
+.linea button.actual { background: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+aside { min-width: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: grid; gap: 10px; }
+aside h2 { font-family: var(--f-display); font-size: 16px; margin: 0; }
 .paso { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 10px; text-align: left; font: inherit; color: inherit; background: none; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; cursor: pointer; }
 .paso:hover { border-color: var(--accent); }
 .paso[aria-current="step"] { border-color: var(--accent); background: var(--accent-soft); }
 .paso .n { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font: 700 12px var(--f-mono); background: var(--accent-soft); color: var(--accent); }
-.paso[aria-current="step"] .n { background: var(--accent); color: #fff; }
-.paso strong { display: block; font-family: var(--f-display); font-size: 14px; margin-bottom: 2px; }
-.paso span { display: block; color: var(--muted); font-size: 12.5px; line-height: 1.45; }
-.paso ul { margin: 6px 0 0; padding-left: 16px; color: var(--fg); font-size: 12.5px; line-height: 1.5; }
-.paso:not([aria-current="step"]) ul { display: none; }
-.fila { display: flex; gap: 8px; flex-wrap: wrap; }
-.btn { font: 600 13px var(--f-body); border-radius: 8px; padding: 9px 14px; cursor: pointer; border: 1px solid var(--line); background: var(--panel); color: var(--fg); }
-.btn.primario { background: var(--accent); border-color: var(--accent); color: #fff; }
-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
-th, td { text-align: left; padding: 7px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
-th { color: var(--muted); font-weight: 600; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.04em; }
-td.m { font-family: var(--f-mono); font-size: 12px; white-space: nowrap; font-variant-numeric: tabular-nums; }
-.tabla { overflow-x: auto; }
-.nivel { display: grid; gap: 8px; border: 1px solid var(--line); border-radius: 10px; padding: 14px; }
-.nivel .lectura { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
-.nivel .valor { font: 700 32px var(--f-display); font-variant-numeric: tabular-nums; }
-.estado { font: 700 12px var(--f-body); letter-spacing: 0.06em; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; color: #fff; }
-input[type="range"] { width: 100%; accent-color: var(--accent); }
-.umbrales { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; font-size: 11px; color: var(--muted); text-align: center; }
-.umbrales b { display: block; font-family: var(--f-mono); color: var(--fg); font-size: 12px; }
-.nota { font-size: 12.5px; color: var(--muted); line-height: 1.5; margin: 0; }
-h2 { font-family: var(--f-display); font-size: 15px; margin: 6px 0 0; }
-.leyenda { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--muted); }
-.leyenda i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
-@media (max-width: 860px) {
-  .app { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 58vh auto; height: auto; }
-  aside { border-left: 0; border-top: 1px solid var(--line); overflow: visible; }
-  .pista { display: none; }
-}
-@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+.paso.hecho .n, .paso[aria-current="step"] .n { background: var(--accent); color: #fff; }
+.paso strong { display: block; font-family: var(--f-display); font-size: 14px; }
+.paso span { display: block; color: var(--muted); font-size: 12.5px; line-height: 1.45; margin-top: 2px; }
+.detalle { border-top: 1px solid var(--line); padding-top: 12px; display: grid; gap: 6px; }
+.detalle h3 { margin: 0; font-family: var(--f-display); font-size: 15px; }
+.detalle ul { margin: 0; padding-left: 18px; line-height: 1.55; font-size: 13px; }
+.detalle .material { font-size: 12.5px; color: var(--muted); }
+.detalle .material b { color: var(--fg); font-weight: 600; }
+.nota { margin: 0; font-size: 12.5px; color: var(--muted); line-height: 1.5; }
+kbd { font-family: var(--f-mono); font-size: 11px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; }
+@media (max-width: 900px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 
-<div class="app">
+<div class="envoltura">
   <header>
-    <h1>Maqueta Centinela Cravo Sur</h1>
-    <p>Modelo 3D a escala real (cm) · caja MDF 60 × 40 × 15 · arrastra para girar, rueda para acercar, toca una pieza para ver sus medidas</p>
+    <h1>Maqueta Centinela Cravo Sur · armado paso a paso</h1>
+    <p>Render realista en Blender a escala real (caja de MDF de 60 × 40 × 15 cm). Avanza con <b>Armar</b> para ver cómo baja cada pieza a su lugar, o retrocede con <b>Desarmar</b> para verla salir en orden inverso.</p>
   </header>
 
-  <div class="stage">
-    <canvas id="lienzo" aria-label="Modelo 3D de la maqueta"></canvas>
-    <div class="vistas" role="group" aria-label="Vistas">
-      <button class="chip" data-vista="iso" aria-pressed="true">Isométrica</button>
-      <button class="chip" data-vista="sup" aria-pressed="false">Superior</button>
-      <button class="chip" data-vista="fre" aria-pressed="false">Frontal</button>
-      <button class="chip" data-vista="tra" aria-pressed="false">Trasera</button>
-      <button class="chip" id="rayosx" aria-pressed="false">Ver por dentro</button>
-    </div>
-    <div class="info" id="info">
-      <h3 id="infoTitulo">Toca una pieza</h3>
-      <p id="infoNota">Cada pieza muestra su medida, material y cómo se instala. Usa los pasos del panel para ver el armado en orden.</p>
-      <dl id="infoDatos" hidden></dl>
-    </div>
-    <div class="pista">x = largo · y = alto · z = fondo · origen en la esquina frontal izquierda</div>
-  </div>
-
-  <aside>
-    <div class="tabs" role="tablist">
-      <button role="tab" id="t-armado" aria-selected="true" aria-controls="p-armado">Armado</button>
-      <button role="tab" id="t-piezas" aria-selected="false" aria-controls="p-piezas">Piezas</button>
-      <button role="tab" id="t-simular" aria-selected="false" aria-controls="p-simular">Simular</button>
+  <div class="grid">
+    <div class="escenario">
+      <div class="pantalla">
+        <div class="cargando" id="cargando">Cargando video…</div>
+        <video id="vAdelante" src="blender/armado.mp4" muted playsinline preload="auto"></video>
+        <video id="vAtras" src="blender/desarmado.mp4" muted playsinline preload="auto" hidden></video>
+        <div class="rotulo" id="rotulo"><b id="rotuloN">0/8</b><span id="rotuloT">Caja vacía</span></div>
+      </div>
+      <div class="linea" id="linea" aria-label="Progreso del armado"></div>
+      <div class="controles">
+        <button class="btn" id="btnDesarmar">◀ Desarmar paso</button>
+        <button class="btn primario" id="btnArmar">Armar paso ▶</button>
+        <span class="espacio"></span>
+        <button class="btn" id="btnTodo">Armar todo</button>
+        <button class="btn" id="btnReinicio">Desarmar todo</button>
+      </div>
+      <p class="nota">Teclado: <kbd>→</kbd> armar · <kbd>←</kbd> desarmar · toca un paso de la lista para saltar a él.</p>
     </div>
 
-    <section class="tab" id="p-armado" role="tabpanel" aria-labelledby="t-armado">
-      <p class="nota">Siete pasos en el orden en que se construye. Cada paso muestra solo lo armado hasta ahí y resalta en azul lo nuevo.</p>
+    <aside>
+      <h2>Pasos</h2>
       <div id="pasos" style="display:grid; gap:8px"></div>
-      <div class="fila">
-        <button class="btn" id="anterior">← Paso anterior</button>
-        <button class="btn primario" id="siguiente">Siguiente paso →</button>
-      </div>
-    </section>
-
-    <section class="tab" id="p-piezas" role="tabpanel" aria-labelledby="t-piezas" hidden>
-      <h2>Lista de corte (MDF 3 mm)</h2>
-      <div class="tabla"><table>
-        <thead><tr><th>Pieza</th><th>Medida (cm)</th><th>Cant.</th></tr></thead>
-        <tbody>
-          <tr><td>Fondo</td><td class="m">60 × 40</td><td>1</td></tr>
-          <tr><td>Tapa izquierda</td><td class="m">24 × 40</td><td>1</td></tr>
-          <tr><td>Tapa derecha</td><td class="m">21 × 40</td><td>1</td></tr>
-          <tr><td>Tapa trasera del río</td><td class="m">15 × 10</td><td>1</td></tr>
-          <tr><td>Frente izquierdo</td><td class="m">24 × 15</td><td>1</td></tr>
-          <tr><td>Frente derecho</td><td class="m">21 × 15</td><td>1</td></tr>
-          <tr><td>Fondo trasero (con puerta)</td><td class="m">60 × 15</td><td>1</td></tr>
-          <tr><td>Laterales</td><td class="m">39.4 × 15</td><td>2</td></tr>
-          <tr><td>División electrónica (larga)</td><td class="m">21.2 × 14.7</td><td>1</td></tr>
-          <tr><td>División electrónica (corta)</td><td class="m">13.2 × 14.7</td><td>1</td></tr>
-          <tr><td>Puerta trasera</td><td class="m">15 × 10</td><td>1</td></tr>
-        </tbody>
-      </table></div>
-      <h2>Otras piezas</h2>
-      <div class="tabla"><table>
-        <thead><tr><th>Pieza</th><th>Medida (cm)</th><th>Material</th></tr></thead>
-        <tbody>
-          <tr><td>Río</td><td class="m">30 × 15 × 15</td><td>Recipiente transparente</td></tr>
-          <tr><td>Puente</td><td class="m">19 × 9 × 0.5</td><td>Balso</td></tr>
-          <tr><td>Vía (2 tramos)</td><td class="m">22 × 8 · 19 × 8</td><td>Cartón paja gris</td></tr>
-          <tr><td>Ribera</td><td class="m">10 × 10 × 1.5</td><td>Bandeja + tierra</td></tr>
-          <tr><td>Poste semáforo</td><td class="m">Ø 0.8 × 12</td><td>Balso / pitillo</td></tr>
-          <tr><td>Mástil del sensor</td><td class="m">Ø 0.8 × 10 + brazo 9</td><td>Balso</td></tr>
-          <tr><td>Brazo barrera</td><td class="m">9 × 0.6 × 0.3</td><td>Balso pintado</td></tr>
-          <tr><td>Poste PIR</td><td class="m">Ø 0.8 × 6</td><td>Balso</td></tr>
-          <tr><td>Viviendas</td><td class="m">5 × 4 × 3</td><td>Cartón paja</td></tr>
-        </tbody>
-      </table></div>
-      <h2>Perforaciones en la tapa (Ø 8 mm)</h2>
-      <p class="nota">Una junto a cada poste para bajar los cables: semáforo (5, 29), barrera (15, 27), IR (12, 15.5), mástil (40.5, 7), humedad (47, 8), PIR (55, 6). Coordenadas (x, z) en cm desde la esquina frontal izquierda.</p>
-    </section>
-
-    <section class="tab" id="p-simular" role="tabpanel" aria-labelledby="t-simular" hidden>
-      <div class="nivel">
-        <div class="lectura">
-          <div><div class="nota">Nivel del agua</div><div class="valor"><span id="nivelValor">2.0</span> <small style="font-size:14px;color:var(--muted)">cm</small></div></div>
-          <span class="estado" id="estado">verde</span>
-        </div>
-        <label for="nivel" class="nota">Mueve para simular la creciente</label>
-        <input type="range" id="nivel" min="0" max="14" step="0.1" value="2">
-        <div class="umbrales"><span>verde<b>&lt; 5</b></span><span>amarillo<b>5</b></span><span>naranja<b>8</b></span><span>rojo<b>11</b></span></div>
-      </div>
-      <div class="fila">
-        <button class="btn primario" id="animar">Animar creciente</button>
-        <button class="btn" id="vaciar">Vaciar</button>
-      </div>
-      <p class="nota">Así reacciona la estación real: en naranja baja la barrera, en rojo suena la sirena y el LED rojo parpadea. El HC-SR04 está a 23 cm del fondo; el desborde está a 14 cm.</p>
-      <h2>Colores del modelo</h2>
-      <div class="leyenda">
-        <span><i style="background:#C9A97A"></i>MDF</span>
-        <span><i style="background:#E8D2A6"></i>Balso</span>
-        <span><i style="background:#2F7D4F"></i>Pasto (tapa pintada)</span>
-        <span><i style="background:#5B6472"></i>Vía</span>
-        <span><i style="background:#1D4ED8"></i>Sensores</span>
-        <span><i style="background:#16A34A"></i>Placas electrónicas</span>
-      </div>
-    </section>
-  </aside>
+      <div class="detalle" id="detalle"></div>
+    </aside>
+  </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
 <script>
 (function () {
   "use strict";
-  const lienzo = document.getElementById("lienzo");
-  if (!window.THREE || !THREE.OrbitControls) {
-    document.getElementById("infoTitulo").textContent = "No se pudo cargar el visor 3D";
-    document.getElementById("infoNota").textContent = "Revisa la conexión a internet y recarga la página. La lista de piezas sigue disponible en el panel.";
-    return;
-  }
-  const renderer = new THREE.WebGLRenderer({ canvas: lienzo, antialias: true, preserveDrawingBuffer: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-  renderer.outputEncoding = THREE.sRGBEncoding;
-  renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  const FPS = 24, CUADROS_PASO = 48, TOTAL = 456;
+  // Fin de cada paso en segundos (paso 0 = caja vacía). Los pasos 1–7 duran 2 s; la prueba con agua, 5 s.
+  const FIN = [0, 1, 2, 3, 4, 5, 6, 7].map((p) => (p * CUADROS_PASO) / FPS).concat([TOTAL / FPS]);
+  const DUR = TOTAL / FPS;
 
-  const escena = new THREE.Scene();
-  const camara = new THREE.PerspectiveCamera(38, 1, 0.5, 600);
-  const controles = new THREE.OrbitControls(camara, lienzo);
-  controles.enableDamping = true;
-  controles.target.set(0, 8, 0);
-  controles.maxPolarAngle = Math.PI * 0.95;
-  controles.minDistance = 25;
-  controles.maxDistance = 220;
-
-  escena.add(new THREE.HemisphereLight(0xffffff, 0x8a96a8, 0.75));
-  const sol = new THREE.DirectionalLight(0xffffff, 0.75);
-  sol.position.set(-40, 80, 60);
-  sol.castShadow = true;
-  sol.shadow.mapSize.set(2048, 2048);
-  Object.assign(sol.shadow.camera, { left: -60, right: 60, top: 60, bottom: -60, near: 1, far: 250 });
-  escena.add(sol);
-
-  // Coordenadas de la maqueta (cm): x largo 0..60, y alto, z fondo 0 (frente)..40 (atrás)
-  const P = (x, y, z) => new THREE.Vector3(x - 30, y, 20 - z);
-
-  const mat = (color, extra = {}) => new THREE.MeshStandardMaterial({ color, roughness: 0.75, metalness: 0.02, ...extra });
-  const M = {
-    mdf: mat(0xC9A97A), mdfOscuro: mat(0xB8955F), pasto: mat(0x2F7D4F), via: mat(0x5B6472), balso: mat(0xE8D2A6),
-    tierra: mat(0x7A5534), blanco: mat(0xF4F4F2), rojo: mat(0xC62828), negro: mat(0x1F2937), sensor: mat(0x1D4ED8),
-    placa: mat(0x16A34A), plata: mat(0xC7CDD6, { metalness: 0.6, roughness: 0.35 }), techo: mat(0xA0522D),
-    vidrio: new THREE.MeshPhysicalMaterial({ color: 0xDCEBFF, transparent: true, opacity: 0.22, roughness: 0.05, depthWrite: false }),
-    agua: new THREE.MeshStandardMaterial({ color: 0x2563EB, transparent: true, opacity: 0.55, roughness: 0.15, depthWrite: false }),
-    cable: new THREE.LineBasicMaterial({ color: 0x1D4ED8 }),
-  };
-
-  const piezas = [];   // {obj, paso, info}
-  function registrar(obj, paso, info) {
-    obj.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; o.userData.pieza = info; } });
-    obj.userData.paso = paso;
-    obj.userData.pieza = info;
-    piezas.push(obj);
-    escena.add(obj);
-    return obj;
-  }
-  // Caja desde esquina mínima (x0,y0,z0) con tamaño (w,h,d) en cm
-  function caja(x0, y0, z0, w, h, d, material) {
-    const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), material);
-    m.position.copy(P(x0 + w / 2, y0 + h / 2, z0 + d / 2));
-    return m;
-  }
-  function cilindro(x, y0, z, r, h, material, seg = 20) {
-    const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, seg), material);
-    m.position.copy(P(x, y0 + h / 2, z));
-    return m;
-  }
-  function grupo(...hijos) { const g = new THREE.Group(); hijos.forEach((h) => g.add(h)); return g; }
-  function textura(ancho, alto, dibujar) {
-    const c = document.createElement("canvas"); c.width = ancho; c.height = alto;
-    const ctx = c.getContext("2d"); dibujar(ctx, ancho, alto);
-    const t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding; t.anisotropy = 4;
-    return { t, ctx, c };
-  }
-
-  const E = 0.3; // espesor MDF
-  const TAPA = 15;
-
-  // ── Paso 1: caja ──────────────────────────────────────────────────────────
-  registrar(caja(0, 0, 0, 60, E, 40, M.mdf), 1, { nombre: "Fondo", medida: "60 × 40 cm", material: "MDF 3 mm", nota: "Base de todo. Pega las paredes encima con silicona o puntillas." });
-  registrar(caja(0, E, 0, 24, TAPA - E, E, M.mdf), 1, { nombre: "Frente izquierdo", medida: "24 × 15 cm", material: "MDF 3 mm", nota: "Lleva el panel comunitario: ventana de 2.7 × 1.5 cm para la OLED y el botón táctil." });
-  registrar(caja(39, E, 0, 21, TAPA - E, E, M.mdf), 1, { nombre: "Frente derecho", medida: "21 × 15 cm", material: "MDF 3 mm", nota: "Entre los dos frentes queda la ventana de 15 cm donde se ve el río." });
-  registrar(caja(0, E, 40 - E, 60, TAPA - E, E, M.mdf), 1, { nombre: "Pared trasera", medida: "60 × 15 cm", material: "MDF 3 mm", nota: "Corta una abertura de 15 × 10 cm en x = 3–18 para la puerta del compartimiento." });
-  registrar(caja(0, E, E, E, TAPA - E, 40 - 2 * E, M.mdf), 1, { nombre: "Lateral izquierdo", medida: "39.4 × 15 cm", material: "MDF 3 mm", nota: "Agujero de 1 cm para el cable USB del ESP32 (alimentación)." });
-  registrar(caja(60 - E, E, E, E, TAPA - E, 40 - 2 * E, M.mdf), 1, { nombre: "Lateral derecho", medida: "39.4 × 15 cm", material: "MDF 3 mm", nota: "" });
-
-  // ── Paso 2: compartimiento de electrónica ─────────────────────────────────
-  registrar(caja(E, E, 26.5, 21.2, TAPA - 2 * E, E, M.mdfOscuro), 2, { nombre: "División frontal del compartimiento", medida: "21.2 × 14.7 cm", material: "MDF 3 mm", nota: "Separa la electrónica del resto. El agua nunca debe llegar aquí." });
-  registrar(caja(21.5, E, 26.5, E, TAPA - 2 * E, 13.2, M.mdfOscuro), 2, { nombre: "División lateral del compartimiento", medida: "13.2 × 14.7 cm", material: "MDF 3 mm", nota: "Queda a 2.5 cm del río: sella las uniones con silicona." });
-  registrar(caja(3, 3, 40, 15, 10, E, M.mdfOscuro), 2, { nombre: "Puerta trasera", medida: "15 × 10 cm", material: "MDF 3 mm + bisagras", nota: "Acceso al ESP32 para reprogramar por USB y revisar cables." });
-  registrar(caja(3, E, 29, 16.5, 0.9, 5.5, M.blanco), 2, { nombre: "Protoboard", medida: "16.5 × 5.5 cm", material: "830 puntos", nota: "Pega con su cinta doble faz. Rieles: +5 V externo y GND común." });
-  registrar(grupo(caja(6, 1.2, 30.2, 5.5, 0.3, 2.8, M.negro), caja(7, 1.5, 30.8, 1.8, 0.3, 1.6, M.plata)), 2, { nombre: "ESP32 DevKit v1", medida: "5.5 × 2.8 cm", material: "Placa", nota: "Sobre la protoboard, con el USB mirando a la puerta trasera." });
-  registrar(grupo(caja(14, 1.2, 30, 5, 1.8, 2.6, M.placa), caja(15.5, 3, 30.5, 1.9, 1.5, 1.5, M.sensor)), 2, { nombre: "Módulo relé", medida: "5 × 2.6 cm", material: "Placa", nota: "Conmuta el buzzer de la sirena. IN → GPIO23." });
-  registrar(caja(3, E, 35.5, 6, 2.5, 3, M.negro), 2, { nombre: "Fuente 5 V / 2 A", medida: "≈ 6 × 3 cm", material: "Cargador de celular", nota: "Alimenta servo, relé, HC-SR04 y PIR. GND común con el ESP32 y condensador de 470 µF." });
-
-  // ── Paso 3: río ───────────────────────────────────────────────────────────
-  const rio = grupo();
-  rio.add(caja(24, E, 0, 15, TAPA - E, 30, M.vidrio));
-  const regla = textura(64, 512, (ctx, w, h) => {
-    ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, w, h);
-    ctx.fillStyle = "#111827"; ctx.font = "bold 20px Arial";
-    for (let cm = 0; cm <= 15; cm++) {
-      const y = h - (cm / 15) * h;
-      ctx.fillRect(0, y - 1, cm % 5 === 0 ? 40 : 22, 2);
-      if (cm % 5 === 0 && cm > 0) ctx.fillText(String(cm), 42, y + 7);
-    }
-  });
-  const reglaMesh = new THREE.Mesh(new THREE.PlaneGeometry(1.4, TAPA - E), new THREE.MeshBasicMaterial({ map: regla.t }));
-  reglaMesh.position.copy(P(24.9, E + (TAPA - E) / 2, -0.02));
-  rio.add(reglaMesh);
-  registrar(rio, 3, { nombre: "Río (recipiente)", medida: "30 × 15 × 15 cm", material: "Plástico transparente o acrílico 3 mm", nota: "Va pegado al fondo y a ras de la tapa. Su cara frontal es la ventana. Regla en cm pegada por fuera. Desborde a 14 cm." });
-  const agua = caja(24.1, E, 0.1, 14.8, 2, 29.8, M.agua);
-  agua.userData.paso = 3; agua.userData.pieza = rio.userData.pieza; piezas.push(agua); escena.add(agua);
-
-  // ── Paso 4: tapa ──────────────────────────────────────────────────────────
-  const tapaPiezas = [
-    registrar(caja(0, TAPA, 0, 24, E, 40, M.pasto), 4, { nombre: "Tapa izquierda", medida: "24 × 40 cm", material: "MDF 3 mm pintado verde", nota: "Perfora Ø 8 mm junto al semáforo (5, 29), la barrera (15, 27) y el IR (12, 15.5) para bajar los cables." }),
-    registrar(caja(39, TAPA, 0, 21, E, 40, M.pasto), 4, { nombre: "Tapa derecha", medida: "21 × 40 cm", material: "MDF 3 mm pintado verde", nota: "Perfora junto al mástil (40.5, 7), la humedad (47, 8) y el PIR (55, 6)." }),
-    registrar(caja(24, TAPA, 30, 15, E, 10, M.pasto), 4, { nombre: "Tapa trasera del río", medida: "15 × 10 cm", material: "MDF 3 mm", nota: "Cierra la parte de atrás del hueco del río." }),
-  ];
-
-  // ── Paso 5: vía, puente, ribera y viviendas ───────────────────────────────
-  const T = TAPA + E;
-  const lineaVia = textura(512, 32, (ctx, w, h) => {
-    ctx.fillStyle = "#5B6472"; ctx.fillRect(0, 0, w, h);
-    ctx.fillStyle = "#F8FAFC"; for (let x = 8; x < w; x += 48) ctx.fillRect(x, h / 2 - 2, 26, 4);
-  });
-  const matVia = new THREE.MeshStandardMaterial({ map: lineaVia.t, roughness: 0.9 });
-  registrar(caja(0, T, 17, 22, 0.2, 8, matVia), 5, { nombre: "Vía (tramo izquierdo)", medida: "22 × 8 cm", material: "Cartón paja gris", nota: "Pega con doble faz. Pinta la línea central blanca discontinua." });
-  registrar(caja(41, T, 17, 19, 0.2, 8, matVia), 5, { nombre: "Vía (tramo derecho)", medida: "19 × 8 cm", material: "Cartón paja gris", nota: "" });
-  registrar(grupo(
-    caja(22, T, 16.5, 19, 0.5, 9, M.balso),
-    caja(22, T + 0.5, 16.5, 19, 1.2, 0.3, M.balso),
-    caja(22, T + 0.5, 25.2, 19, 1.2, 0.3, M.balso),
-  ), 5, { nombre: "Puente", medida: "19 × 9 × 0.5 cm + barandas 1.2 cm", material: "Balso", nota: "Apoyado 1.5 cm sobre cada orilla. Deja libre el frente del río para el sensor." });
-  registrar(grupo(caja(42, T, 3, 10, 1.5, 10, M.balso), caja(42.3, T + 0.3, 3.3, 9.4, 1.3, 9.4, M.tierra)), 5, { nombre: "Ribera", medida: "10 × 10 × 1.5 cm", material: "Bandeja + tierra húmeda", nota: "Bandeja impermeable (tapa de recipiente) con tierra para el sensor de humedad." });
-  function vivienda(x, z) {
-    const g = grupo(caja(x, T, z, 5, 3, 4, M.blanco));
-    const techo = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 3.4, 2, 4, 1), M.techo);
-    techo.rotation.y = Math.PI / 4; techo.scale.set(1.05, 1, 0.82);
-    techo.position.copy(P(x + 2.5, T + 4, z + 2)); g.add(techo);
-    return g;
-  }
-  registrar(grupo(vivienda(53, 29), vivienda(53, 35)), 5, { nombre: "Viviendas ribereñas", medida: "5 × 4 × 3 cm", material: "Cartón paja", nota: "Decorativas: muestran a quién protege la alerta." });
-
-  // ── Paso 6: sensores y actuadores ─────────────────────────────────────────
-  // Semáforo
-  const leds = [];
-  const colLed = [0xB91C1C, 0xEA580C, 0xCA8A04, 0x15803D]; // rojo, naranja, amarillo, verde (de arriba a abajo)
-  const semaforo = grupo(cilindro(5, T, 29, 0.4, 12, M.negro), caja(4.1, T + 8, 28.2, 1.8, 5, 1.4, M.negro));
-  colLed.forEach((c, i) => {
-    const led = new THREE.Mesh(new THREE.SphereGeometry(0.42, 16, 12), new THREE.MeshStandardMaterial({ color: c, emissive: c, emissiveIntensity: 0.05, roughness: 0.3 }));
-    led.position.copy(P(5, T + 12.2 - i * 1.1, 28.05)); semaforo.add(led); leds.push(led);
-  });
-  const sirena = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.6, 0.8, 20), new THREE.MeshStandardMaterial({ color: 0x222831, emissive: 0xff2020, emissiveIntensity: 0 }));
-  sirena.position.copy(P(5, T + 13.5, 29)); semaforo.add(sirena);
-  registrar(semaforo, 6, { nombre: "Semáforo + sirena", medida: "Poste 12 cm · cabeza 1.8 × 5 cm", material: "Balso negro + 4 LED 5 mm + buzzer", nota: "LED rojo GPIO25, naranja GPIO16, amarillo GPIO17, verde GPIO19 (220 Ω cada uno). Buzzer en el relé (COM/NO)." });
-
-  // Barrera
-  const pivoteBarrera = new THREE.Group();
-  pivoteBarrera.position.copy(P(15, T + 3, 26.2));
-  const brazo = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.6, 9), M.rojo);
-  brazo.position.set(0, 0, 4.5); // se extiende hacia el frente (sobre la vía)
-  const franjas = [1.5, 4.5, 7.5].map((z) => { const f = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.62, 1), M.blanco); f.position.set(0, 0, z); return f; });
-  pivoteBarrera.add(brazo, ...franjas);
-  pivoteBarrera.rotation.x = -Math.PI / 2; // arranca abierta (verde)
-  registrar(grupo(caja(14, T, 26.5, 2.3, 3.5, 1.2, M.sensor), pivoteBarrera), 6, { nombre: "Barrera (servo SG90)", medida: "Servo 2.3 × 1.2 × 2.2 cm · brazo 9 cm", material: "SG90 + balso rojo y blanco", nota: "Servo en un taco de 1.3 cm. Señal GPIO13. Abierta = 90°, cerrada = 0° (calibra SERVO_ABIERTA/CERRADA)." });
-
-  registrar(grupo(caja(11.2, T, 14.2, 1.6, 0.25, 3.2, M.placa), cilindro(11.6, T + 0.25, 16.8, 0.25, 0.6, M.negro), cilindro(12.4, T + 0.25, 16.8, 0.25, 0.6, M.negro)), 6,
-    { nombre: "Sensor IR de obstáculos", medida: "3.2 × 1.4 cm", material: "Módulo IR", nota: "Al borde de la vía con los LED apuntando al carril, antes de la barrera. OUT → GPIO26." });
-
-  // Mástil + HC-SR04 + DHT11
-  const mastil = grupo(
-    cilindro(40.5, T, 7, 0.4, 10, M.balso),
-    caja(31, T + 9.2, 6.6, 9.9, 0.6, 0.8, M.balso),
-  );
-  registrar(mastil, 6, { nombre: "Mástil y brazo del sensor", medida: "Poste 10 cm · brazo 9.5 cm", material: "Balso", nota: "En la orilla derecha. El brazo pone el HC-SR04 sobre el centro del río (x = 31.5)." });
-  const hc = grupo(
-    caja(29.25, T + 8.3, 6, 4.5, 0.9, 2, M.sensor),
-    cilindro(30.4, T + 7.7, 7, 0.75, 0.6, M.plata), cilindro(32.6, T + 7.7, 7, 0.75, 0.6, M.plata),
-  );
-  registrar(hc, 6, { nombre: "HC-SR04 (nivel del agua)", medida: "4.5 × 2 cm · a 23 cm del fondo", material: "Sensor ultrasónico", nota: "Mirando hacia abajo, centrado sobre el agua y lejos de las paredes. ECHO por divisor 1k/2k a GPIO18, TRIG a GPIO5. ALTURA_SENSOR_CM = 23." });
-  registrar(caja(40.9, T + 4, 6.2, 0.5, 2, 1.6, M.sensor), 6, { nombre: "DHT11", medida: "1.6 × 2 cm", material: "Sensor", nota: "Pegado al mástil, a la sombra. DATA → GPIO4." });
-  registrar(grupo(caja(46.5, T + 1.8, 7.6, 1.8, 2.2, 0.2, M.placa), caja(46.7, T + 0.3, 7.7, 0.4, 1.6, 0.1, M.plata), caja(47.6, T + 0.3, 7.7, 0.4, 1.6, 0.1, M.plata)), 6,
-    { nombre: "Sensor de humedad de suelo", medida: "Horquilla 2 × 6 cm", material: "Sensor resistivo", nota: "Clavado en la tierra de la ribera. AO → GPIO34 (ADC1). Alimenta a 3.3 V." });
-  const pir = grupo(cilindro(55, T, 6, 0.4, 6, M.balso), caja(54.2, T + 6, 5.2, 1.6, 0.4, 1.6, M.placa));
-  const domo = new THREE.Mesh(new THREE.SphereGeometry(0.75, 20, 12, 0, Math.PI * 2, 0, Math.PI / 2), M.blanco);
-  domo.position.copy(P(55, T + 6.4, 6)); pir.add(domo);
-  registrar(pir, 6, { nombre: "PIR (personas en la ribera)", medida: "Poste 6 cm · domo Ø 1.5 cm", material: "HC-SR501", nota: "Inclinado hacia la ribera y el río. OUT → GPIO27. Tiempo al mínimo." });
-
-  // Panel frontal: OLED y táctil
-  const oled = textura(256, 128, () => {});
-  const pantalla = new THREE.Mesh(new THREE.PlaneGeometry(2.7, 1.5), new THREE.MeshBasicMaterial({ map: oled.t }));
-  pantalla.position.copy(P(6.5, 9, -0.03));
-  registrar(grupo(caja(5, 8, -0.2, 3, 2.1, 0.2, M.negro), pantalla), 6, { nombre: "Pantalla OLED", medida: "2.7 × 1.5 cm visibles", material: "SSD1306 I2C", nota: "En el frente izquierdo, a la altura de la vista. SDA GPIO21, SCL GPIO22." });
-  const tactil = cilindro(13, 8.5, -0.15, 0.9, 0.3, M.sensor); tactil.rotation.x = Math.PI / 2;
-  registrar(grupo(tactil), 6, { nombre: "Botón táctil comunitario", medida: "Ø 1.8 cm", material: "TTP223", nota: "Toque corto: silenciar sirena o cambiar pantalla. Mantener 2 s: emergencia. SIG → GPIO33." });
-
-  // ── Paso 7: cableado ──────────────────────────────────────────────────────
-  const esp = P(8.75, 1.6, 31.6);
-  const destinos = [[5, T, 29], [15, T, 27], [12, T, 15.5], [40.5, T, 7], [47, T, 8], [55, T, 6], [6.5, 9, 0.3], [13, 8.5, 0.3]];
-  const cables = new THREE.Group();
-  destinos.forEach(([x, y, z]) => {
-    const fin = P(x, y, z), bajada = P(x, y - 1.5, z);
-    const curva = new THREE.CatmullRomCurve3([fin, bajada, P(x, 4, Math.max(z, 3)), new THREE.Vector3((bajada.x + esp.x) / 2, 3, (bajada.z + esp.z) / 2), esp]);
-    cables.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(curva.getPoints(40)), M.cable));
-  });
-  registrar(cables, 7, { nombre: "Cableado", medida: "Dupont macho-hembra 20–30 cm", material: "Cables + bridas", nota: "Cada cable baja por su perforación de Ø 8 mm y entra al compartimiento por un agujero en la división. Agrupa con bridas y etiqueta cada uno." });
-
-  // ── Pasos (texto) ─────────────────────────────────────────────────────────
   const PASOS = [
-    { t: "Caja de MDF", d: "Base de 60 × 40 cm y paredes de 15 cm.", l: ["Corta fondo, frentes, trasera y laterales (pestaña Piezas).", "Deja la ventana de 15 cm del río entre x = 24 y x = 39 en el frente.", "Abre la puerta trasera de 15 × 10 cm y el agujero del USB.", "Pega con silicona y refuerza esquinas con escuadras de balso."] },
-    { t: "Compartimiento de electrónica", d: "Esquina trasera izquierda, cerrado y seco.", l: ["Pega las dos divisiones (21.2 y 13.2 cm).", "Fija la protoboard con el ESP32, el relé y la fuente de 5 V.", "Conecta según el plano eléctrico y prueba antes de cerrar.", "Pon la puerta trasera con bisagras."] },
-    { t: "Río", d: "Recipiente transparente de 30 × 15 × 15 cm.", l: ["Ubícalo en x = 24–39, pegado al frente (z = 0).", "Sella con silicona por fuera: el agua no debe pasar a la caja.", "Pega la regla en cm en la cara frontal.", "Marca con cinta los niveles 5, 8, 11 y 14 cm."] },
-    { t: "Tapa (terreno)", d: "Tres piezas a ras del borde del recipiente.", l: ["Pinta de verde antes de pegar.", "Perfora Ø 8 mm en cada punto de poste (pestaña Piezas).", "Deja la tapa izquierda atornillada (no pegada) para poder abrir."] },
-    { t: "Vía, puente y ribera", d: "El escenario que se protege.", l: ["Pega los dos tramos de vía (z = 17–25).", "Arma el puente de balso de 19 × 9 cm con barandas.", "Pon la bandeja de tierra de la ribera a la derecha del río.", "Ubica las viviendas al fondo derecho."] },
-    { t: "Sensores y actuadores", d: "Cada uno en su punto, con el cable por su perforación.", l: ["Semáforo en (5, 29) y barrera con servo en (15, 27).", "IR en (12, 15.5) apuntando al carril.", "Mástil en (40.5, 7): HC-SR04 sobre el río a 23 cm del fondo, DHT11 en el poste.", "Humedad en la ribera y PIR en (55, 6) mirando al río.", "OLED y táctil en el frente izquierdo."] },
-    { t: "Cableado y prueba", d: "Todo al compartimiento por debajo de la tapa.", l: ["Baja cada cable por su perforación y agrúpalos con bridas.", "Revisa GND común entre el ESP32 y la fuente de 5 V.", "Sube el firmware y calibra con la página Sensores de la OLED.", "Vierte agua y comprueba verde → amarillo → naranja → rojo."] },
+    { t: "Caja de MDF", d: "Fondo, frentes, laterales y pared trasera.",
+      l: ["Corta fondo de 60 × 40 y paredes de 15 cm de alto.", "Deja la ventana del río de 15 cm entre x = 24 y x = 39 del frente.", "Abre la puerta trasera de 15 × 10 cm y un agujero para el USB.", "Pega con silicona y refuerza esquinas con balso."],
+      m: "MDF 3 mm: fondo 60×40, frente 24×15 y 21×15, trasera 60×15, laterales 39,4×15" },
+    { t: "Compartimiento de electrónica", d: "Esquina trasera izquierda, separada del agua.",
+      l: ["Pega las divisiones de 21,2 y 13,2 cm.", "Fija la protoboard con el ESP32 y el relé; la fuente de 5 V al fondo.", "Conecta según el plano eléctrico y prueba antes de cerrar.", "Pon la puerta trasera con bisagras."],
+      m: "MDF 3 mm, protoboard 830, ESP32, relé, cargador 5 V / 2 A" },
+    { t: "Río", d: "Recipiente transparente de 30 × 15 × 15 cm.",
+      l: ["Ubícalo en x = 24–39, pegado al frente.", "Sella todo el contorno con silicona.", "Pega la regla en cm en la cara frontal.", "Marca 5, 8, 11 y 14 cm con cinta de colores."],
+      m: "Recipiente plástico o acrílico 3 mm, silicona, regla impresa" },
+    { t: "Tapa (terreno)", d: "Tres piezas a ras del borde del río.",
+      l: ["Pinta de verde antes de montar.", "Perfora Ø 8 mm junto a cada poste para los cables.", "Atornilla la tapa izquierda (no la pegues): se abre para revisar la electrónica."],
+      m: "MDF 3 mm: 24×40, 21×40 y 15×10 · pintura acrílica verde" },
+    { t: "Vía, puente y ribera", d: "El escenario que se protege.",
+      l: ["Pega los dos tramos de vía (8 cm de ancho) con línea blanca.", "Arma el puente de balso de 19 × 9 cm con barandas.", "Pon la bandeja de tierra a la derecha del río.", "Ubica las viviendas al fondo."],
+      m: "Cartón paja gris, balso, bandeja + tierra, cartón paja blanco" },
+    { t: "Sensores y actuadores", d: "Cada uno en su punto, cable por su perforación.",
+      l: ["Semáforo con 4 LED y buzzer en (5, 29); barrera con servo en (15, 27).", "IR en (12, 15,5) apuntando al carril.", "Mástil en (40,5, 7): HC-SR04 sobre el río a 23 cm del fondo, DHT11 en el poste.", "Humedad en la ribera; PIR en (55, 6) mirando al río.", "OLED y botón táctil en el frente izquierdo."],
+      m: "Balso para postes, 4 LED + 220 Ω, SG90, HC-SR04, DHT11, PIR, IR, TTP223, OLED" },
+    { t: "Cableado", d: "Todo baja al compartimiento por debajo de la tapa.",
+      l: ["Baja cada cable por su perforación.", "Los del lado derecho van por detrás del río, nunca por dentro.", "Agrupa con bridas y etiqueta cada cable.", "Revisa GND común entre ESP32 y fuente de 5 V."],
+      m: "Dupont macho-hembra 20–30 cm, bridas, cinta para etiquetar" },
+    { t: "Prueba con agua", d: "Verde → amarillo → naranja → rojo.",
+      l: ["Vierte agua poco a poco.", "A 8 cm baja la barrera y se enciende el LED naranja.", "A 11 cm suena la sirena y parpadea el LED rojo.", "Silencia con el botón táctil y vacía con la manguera."],
+      m: "Jarra con agua, manguera con pinza o jeringa" },
   ];
-  let pasoActual = 7;
-  const contPasos = document.getElementById("pasos");
+
+  const vA = document.getElementById("vAdelante"), vR = document.getElementById("vAtras");
+  const bArmar = document.getElementById("btnArmar"), bDesarmar = document.getElementById("btnDesarmar");
+  const bTodo = document.getElementById("btnTodo"), bReinicio = document.getElementById("btnReinicio");
+  const contPasos = document.getElementById("pasos"), detalle = document.getElementById("detalle"), linea = document.getElementById("linea");
+  const rotuloN = document.getElementById("rotuloN"), rotuloT = document.getElementById("rotuloT");
+
+  let paso = 0, ocupado = false, metaPaso = null;
+
   PASOS.forEach((p, i) => {
     const b = document.createElement("button");
-    b.className = "paso"; b.type = "button";
-    b.innerHTML = `<span class="n">${i + 1}</span><div><strong>${p.t}</strong><span>${p.d}</span><ul>${p.l.map((x) => `<li>${x}</li>`).join("")}</ul></div>`;
-    b.addEventListener("click", () => ponerPaso(i + 1));
+    b.type = "button"; b.className = "paso";
+    b.innerHTML = `<span class="n">${i + 1}</span><div><strong>${p.t}</strong><span>${p.d}</span></div>`;
+    b.addEventListener("click", () => saltar(i + 1));
     contPasos.appendChild(b);
+    const s = document.createElement("button");
+    s.type = "button"; s.title = `Paso ${i + 1}: ${p.t}`; s.setAttribute("aria-label", s.title);
+    s.addEventListener("click", () => saltar(i + 1));
+    linea.appendChild(s);
   });
 
-  const resaltado = new Map();
-  function ponerPaso(n) {
-    pasoActual = Math.max(1, Math.min(7, n));
+  function pintar() {
     [...contPasos.children].forEach((b, i) => {
-      if (i + 1 === pasoActual) b.setAttribute("aria-current", "step");
-      else b.removeAttribute("aria-current");
+      b.classList.toggle("hecho", i + 1 < paso);
+      if (i + 1 === paso) b.setAttribute("aria-current", "step"); else b.removeAttribute("aria-current");
     });
-    piezas.forEach((o) => {
-      o.visible = o.userData.paso <= pasoActual;
-      const nuevo = o.userData.paso === pasoActual && pasoActual < 7;
-      o.traverse((m) => {
-        if (!m.isMesh || !m.material.emissive || leds.includes(m) || m === sirena) return;
-        if (!resaltado.has(m)) resaltado.set(m, { c: m.material.emissive.getHex(), i: m.material.emissiveIntensity });
-        if (nuevo) { m.material = m.material.clone(); m.material.emissive.setHex(0x1D4ED8); m.material.emissiveIntensity = 0.35; }
-        else if (m.material.emissive.getHex() === 0x1D4ED8 && m.material.emissiveIntensity === 0.35) { const r = resaltado.get(m); m.material.emissive.setHex(r.c); m.material.emissiveIntensity = r.i; }
-      });
+    [...linea.children].forEach((s, i) => { s.className = i + 1 < paso ? "hecho" : i + 1 === paso ? "actual" : ""; });
+    rotuloN.textContent = `${paso}/8`;
+    rotuloT.textContent = paso ? PASOS[paso - 1].t : "Caja vacía";
+    const p = PASOS[Math.max(paso, 1) - 1];
+    detalle.innerHTML = paso
+      ? `<h3>Paso ${paso} · ${p.t}</h3><ul>${p.l.map((x) => `<li>${x}</li>`).join("")}</ul><p class="material"><b>Material:</b> ${p.m}</p>`
+      : `<h3>Antes de empezar</h3><p class="nota">Toca <b>Armar paso</b> para ver el paso 1. Cada paso muestra solo las piezas nuevas bajando a su lugar.</p>`;
+    bDesarmar.disabled = ocupado || paso === 0;
+    bArmar.disabled = ocupado || paso === 8;
+    bTodo.disabled = ocupado || paso === 8;
+    bReinicio.disabled = ocupado || paso === 0;
+  }
+
+  function mostrar(v) { vA.hidden = v !== vA; vR.hidden = v !== vR; }
+
+  // Reproduce un video hasta un tiempo y se detiene exacto ahí
+  function reproducirHasta(video, desde, hasta, alTerminar) {
+    ocupado = true; pintar();
+    video.currentTime = desde;
+    mostrar(video);
+    const vigilar = () => {
+      if (video.currentTime >= hasta - 0.02 || video.ended) {
+        video.pause(); video.currentTime = hasta; ocupado = false; alTerminar(); return;
+      }
+      requestAnimationFrame(vigilar);
+    };
+    video.play().then(() => requestAnimationFrame(vigilar)).catch(() => { video.currentTime = hasta; ocupado = false; alTerminar(); });
+  }
+
+  function armar(hastaPaso) {
+    if (ocupado || paso >= 8) return;
+    const meta = Math.min(hastaPaso ?? paso + 1, 8);
+    reproducirHasta(vA, FIN[paso], FIN[meta], () => { paso = meta; pintar(); });
+  }
+
+  function desarmar(hastaPaso) {
+    if (ocupado || paso <= 0) return;
+    const meta = Math.max(hastaPaso ?? paso - 1, 0);
+    reproducirHasta(vR, DUR - FIN[paso], DUR - FIN[meta], () => {
+      paso = meta;
+      vA.currentTime = FIN[paso];   // deja el video de armado listo en el mismo punto
+      const volver = () => { mostrar(vA); vA.removeEventListener("seeked", volver); };
+      vA.addEventListener("seeked", volver);
+      pintar();
     });
-    if (rayosX) aplicarRayosX(true);
   }
-  document.getElementById("anterior").addEventListener("click", () => ponerPaso(pasoActual - 1));
-  document.getElementById("siguiente").addEventListener("click", () => ponerPaso(pasoActual + 1));
 
-  // ── Ver por dentro ────────────────────────────────────────────────────────
-  let rayosX = false;
-  const opacos = [...tapaPiezas, ...piezas.filter((o) => ["Frente izquierdo", "Frente derecho", "Pared trasera", "Lateral izquierdo", "Lateral derecho", "Puerta trasera"].includes(o.userData.pieza.nombre))];
-  function aplicarRayosX(on) {
-    opacos.forEach((o) => o.traverse((m) => {
-      if (!m.isMesh) return;
-      if (!m.userData.matOriginal) m.userData.matOriginal = m.material;
-      if (on) { m.material = m.userData.matOriginal.clone(); m.material.transparent = true; m.material.opacity = 0.18; m.material.depthWrite = false; }
-      else m.material = m.userData.matOriginal;
-    }));
+  function saltar(n) {
+    if (ocupado || n === paso) return;
+    if (Math.abs(n - paso) === 1) return n > paso ? armar(n) : desarmar(n);
+    vA.pause(); vR.pause();
+    paso = n; vA.currentTime = FIN[n]; mostrar(vA); pintar();
   }
-  const btnRayos = document.getElementById("rayosx");
-  btnRayos.addEventListener("click", () => { rayosX = !rayosX; btnRayos.setAttribute("aria-pressed", String(rayosX)); aplicarRayosX(rayosX); });
 
-  // ── Vistas ────────────────────────────────────────────────────────────────
-  const VISTAS = { iso: [62, 58, 78], sup: [0.01, 115, 0.01], fre: [0, 18, 95], tra: [-30, 40, -80] };
-  let anim = null;
-  function irVista(v) {
-    document.querySelectorAll("[data-vista]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.vista === v)));
-    const desde = camara.position.clone(), hasta = new THREE.Vector3(...VISTAS[v]);
-    const t0 = performance.now(), dur = matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 600;
-    anim = (t) => { const k = dur ? Math.min(1, (t - t0) / dur) : 1; const e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2; camara.position.lerpVectors(desde, hasta, e); if (k >= 1) anim = null; };
-  }
-  document.querySelectorAll("[data-vista]").forEach((b) => b.addEventListener("click", () => irVista(b.dataset.vista)));
-  camara.position.set(...VISTAS.iso);
-
-  // ── Selección de piezas ───────────────────────────────────────────────────
-  const rayo = new THREE.Raycaster(), puntero = new THREE.Vector2();
-  let seleccion = null, inicioToque = null;
-  const infoTitulo = document.getElementById("infoTitulo"), infoNota = document.getElementById("infoNota"), infoDatos = document.getElementById("infoDatos");
-  lienzo.addEventListener("pointerdown", (e) => { inicioToque = [e.clientX, e.clientY]; });
-  lienzo.addEventListener("pointerup", (e) => {
-    if (!inicioToque || Math.hypot(e.clientX - inicioToque[0], e.clientY - inicioToque[1]) > 6) return;
-    const r = lienzo.getBoundingClientRect();
-    puntero.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
-    rayo.setFromCamera(puntero, camara);
-    const visibles = [];
-    piezas.forEach((o) => o.visible && o.traverse((m) => m.isMesh && visibles.push(m)));
-    const hit = rayo.intersectObjects(visibles, false).find((h) => !(rayosX && h.object.material.opacity < 0.3));
-    mostrar(hit ? hit.object.userData.pieza : null);
+  bArmar.addEventListener("click", () => armar());
+  bDesarmar.addEventListener("click", () => desarmar());
+  bTodo.addEventListener("click", () => armar(8));
+  bReinicio.addEventListener("click", () => desarmar(0));
+  document.addEventListener("keydown", (e) => {
+    if (e.target.closest("input, textarea")) return;
+    if (e.key === "ArrowRight") { e.preventDefault(); armar(); }
+    if (e.key === "ArrowLeft") { e.preventDefault(); desarmar(); }
   });
-  function mostrar(p) {
-    seleccion = p;
-    if (!p) { infoTitulo.textContent = "Toca una pieza"; infoNota.textContent = "Cada pieza muestra su medida, material y cómo se instala."; infoDatos.hidden = true; return; }
-    infoTitulo.textContent = p.nombre;
-    infoDatos.innerHTML = `<dt>Medida</dt><dd>${p.medida}</dd><dt>Material</dt><dd>${p.material}</dd>`;
-    infoDatos.hidden = false;
-    infoNota.textContent = p.nota || "";
-  }
 
-  // ── Simulación de la creciente ────────────────────────────────────────────
-  const U = { amarillo: 5, naranja: 8, rojo: 11 };
-  const deslizador = document.getElementById("nivel"), nivelValor = document.getElementById("nivelValor"), estadoEl = document.getElementById("estado");
-  let nivel = 2, animando = false, dir = 1;
-  const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
-  function riesgo(n) { return n >= U.rojo ? "rojo" : n >= U.naranja ? "naranja" : n >= U.amarillo ? "amarillo" : "verde"; }
-  function dibujarOled(r) {
-    const { ctx, c } = oled;
-    ctx.fillStyle = "#000"; ctx.fillRect(0, 0, c.width, c.height);
-    ctx.fillStyle = "#9EE7FF"; ctx.font = "16px monospace"; ctx.fillText("CENTINELA  W M", 8, 20);
-    ctx.font = "bold 34px monospace"; ctx.fillText(r.toUpperCase(), 8, 62);
-    ctx.font = "16px monospace"; ctx.fillText(`Nivel ${nivel.toFixed(1)}/14 cm`, 8, 90);
-    ctx.fillText(`Barr: ${r === "naranja" || r === "rojo" ? "CERR" : "ABIE"} AUTO`, 8, 112);
-    ctx.strokeStyle = "#9EE7FF"; ctx.strokeRect(234, 24, 16, 96);
-    const h = Math.min(92, (nivel / 14) * 92); ctx.fillRect(236, 118 - h, 12, h);
-    oled.t.needsUpdate = true;
-  }
-  let anguloObjetivo = -Math.PI / 2;
-  function actualizarNivel(n) {
-    nivel = n;
-    deslizador.value = n.toFixed(1);
-    nivelValor.textContent = n.toFixed(1);
-    const r = riesgo(n);
-    estadoEl.textContent = r;
-    estadoEl.style.background = css(`--${r}`);
-    const alto = Math.max(0.05, n);
-    agua.scale.y = alto / 2;
-    agua.position.y = E + alto / 2;
-    agua.visible = agua.userData.paso <= pasoActual && n > 0.05;
-    const idx = { rojo: 0, naranja: 1, amarillo: 2, verde: 3 }[r];
-    leds.forEach((l, i) => { l.material.emissiveIntensity = i === idx ? 2.2 : 0.05; });
-    anguloObjetivo = r === "naranja" || r === "rojo" ? 0 : -Math.PI / 2;
-    dibujarOled(r);
-  }
-  deslizador.addEventListener("input", () => { animando = false; actualizarNivel(parseFloat(deslizador.value)); });
-  document.getElementById("animar").addEventListener("click", () => { animando = !animando; dir = nivel >= 13.5 ? -1 : 1; });
-  document.getElementById("vaciar").addEventListener("click", () => { animando = false; actualizarNivel(0); });
+  const quitarCarga = () => { document.getElementById("cargando").hidden = true; };
+  vA.addEventListener("loadeddata", () => { quitarCarga(); vA.currentTime = FIN[paso]; });
+  vA.addEventListener("error", () => { document.getElementById("cargando").textContent = "No se pudo cargar el video. Recarga la página."; });
 
-  // ── Pestañas ──────────────────────────────────────────────────────────────
-  const tabs = ["armado", "piezas", "simular"];
-  function abrirTab(id) {
-    tabs.forEach((t) => {
-      document.getElementById(`t-${t}`).setAttribute("aria-selected", String(t === id));
-      document.getElementById(`p-${t}`).hidden = t !== id;
-    });
-    try { localStorage.setItem("maqueta.tab", id); } catch (e) {}
-  }
-  tabs.forEach((t) => document.getElementById(`t-${t}`).addEventListener("click", () => abrirTab(t)));
-  try { const g = localStorage.getItem("maqueta.tab"); if (tabs.includes(g)) abrirTab(g); } catch (e) {}
-
-  // ── Tema y tamaño ─────────────────────────────────────────────────────────
-  function aplicarTema() { escena.background = new THREE.Color(css("--stage") || "#E6EAF0"); }
-  aplicarTema();
-  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", aplicarTema);
-  new MutationObserver(aplicarTema).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
-
-  function ajustar() {
-    const r = lienzo.parentElement.getBoundingClientRect();
-    renderer.setSize(r.width, r.height, false);
-    camara.aspect = r.width / Math.max(r.height, 1);
-    camara.updateProjectionMatrix();
-  }
-  new ResizeObserver(ajustar).observe(lienzo.parentElement);
-  ajustar();
-
-  ponerPaso(7);
-  actualizarNivel(2);
-
-  let ultimo = performance.now();
-  renderer.setAnimationLoop((t) => {
-    const dt = Math.min(0.05, (t - ultimo) / 1000); ultimo = t;
-    if (anim) anim(t);
-    if (animando) {
-      let n = nivel + dir * dt * 1.6;
-      if (n >= 13.5) { n = 13.5; dir = -1; }
-      if (n <= 1) { n = 1; dir = 1; }
-      actualizarNivel(n);
-    }
-    pivoteBarrera.rotation.x += (anguloObjetivo - pivoteBarrera.rotation.x) * Math.min(1, dt * 6);
-    const rojo = riesgo(nivel) === "rojo";
-    const pulso = rojo ? (Math.sin(t / 140) > 0 ? 1 : 0) : 0;
-    sirena.material.emissiveIntensity = rojo ? 0.4 + pulso * 1.6 : 0;
-    if (rojo) leds[0].material.emissiveIntensity = 0.2 + pulso * 2.2;
-    controles.update();
-    renderer.render(escena, camara);
-  });
+  pintar();
 })();
 </script>
 
