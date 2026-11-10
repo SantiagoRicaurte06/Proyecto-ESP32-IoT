@@ -1,0 +1,29 @@
+# Pruebas del backend en cada PR y push a main/develop.
+name: Backend
+
+on:
+  pull_request:
+    paths: ['backend/**', '.github/workflows/backend.yml']
+  push:
+    branches: [main, develop]
+    paths: ['backend/**', '.github/workflows/backend.yml']
+
+permissions:
+  contents: read
+
+jobs:
+  pruebas:
+    name: Pruebas del backend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+      - run: npm test
