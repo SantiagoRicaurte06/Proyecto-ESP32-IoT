@@ -13,7 +13,7 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS lecturas (
     ts      INTEGER NOT NULL,      -- ms UTC
     nivel   REAL, tasa REAL, suelo INTEGER, temp REAL, hum REAL,
-    riesgo  TEXT, barrera TEXT, sirena INTEGER, modo TEXT,
+    riesgo  TEXT, barrera TEXT, alarma INTEGER, modo TEXT,
     pir     INTEGER, ir INTEGER
   );
   CREATE INDEX IF NOT EXISTS idx_lecturas_ts ON lecturas(ts);
@@ -35,7 +35,7 @@ db.exec(`
 `);
 
 const insLectura = db.prepare(`INSERT INTO lecturas
-  (ts, nivel, tasa, suelo, temp, hum, riesgo, barrera, sirena, modo, pir, ir)
+  (ts, nivel, tasa, suelo, temp, hum, riesgo, barrera, alarma, modo, pir, ir)
   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
 const insEvento = db.prepare(`INSERT INTO eventos (ts, tipo, riesgo, nivel, datos) VALUES (?, ?, ?, ?, ?)`);
 const insNotif = db.prepare(`INSERT INTO notificaciones (ts, canal, titulo, mensaje, prioridad, ok) VALUES (?, ?, ?, ?, ?, ?)`);
@@ -46,7 +46,7 @@ const txt = (v) => (typeof v === "string" ? v.slice(0, 40) : null);
 
 export function guardarLectura(ts, t) {
   insLectura.run(ts, num(t.nivel), num(t.tasa), num(t.suelo), num(t.temp), num(t.hum),
-    txt(t.riesgo), txt(t.barrera), bool(t.sirena), txt(t.modo), bool(t.pir), bool(t.ir));
+    txt(t.riesgo), txt(t.barrera), bool(t.alarma), txt(t.modo), bool(t.pir), bool(t.ir));
 }
 
 export function guardarEvento(ts, e) {

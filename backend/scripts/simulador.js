@@ -18,8 +18,8 @@ const cliente = mqtt.connect(config.mqtt.url, {
 });
 
 let t = 0, nivel = 2, historial = [], riesgo = 0, reconocida = true;
-let modoManual = false, barreraManual = false, sirenaManual = false;
-let barrera = false, sirena = false, ultimoPir = 0;
+let modoManual = false, barreraManual = false;
+let barrera = false, alarma = false, ultimoPir = 0;
 const factor = LENTO ? 3 : 1;
 
 // Escenario: calma → lluvia (sube) → pico → baja, en segundos
@@ -63,9 +63,8 @@ cliente.on("connect", () => {
 cliente.on("message", (_t, buf) => {
   let c; try { c = JSON.parse(buf.toString()); } catch { return; }
   console.log("[cmd]", c);
-  if (c.accion === "barrera") { modoManual = true; barreraManual = c.valor === "cerrar"; sirenaManual = sirena; }
-  else if (c.accion === "sirena") { modoManual = true; sirenaManual = !!c.valor; barreraManual = barrera; }
-  else if (c.accion === "modo") { modoManual = c.valor === "manual"; barreraManual = barrera; sirenaManual = sirena; }
+  if (c.accion === "barrera") { modoManual = true; barreraManual = c.valor === "cerrar"; }
+  else if (c.accion === "modo") { modoManual = c.valor === "manual"; barreraManual = barrera; }
   else if (c.accion === "reconocer") { if (!reconocida) { reconocida = true; evento("alerta_reconocida", { origen: "app" }); } return; }
   else if (c.accion === "umbrales") { Object.assign(U, c.valor); pub("estado", { online: true, fw: "sim-1.0.0", ip: "simulador", umbrales: U, desborde: DESBORDE }, { retain: true, qos: 1 }); return; }
   else return;
@@ -97,7 +96,7 @@ setInterval(() => {
   }
 
   barrera = modoManual ? barreraManual : riesgo >= 2;
-  sirena = modoManual ? sirenaManual : riesgo === 3 && !reconocida;
+  alarma = riesgo === 3 && !reconocida;
   const pir = riesgo >= 2 && Math.random() < 0.03;
   if (pir && Date.now() - ultimoPir > 15000) { ultimoPir = Date.now(); evento("persona_zona"); }
   if (barrera && Math.random() < 0.01) evento("vehiculo_barrera");
@@ -106,8 +105,8 @@ setInterval(() => {
     pub("telemetria", {
       ts: Math.floor(Date.now() / 1000), nivel: +nivel.toFixed(1), dist: +(23 - nivel).toFixed(1), tasa: +ta.toFixed(2),
       suelo, temp: +(29 + Math.sin(t / 300) * 3).toFixed(1), hum: Math.round(70 + nivel), riesgo: ORDEN[riesgo],
-      barrera: barrera ? "cerrada" : "abierta", sirena, modo: modoManual ? "manual" : "auto", reconocida, pir, ir: false, rssi: -55,
+      barrera: barrera ? "cerrada" : "abierta", alarma, modo: modoManual ? "manual" : "auto", reconocida, pir, ir: false, rssi: -55,
     });
-    process.stdout.write(`\r${ORDEN[riesgo].padEnd(8)} nivel ${nivel.toFixed(1).padStart(5)} cm  tasa ${ta.toFixed(2).padStart(6)} cm/min  barrera ${barrera ? "cerrada" : "abierta"}  sirena ${sirena ? "ON " : "off"}   `);
+    process.stdout.write(`\r${ORDEN[riesgo].padEnd(8)} nivel ${nivel.toFixed(1).padStart(5)} cm  tasa ${ta.toFixed(2).padStart(6)} cm/min  barrera ${barrera ? "cerrada" : "abierta"}  alarma ${alarma ? "ON " : "off"}   `);
   }
 }, 1000);
