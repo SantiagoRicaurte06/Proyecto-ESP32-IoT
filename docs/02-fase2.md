@@ -89,7 +89,9 @@ Ver [`hardware/README.md`](../hardware/README.md#tabla-de-conexiones) (component
 
 ## 7. Plano eléctrico
 
-![Plano eléctrico](../hardware/plano-electrico.svg)
+![Plano de conexiones](../hardware/plano-conexiones.svg)
+
+Cable por cable, con casillas para marcar: [`hardware/cableado.md`](../hardware/cableado.md). Resumen por pin: [`hardware/plano-electrico.svg`](../hardware/plano-electrico.svg).
 
 Simulación: [`firmware/diagram.json`](../firmware/diagram.json) para Wokwi (en VS Code). El potenciómetro hace de sensor de suelo y los pulsadores hacen de IR y táctil.
 
