@@ -27,13 +27,6 @@
       "attrs": {}
     },
     {
-      "type": "wokwi-potentiometer",
-      "id": "suelo",
-      "top": 230,
-      "left": -150,
-      "attrs": {}
-    },
-    {
       "type": "wokwi-pir-motion-sensor",
       "id": "pir",
       "top": -150,
@@ -145,24 +138,6 @@
     [
       "dht:SDA",
       "esp:D4",
-      "green",
-      []
-    ],
-    [
-      "suelo:VCC",
-      "esp:3V3",
-      "red",
-      []
-    ],
-    [
-      "suelo:GND",
-      "esp:GND.2",
-      "black",
-      []
-    ],
-    [
-      "suelo:SIG",
-      "esp:D34",
       "green",
       []
     ],

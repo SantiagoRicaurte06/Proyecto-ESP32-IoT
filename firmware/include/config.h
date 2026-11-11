@@ -11,7 +11,6 @@
 // ── Pines ────────────────────────────────────────────────────────────────────
 #define PIN_TRIG        5    // HC-SR04 TRIG
 #define PIN_ECHO        18   // HC-SR04 ECHO (con divisor 1k/2k → 3,3 V)
-#define PIN_SUELO       34   // Humedad de suelo AO (ADC1, solo entrada)
 #define PIN_DHT         4    // DHT11 DATA
 #define PIN_PIR         27   // PIR OUT
 #define PIN_IR          26   // IR obstáculos OUT (LOW = obstáculo)
@@ -46,11 +45,7 @@
 #define TIEMPO_BAJADA_MS   10000  // ...durante 10 s seguidos
 
 #define TASA_RAPIDA_CM_MIN 2.0f   // ascenso brusco: sube un nivel de riesgo
-#define SUELO_SATURADO_PCT 80     // ribera saturada: verde pasa a amarillo
 
-// Calibración del sensor de suelo (lectura ADC en seco y en agua)
-#define SUELO_ADC_SECO     3200
-#define SUELO_ADC_MOJADO   1300
 
 // Servo (grados)
 #define SERVO_ABIERTA      90

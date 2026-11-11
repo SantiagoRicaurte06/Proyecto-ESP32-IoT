@@ -55,7 +55,7 @@ export default function Monitor({ datos, error, rol, onReconocer }) {
 
       <Tarjeta titulo="Sensores">
         <View style={s.grilla}>
-          <Dato etiqueta="Suelo ribera" valor={t?.suelo} unidad="%" />
+          <Dato etiqueta="Distancia al agua" valor={t?.dist} unidad="cm" />
           <Dato etiqueta="Temperatura" valor={t?.temp} unidad="°C" />
           <Dato etiqueta="Humedad aire" valor={t?.hum} unidad="%" />
           <Dato etiqueta="Personas en ribera" valor={t ? (t.pir ? "Detectada" : "No") : null} />

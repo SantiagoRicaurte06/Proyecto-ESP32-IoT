@@ -59,7 +59,6 @@ struct Umbrales { float amarillo, naranja, rojo; } umbrales;
 
 float nivelCm = 0, distanciaCm = 0, tasaCmMin = 0;
 float temperatura = NAN, humedad = NAN;
-int sueloPct = 0, sueloRaw = 0;
 bool pirActivo = false, irObstaculo = false;
 
 Riesgo riesgo = VERDE;
@@ -130,13 +129,12 @@ float calcularTasa() {
   return (float)((histN * sxy - sx * sy) / den);
 }
 
-Riesgo riesgoPara(float nivel, float tasa, int suelo) {
+Riesgo riesgoPara(float nivel, float tasa) {
   Riesgo r = VERDE;
   if (nivel >= umbrales.rojo) r = ROJO;
   else if (nivel >= umbrales.naranja) r = NARANJA;
   else if (nivel >= umbrales.amarillo) r = AMARILLO;
   if (tasa >= TASA_RAPIDA_CM_MIN && r < ROJO) r = (Riesgo)(r + 1);  // sube rápido: un nivel más
-  if (suelo >= SUELO_SATURADO_PCT && r == VERDE) r = AMARILLO;      // ribera saturada
   return r;
 }
 
@@ -169,7 +167,6 @@ String telemetriaJson() {
   d["nivel"] = roundf(nivelCm * 10) / 10;
   d["dist"] = roundf(distanciaCm * 10) / 10;
   d["tasa"] = roundf(tasaCmMin * 100) / 100;
-  d["suelo"] = sueloPct;
   if (!isnan(temperatura)) d["temp"] = roundf(temperatura * 10) / 10;
   if (!isnan(humedad)) d["hum"] = roundf(humedad);
   d["riesgo"] = NOMBRE_RIESGO[riesgo];
@@ -299,10 +296,10 @@ void dibujarOled() {
     oled.drawRect(118, 11, 10, 53, SSD1306_WHITE);
     oled.fillRect(120, 62 - alto, 6, alto, SSD1306_WHITE);
   } else if (paginaOled == 1) {
-    // Página de sensores: también sirve para calibrar (Dist y ADC del suelo)
+    // Página de sensores: también sirve para calibrar (Dist = distancia al agua)
     oled.setCursor(0, 12); oled.printf("Dist: %.1f cm", distanciaCm);
     oled.setCursor(0, 22); oled.printf("Temp: %.1fC Hum: %.0f%%", temperatura, humedad);
-    oled.setCursor(0, 32); oled.printf("Suelo: %d%% (ADC %d)", sueloPct, sueloRaw);
+    oled.setCursor(0, 32); oled.printf("Nivel: %.1f cm", nivelCm);
     oled.setCursor(0, 42); oled.printf("PIR:%s  IR:%s", pirActivo ? "SI" : "no", irObstaculo ? "SI" : "no");
     oled.setCursor(0, 52); oled.printf("Toque corto: pagina");
   } else {
@@ -328,8 +325,6 @@ void actualizarNivel() {
 }
 
 void actualizarSensores() {
-  sueloRaw = analogRead(PIN_SUELO);
-  sueloPct = constrain(map(sueloRaw, SUELO_ADC_SECO, SUELO_ADC_MOJADO, 0, 100), 0, 100);
 
   static unsigned long ultimoDht = 0;
   if (millis() - ultimoDht > PERIODO_DHT_MS) {
@@ -341,7 +336,7 @@ void actualizarSensores() {
 }
 
 void evaluarRiesgo() {
-  Riesgo objetivo = riesgoPara(nivelCm, tasaCmMin, sueloPct);
+  Riesgo objetivo = riesgoPara(nivelCm, tasaCmMin);
   Riesgo anterior = riesgo;
 
   if (objetivo > riesgo) {
@@ -349,7 +344,7 @@ void evaluarRiesgo() {
     inicioBajadaMs = 0;
   } else if (objetivo < riesgo) {
     // bajar: con histéresis (como si el agua estuviera 1 cm más alta) y sostenido 10 s
-    Riesgo conMargen = riesgoPara(nivelCm + HISTERESIS_CM, tasaCmMin, sueloPct);
+    Riesgo conMargen = riesgoPara(nivelCm + HISTERESIS_CM, tasaCmMin);
     if (conMargen < riesgo) {
       if (!inicioBajadaMs) inicioBajadaMs = millis();
       if (millis() - inicioBajadaMs > TIEMPO_BAJADA_MS) { riesgo = conMargen; inicioBajadaMs = 0; }
@@ -367,7 +362,6 @@ void evaluarRiesgo() {
     e["de"] = NOMBRE_RIESGO[anterior];
     e["a"] = NOMBRE_RIESGO[riesgo];
     e["tasa"] = roundf(tasaCmMin * 100) / 100;
-    e["suelo"] = sueloPct;
     publicarEvento("cambio_riesgo", e);
   }
 }
@@ -455,7 +449,6 @@ void setup() {
   pinMode(PIN_JOY_SW, INPUT_PULLUP);
 #endif
   analogReadResolution(12);
-  analogSetPinAttenuation(PIN_SUELO, ADC_11db);
 
   prefs.begin("centinela", false);
   umbrales.amarillo = prefs.getFloat("amarillo", UMBRAL_AMARILLO_CM);

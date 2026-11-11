@@ -5,7 +5,7 @@ ESP32 DevKit v1 con PlatformIO (framework Arduino).
 ## Qué hace
 
 - Mide el nivel del agua (HC-SR04, mediana de 5 lecturas) y calcula la **tasa de ascenso** (cm/min) con regresión lineal sobre los últimos 30 s.
-- Clasifica el riesgo (verde → amarillo → naranja → rojo) combinando nivel, tasa y saturación del suelo, con **histéresis** para bajar de nivel.
+- Clasifica el riesgo (verde → amarillo → naranja → rojo) combinando nivel y tasa de ascenso, con **histéresis** para bajar de nivel.
 - Señalización con 2 LED: verde fijo (normal), verde intermitente (amarillo), rojo fijo con barrera cerrada (naranja) y rojo intermitente (rojo) hasta que alguien reconozca la alerta (táctil o app). Sin sirena; el relé queda opcional (`USAR_RELE`).
 - **Funciona sin internet**: la lógica corre en el ESP32. Si cae la conexión, guarda telemetría y eventos en memoria y los envía al reconectar.
 - MQTT con TLS, QoS 1 en comandos, estado *retained* y **Last Will** (`online:false`) para detectar la caída de la estación.
@@ -20,13 +20,13 @@ pio device monitor                                # ver logs
 pio run -t upload --upload-port centinela-est01.local   # actualizar por WiFi (OTA)
 ```
 
-Calibra en `include/config.h`: `ALTURA_SENSOR_CM` (del fondo del cauce al sensor), umbrales, `SUELO_ADC_SECO/MOJADO` y `RELE_ACTIVO_EN_ALTO`.
+Calibra en `include/config.h`: `ALTURA_SENSOR_CM` (del fondo del cauce al sensor), umbrales y ángulos del servo (`SERVO_ABIERTA` / `SERVO_CERRADA`).
 
 ## Simulación (sin hardware)
 
 1. Instala la extensión **Wokwi Simulator** en VS Code.
 2. `pio run -e wokwi`
-3. Abre `diagram.json` y presiona ▶. Mueve la distancia del HC-SR04 para simular la creciente (distancia baja = agua alta); usa el potenciómetro como humedad de suelo y los botones como IR y táctil.
+3. Abre `diagram.json` y presiona ▶. Mueve la distancia del HC-SR04 para simular la creciente (distancia baja = agua alta); usa los botones como IR y táctil.
 
 En la simulación se usa DHT22 (Wokwi no tiene DHT11) y la red `Wokwi-GUEST`.
 

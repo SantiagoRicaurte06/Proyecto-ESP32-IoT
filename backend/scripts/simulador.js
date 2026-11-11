@@ -31,10 +31,9 @@ function nivelObjetivo(seg) {
   return Math.max(2, 12.5 - (f - 170) * 0.15);                        // baja
 }
 
-function riesgoPara(n, tasa, suelo) {
+function riesgoPara(n, tasa) {
   let r = n >= U.rojo ? 3 : n >= U.naranja ? 2 : n >= U.amarillo ? 1 : 0;
   if (tasa >= 2 && r < 3) r++;
-  if (suelo >= 80 && r === 0) r = 1;
   return r;
 }
 
@@ -79,20 +78,19 @@ setInterval(() => {
   historial.push({ t, n: nivel });
   if (historial.length > 30) historial.shift();
   const ta = tasa();
-  const suelo = Math.min(100, Math.round(55 + nivel * 2.5));
-  const objetivo = riesgoPara(nivel, ta, suelo);
+  const objetivo = riesgoPara(nivel, ta);
   const anterior = riesgo;
 
   if (objetivo > riesgo) { riesgo = objetivo; bajandoDesde = 0; }
   else if (objetivo < riesgo) {
-    const margen = riesgoPara(nivel + HIST, ta, suelo);
+    const margen = riesgoPara(nivel + HIST, ta);
     if (margen < riesgo) { bajandoDesde ||= t; if (t - bajandoDesde > 10) { riesgo = margen; bajandoDesde = 0; } }
     else bajandoDesde = 0;
   }
   if (riesgo !== anterior) {
     if (riesgo > anterior && riesgo >= 2) reconocida = false;
     if (riesgo < 2) reconocida = true;
-    evento("cambio_riesgo", { de: ORDEN[anterior], a: ORDEN[riesgo], tasa: +ta.toFixed(2), suelo });
+    evento("cambio_riesgo", { de: ORDEN[anterior], a: ORDEN[riesgo], tasa: +ta.toFixed(2) });
   }
 
   barrera = modoManual ? barreraManual : riesgo >= 2;
@@ -104,7 +102,7 @@ setInterval(() => {
   if (t % 2 === 0) {
     pub("telemetria", {
       ts: Math.floor(Date.now() / 1000), nivel: +nivel.toFixed(1), dist: +(23 - nivel).toFixed(1), tasa: +ta.toFixed(2),
-      suelo, temp: +(29 + Math.sin(t / 300) * 3).toFixed(1), hum: Math.round(70 + nivel), riesgo: ORDEN[riesgo],
+      temp: +(29 + Math.sin(t / 300) * 3).toFixed(1), hum: Math.round(70 + nivel), riesgo: ORDEN[riesgo],
       barrera: barrera ? "cerrada" : "abierta", alarma, modo: modoManual ? "manual" : "auto", reconocida, pir, ir: false, rssi: -55,
     });
     process.stdout.write(`\r${ORDEN[riesgo].padEnd(8)} nivel ${nivel.toFixed(1).padStart(5)} cm  tasa ${ta.toFixed(2).padStart(6)} cm/min  barrera ${barrera ? "cerrada" : "abierta"}  alarma ${alarma ? "ON " : "off"}   `);
