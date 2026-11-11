@@ -16,13 +16,13 @@ Modelo realista de la maqueta a escala real (1 unidad = 1 cm), con animación de
 | Paso | Qué se arma | Cuadros |
 |---|---|---|
 | 1 | Caja de MDF (fondo, frentes, laterales, trasera con puerta) | 1–48 |
-| 2 | Compartimiento de electrónica: divisiones, protoboard, ESP32, relé, fuente, puerta | 49–96 |
+| 2 | Compartimiento de electrónica: divisiones, protoboard, ESP32, fuente, puerta | 49–96 |
 | 3 | Río: recipiente transparente con regla | 97–144 |
 | 4 | Tapa (terreno) en tres piezas | 145–192 |
 | 5 | Vía, puente, ribera y viviendas | 193–240 |
 | 6 | Sensores y actuadores | 241–288 |
 | 7 | Cableado bajo la tapa (la tapa izquierda se vuelve transparente) | 289–336 |
-| 8 | Prueba con agua: amarillo, naranja (baja la barrera) y rojo (sirena) | 337–456 |
+| 8 | Prueba con agua: verde intermitente, rojo fijo con barrera abajo y rojo intermitente | 337–456 |
 
 ## Regenerar
 

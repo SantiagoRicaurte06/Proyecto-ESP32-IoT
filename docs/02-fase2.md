@@ -15,7 +15,7 @@ Las estaciones hidrológicas oficiales son pocas, costosas y no avisan directame
 
 ## 2. Justificación
 
-- **Social:** protege vidas y bienes en zonas ribereñas. El semáforo, la sirena y la barrera actúan en sitio, mientras las alertas al celular llegan a quien no está cerca. El agente IA permite que cualquier persona pregunte en lenguaje natural sin saber leer gráficas.
+- **Social:** protege vidas y bienes en zonas ribereñas. El semáforo y la barrera actúan en sitio, mientras las alertas al celular llegan a quien no está cerca. El agente IA permite que cualquier persona pregunte en lenguaje natural sin saber leer gráficas.
 - **Técnica:** integra IoT (ESP32 con sensores y actuadores), comunicación MQTT con TLS, procesamiento en el borde (filtro, regresión, máquina de estados con histéresis), persistencia de series de tiempo, API REST, app móvil y un agente de IA con *tool calling*. Cubre las competencias del programa ADSO de punta a punta.
 - **Económica:** usa hardware que ya está disponible (costo adicional ≈ $30.000 COP) y servicios con capa gratuita (HiveMQ Cloud, ntfy, GitHub Actions). Una estación comercial cuesta millones de pesos. El diseño es replicable en cada puente o vado.
 
@@ -26,7 +26,7 @@ Las estaciones hidrológicas oficiales son pocas, costosas y no avisan directame
 **Objetivos específicos.**
 1. Implementar en el ESP32 la medición del nivel del agua, la tasa de ascenso y las variables ambientales, con una máquina de estados de riesgo que opere sin conexión a internet.
 2. Integrar la estación con un broker MQTT seguro y un backend que almacene el histórico y envíe notificaciones push y por correo según el nivel de alerta.
-3. Construir una aplicación Android que muestre el estado en tiempo real, el histórico y los eventos, y permita al operador controlar la barrera y la sirena.
+3. Construir una aplicación Android que muestre el estado en tiempo real, el histórico y los eventos, y permita al operador controlar la barrera y reconocer alertas.
 4. Diseñar un agente de IA que responda preguntas en lenguaje natural sobre las métricas consultando la base de datos mediante herramientas.
 5. Validar el sistema en una maqueta a escala que simule una creciente real ante el jurado.
 
@@ -36,14 +36,14 @@ Una estación instalada en el puente mide cada 0,5 s la distancia al agua (HC-SR
 
 | Nivel | Condición (maqueta) | Acción automática |
 |---|---|---|
-| Verde | nivel < 5 cm | LED verde, paso abierto |
-| Amarillo | ≥ 5 cm, o suelo saturado ≥ 80 % | LED amarillo, push de vigilancia |
+| Verde | nivel < 5 cm | LED verde fijo, paso abierto |
+| Amarillo | ≥ 5 cm, o suelo saturado ≥ 80 % | LED verde intermitente, push de vigilancia |
 | Naranja | ≥ 8 cm | **Barrera cerrada**, push + correo |
-| Rojo | ≥ 11 cm | **Sirena** hasta que alguien la reconozca, push prioritario repetido cada 2 min + correo |
+| Rojo | ≥ 11 cm | Barrera cerrada y **LED rojo intermitente** hasta que alguien reconozca la alerta, push prioritario repetido cada 2 min + correo |
 
 Si el agua sube a más de 2 cm/min, el riesgo sube un nivel extra. Para bajar de nivel, el agua debe estar 1 cm por debajo del umbral durante 10 s (histéresis), así el semáforo no parpadea en el límite.
 
-Toda la lógica de seguridad corre **en el ESP32**. Si se cae el WiFi, la estación sigue cerrando la barrera y activando la sirena, guarda las lecturas en memoria y las envía al reconectar. El backend recibe todo por MQTT, lo guarda en SQLite, predice el **tiempo hasta el desbordamiento** y notifica. La app muestra el estado cada 2 s, y el agente IA responde preguntas consultando la base de datos.
+Toda la lógica de seguridad corre **en el ESP32**. Si se cae el WiFi, la estación sigue cerrando la barrera y encendiendo el LED rojo, guarda las lecturas en memoria y las envía al reconectar. El backend recibe todo por MQTT, lo guarda en SQLite, predice el **tiempo hasta el desbordamiento** y notifica. La app muestra el estado cada 2 s, y el agente IA responde preguntas consultando la base de datos.
 
 ## 5. Arquitectura del sistema
 
@@ -52,7 +52,7 @@ Toda la lógica de seguridad corre **en el ESP32**. Si se cae el WiFi, la estaci
 flowchart LR
   subgraph Estacion["Estación (maqueta)"]
     S["Sensores<br/>HC-SR04 · suelo · DHT11<br/>PIR · IR · táctil"] --> E["ESP32<br/>filtro + tasa + riesgo"]
-    E --> A["Actuadores<br/>servo barrera · relé sirena<br/>4 LED · OLED"]
+    E --> A["Actuadores<br/>servo barrera · LED rojo y verde<br/>OLED"]
   end
   E <-->|"MQTT TLS :8883<br/>telemetría · eventos · cmd · LWT"| B[("HiveMQ Cloud")]
   B <--> K["Backend Node.js<br/>predicción · reglas"]
@@ -81,8 +81,8 @@ Ver [`hardware/README.md`](../hardware/README.md#tabla-de-conexiones) (component
 | GPIO | Componente | | GPIO | Componente |
 |---|---|---|---|---|
 | 5 / 18 | HC-SR04 TRIG / ECHO (divisor) | | 13 | Servo SG90 |
-| 34 | Humedad de suelo (ADC1) | | 23 | Relé (sirena) |
-| 4 | DHT11 | | 19 / 17 / 16 / 25 | LED verde / amarillo / naranja / rojo |
+| 34 | Humedad de suelo (ADC1) | | | |
+| 4 | DHT11 | | 19 / 25 | LED verde / rojo |
 | 27 | PIR | | 21 / 22 | OLED SDA / SCL |
 | 26 | IR obstáculos | | 32 / 14 | Joystick (opcional) |
 | 33 | Táctil | | | |
@@ -114,7 +114,7 @@ Simulación: [`firmware/diagram.json`](../firmware/diagram.json) para Wokwi (en 
   - Vía con puente de balso.
   - Barrera con el servo.
   - Sensor IR en el carril.
-  - Semáforo de 12 cm con 4 LED y el buzzer.
+  - Semáforo de 12 cm con LED rojo y LED verde.
   - Mástil de 10 cm con el brazo del HC-SR04 sobre el río (a 23 cm del fondo) y el DHT11.
   - Bandeja de tierra (ribera) con el sensor de humedad.
   - PIR apuntando a la ribera.
@@ -135,7 +135,7 @@ Base: `centinela/est01`
 **Telemetría**
 ```json
 { "ts": 1794342525, "nivel": 7.1, "dist": 15.9, "tasa": 3.99, "suelo": 73, "temp": 29.9, "hum": 77,
-  "riesgo": "naranja", "barrera": "cerrada", "sirena": false, "modo": "auto", "reconocida": false,
+  "riesgo": "naranja", "barrera": "cerrada", "alarma": false, "modo": "auto", "reconocida": false,
   "pir": false, "ir": false, "rssi": -55 }
 ```
 
@@ -157,9 +157,8 @@ Base: `centinela/est01`
 **Comandos**
 ```json
 { "accion": "barrera", "valor": "cerrar" | "abrir" }      // pasa a modo manual
-{ "accion": "sirena",  "valor": true | false }            // pasa a modo manual
 { "accion": "modo",    "valor": "auto" | "manual" }
-{ "accion": "reconocer" }                                 // silencia la sirena
+{ "accion": "reconocer" }                                 // el LED rojo queda fijo y la alerta deja de repetirse
 { "accion": "umbrales", "valor": { "amarillo": 5, "naranja": 8, "rojo": 11 } }
 ```
 
@@ -174,7 +173,7 @@ Base: `centinela/est01`
 | Monitor | Tarjeta de riesgo con color y consejo de seguridad, tubo de nivel, tasa, **tiempo estimado al desborde**, sensores, actuadores y estado de conexión. Actualiza cada 2 s |
 | Historial | Gráfica del nivel (15 min a 24 h) con las líneas de umbral y la lista de eventos |
 | Agente IA | Chat con preguntas sugeridas |
-| Control | Solo operador: modo auto/manual, barrera, sirena, reconocer alerta y umbrales |
+| Control | Solo operador: modo auto/manual, barrera, reconocer alerta y umbrales |
 | Ajustes | URL del backend, token (comunidad u operador), guía de ntfy |
 
 El APK se compila en **GitHub Actions** (`.github/workflows/apk.yml`) y se descarga como artefacto.
@@ -191,7 +190,7 @@ El APK se compila en **GitHub Actions** (`.github/workflows/apk.yml`) y se desca
 | `POST /api/comando` | **operador** | `{accion, valor}` validado → MQTT |
 | `POST /api/agente` | comunidad | `{historial:[{rol, texto}]}` → respuesta del agente (máx. 12/min por IP) |
 
-**Base de datos** (SQLite): `lecturas(ts, nivel, tasa, suelo, temp, hum, riesgo, barrera, sirena, modo, pir, ir)` con índice en `ts`; `eventos(id, ts, tipo, riesgo, nivel, datos JSON)` con índices `ts` y `(tipo, ts)`; `notificaciones(...)` como registro de envíos.
+**Base de datos** (SQLite): `lecturas(ts, nivel, tasa, suelo, temp, hum, riesgo, barrera, alarma, modo, pir, ir)` con índice en `ts`; `eventos(id, ts, tipo, riesgo, nivel, datos JSON)` con índices `ts` y `(tipo, ts)`; `notificaciones(...)` como registro de envíos.
 
 ## 11. Agente IA
 
@@ -233,7 +232,7 @@ sequenceDiagram
 | ¿Cuál fue el nivel máximo hoy y a qué hora? | `estadisticas(nivel)` | "El máximo fue 12,6 cm a las 3:30 p. m." |
 | ¿Cuánto tiempo estuvimos en rojo? | `tiempo_por_riesgo` | "1,2 minutos en rojo, 2,1 en naranja y 0,8 en amarillo." |
 | ¿Alguien intentó cruzar el puente cerrado? | `contar_eventos(vehiculo_barrera)` | "Sí, 2 vehículos, a las 3:29 y 3:30 p. m." |
-| Genera el reporte del último evento | `listar_eventos`, `serie_nivel`, `tiempo_por_riesgo` | Reporte con inicio, pico, duración por nivel y acciones (barrera, sirena, reconocimiento) |
+| Genera el reporte del último evento | `listar_eventos`, `serie_nivel`, `tiempo_por_riesgo` | Reporte con inicio, pico, duración por nivel y acciones (barrera, LED de alerta, reconocimiento) |
 
 ## 12. Plan de trabajo (2 días) y materiales
 
@@ -246,7 +245,7 @@ El software ya está escrito y probado. Esto es lo que queda:
 | 1 h | Crear cuentas: HiveMQ Cloud (cluster + 2 usuarios), clave de Anthropic, app ntfy en el celular | |
 | 1 h | Simular en Wokwi y probar el backend + simulador + app (sin hardware) — ver [puesta en marcha](03-puesta-en-marcha.md) | |
 | 3 h | Cortar y armar la caja de MDF, empotrar y sellar el recipiente, pintar | |
-| 2 h | Cablear en la protoboard según el plano, subir firmware y calibrar (`ALTURA_SENSOR_CM`, suelo seco/mojado, relé) | |
+| 2 h | Cablear en la protoboard según el plano, subir firmware y calibrar (`ALTURA_SENSOR_CM`, suelo seco/mojado, ángulos del servo) | |
 | 1 h | Montar postes, mástil, barrera, semáforo, ribera; pasar cables | |
 
 **Día 2 — Integración y sustentación**
@@ -262,7 +261,7 @@ El software ya está escrito y probado. Esto es lo que queda:
 1. Estado verde: mostrar la app y la OLED.
 2. Verter agua: sube a amarillo y llega el push.
 3. Seguir vertiendo: naranja. La barrera baja, llegan push y correo, y la app muestra el tiempo estimado al desborde.
-4. Rojo: suena la sirena. Pasar un carrito por el IR (alerta de vehículo) y reconocer la alerta con el táctil.
+4. Rojo: el LED rojo parpadea. Pasar un carrito por el IR (alerta de vehículo) y reconocer la alerta con el táctil (el LED queda fijo).
 5. Desconectar el WiFi del ESP32: la estación sigue funcionando y llega "estación desconectada". Reconectar y mostrar que el respaldo se envió.
 6. Vaciar con la manguera: baja con histéresis a verde.
 7. Preguntar al agente: "¿Qué pasó en el último evento?" y "¿Cuánto tiempo estuvimos en rojo?".

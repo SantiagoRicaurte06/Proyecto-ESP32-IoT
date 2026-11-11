@@ -86,7 +86,6 @@ Toca **Probar y guardar**.
    - Toca el botón táctil para pasar a la página **Sensores** de la OLED.
    - `ALTURA_SENSOR_CM`: con el recipiente vacío, el valor `Dist` (cm). Con eso, el nivel marca ≈ 0.
    - `SUELO_ADC_SECO` / `SUELO_ADC_MOJADO`: el valor `ADC` del sensor de suelo en el aire y dentro de un vaso de agua.
-   - `RELE_ACTIVO_EN_ALTO`: si el relé queda pegado al revés, cámbialo.
    - `SERVO_ABIERTA` / `SERVO_CERRADA`: ángulos según cómo pegaste el brazo.
 5. Después del primer USB, las siguientes subidas pueden ir por WiFi: `pio run -t upload --upload-port centinela-est01.local`.
 
@@ -95,7 +94,7 @@ Toca **Probar y guardar**.
 ## 6. Lista de verificación antes de la sustentación
 
 - [ ] Verde con el recipiente vacío; amarillo, naranja y rojo al llenarlo a 5, 8 y 11 cm.
-- [ ] La barrera baja en naranja y la sirena suena en rojo. El táctil la silencia.
+- [ ] Verde fijo → verde intermitente (amarillo) → rojo fijo y barrera abajo (naranja) → rojo intermitente (rojo). El táctil deja el rojo fijo.
 - [ ] Llegan los push de ntfy en cada cambio y el correo en naranja y rojo.
 - [ ] La app muestra "Desborde estimado en ~N min" mientras se vierte agua.
 - [ ] Con el router apagado, la estación sigue actuando sola y llega "Estación DESCONECTADA". Al volver, el respaldo se envía.

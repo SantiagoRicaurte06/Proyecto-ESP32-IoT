@@ -4,7 +4,7 @@
 
 **Sistema IoT de alerta temprana de crecientes** · ESP32 + MQTT + App Android + Agente IA
 
-Mide el nivel del río y **la velocidad a la que sube**, cierra el paso del puente, activa la sirena, avisa al celular y responde en lenguaje natural qué está pasando. Funciona aunque se caiga internet.
+Mide el nivel del río y **la velocidad a la que sube**, cierra el paso del puente, enciende la alerta en el semáforo, avisa al celular y responde en lenguaje natural qué está pasando. Funciona aunque se caiga internet.
 
 Proyecto formativo · **SENA – Tecnología en Análisis y Desarrollo de Software (ADSO)** · Yopal, Casanare, Colombia
 
@@ -25,10 +25,10 @@ Proyecto formativo · **SENA – Tecnología en Análisis y Desarrollo de Softwa
 
 | Riesgo | Condición (maqueta) | La estación… | Notificación |
 |---|---|---|---|
-| 🟢 Verde | nivel < 5 cm | paso abierto | — |
-| 🟡 Amarillo | ≥ 5 cm o ribera saturada | vigila | push |
-| 🟠 Naranja | ≥ 8 cm | **cierra la barrera** | push + correo |
-| 🔴 Rojo | ≥ 11 cm | **sirena** hasta que alguien la reconozca | push repetido + correo |
+| 🟢 Verde | nivel < 5 cm | LED verde fijo, paso abierto | — |
+| 🟡 Amarillo | ≥ 5 cm o ribera saturada | LED verde intermitente | push |
+| 🟠 Naranja | ≥ 8 cm | **cierra la barrera** y enciende el LED rojo | push + correo |
+| 🔴 Rojo | ≥ 11 cm | barrera cerrada y **LED rojo intermitente** hasta que alguien reconozca la alerta | push repetido + correo |
 
 Si el agua sube a más de 2 cm/min, el riesgo sube un nivel extra. Además, el sistema avisa cuando:
 - hay personas en la ribera durante una alerta,
@@ -41,7 +41,7 @@ Si el agua sube a más de 2 cm/min, el riesgo sube un nivel extra. Además, el s
 ```mermaid
 flowchart LR
   S["Sensores<br/>nivel · suelo · DHT11<br/>PIR · IR · táctil"] --> E["ESP32<br/>riesgo local"]
-  E --> A["Barrera · sirena<br/>semáforo · OLED"]
+  E --> A["Barrera · LED rojo y verde<br/>OLED"]
   E <-->|MQTT TLS| B[("HiveMQ Cloud")]
   B <--> K["Backend Node.js"]
   K --> D[("SQLite")]

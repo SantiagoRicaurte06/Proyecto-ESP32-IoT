@@ -23,15 +23,12 @@ Acompaña a [`plano-conexiones.svg`](plano-conexiones.svg). Los números de la c
 | 6 | IR de obstáculos | OUT | GPIO26 | azul | ☐ |
 | 7 | PIR HC-SR501 | OUT | GPIO27 | naranja | ☐ |
 | 8 | Servo SG90 | naranja | GPIO13 | turquesa | ☐ |
-| 9 | Relé 1 canal | IN | GPIO23 | violeta | ☐ |
-| 10 | OLED SSD1306 | SCL | GPIO22 | verde oliva | ☐ |
-| 11 | OLED SSD1306 | SDA | GPIO21 | verde | ☐ |
-| 12 | LED verde | + | GPIO19 | morado | ☐ |
-| 13 | HC-SR04 | ECHO | R1 1 kΩ → GPIO18; del punto entre R1 y GPIO18, R2 2 kΩ → GND | cian | ☐ |
-| 14 | HC-SR04 | TRIG | GPIO5 | amarillo | ☐ |
-| 15 | LED amarillo | + | GPIO17 | rosado | ☐ |
-| 16 | LED naranja | + | GPIO16 | azul | ☐ |
-| 17 | DHT11 | DATA | GPIO4 | naranja | ☐ |
+| 9 | OLED SSD1306 | SCL | GPIO22 | violeta | ☐ |
+| 10 | OLED SSD1306 | SDA | GPIO21 | verde oliva | ☐ |
+| 11 | LED verde | + | GPIO19 | verde | ☐ |
+| 12 | HC-SR04 | ECHO | R1 1 kΩ → GPIO18; del punto entre R1 y GPIO18, R2 2 kΩ → GND | morado | ☐ |
+| 13 | HC-SR04 | TRIG | GPIO5 | cian | ☐ |
+| 14 | DHT11 | DATA | GPIO4 | amarillo | ☐ |
 
 ## Alimentación de cada módulo
 
@@ -50,20 +47,13 @@ Acompaña a [`plano-conexiones.svg`](plano-conexiones.svg). Los números de la c
 | PIR HC-SR501 | GND | GND común | negro | ☐ |
 | Servo SG90 | rojo | +5 V (fuente externa) | rojo | ☐ |
 | Servo SG90 | café | GND común | negro | ☐ |
-| Relé 1 canal | VCC | +5 V (fuente externa) | rojo | ☐ |
-| Relé 1 canal | GND | GND común | negro | ☐ |
-| Relé 1 canal | COM | +5 V (fuente externa) | rojo | ☐ |
-| Buzzer 5 V | − | GND común | negro | ☐ |
 | OLED SSD1306 | VCC | +3,3 V (pin 3V3 del ESP32) | naranja | ☐ |
 | OLED SSD1306 | GND | GND común | negro | ☐ |
 | LED verde | − | GND común | negro | ☐ |
 | HC-SR04 | VCC | +5 V (fuente externa) | rojo | ☐ |
 | HC-SR04 | GND | GND común | negro | ☐ |
-| LED amarillo | − | GND común | negro | ☐ |
-| LED naranja | − | GND común | negro | ☐ |
 | DHT11 | VCC | +3,3 V (pin 3V3 del ESP32) | naranja | ☐ |
 | DHT11 | GND | GND común | negro | ☐ |
-| Relé 1 canal | NO | Buzzer + (el − del buzzer a GND) | café | ☐ |
 
 ## Prueba antes de cerrar la caja
 
@@ -71,4 +61,4 @@ Acompaña a [`plano-conexiones.svg`](plano-conexiones.svg). Los números de la c
 2. Conecta la fuente de 5 V: la barrera debe ir a 90° (abierta) y el LED verde encenderse.
 3. Toca el táctil: la OLED cambia a la página **Sensores**, con distancia, temperatura y valor ADC del suelo.
 4. Acerca la mano al HC-SR04: la distancia cambia. Tapa el IR y pasa la mano frente al PIR: la página Sensores muestra `SI`.
-5. Si el relé queda activado al revés, cambia `RELE_ACTIVO_EN_ALTO` en `firmware/include/config.h`.
+5. Vierte agua: el LED verde parpadea en amarillo; en naranja baja la barrera y se enciende el LED rojo; en rojo el LED rojo parpadea hasta que tocas el táctil.

@@ -33,32 +33,27 @@
 | | SIG | **GPIO33** | | HIGH = tocado |
 | Servo SG90 | Rojo / Café | — | 5 V (riel externo) | Condensador de 470 µF en el riel |
 | | Naranja (señal) | **GPIO13** | | |
-| Relé 1 canal | VCC / GND | — | 5 V (riel externo) | |
-| | IN | **GPIO23** | | Activo en BAJO por defecto (`RELE_ACTIVO_EN_ALTO`) |
-| | COM / NO | — | 5 V → buzzer o baliza | La "sirena" de la maqueta |
 | LED verde | Ánodo (+) | **GPIO19** | | 220 Ω en serie; cátodo a GND |
-| LED amarillo | Ánodo (+) | **GPIO17** | | 220 Ω |
-| LED naranja | Ánodo (+) | **GPIO16** | | 220 Ω (si no tienes naranja, usa otro amarillo o uno blanco) |
 | LED rojo | Ánodo (+) | **GPIO25** | | 220 Ω |
 | OLED I2C (SSD1306) | VCC / GND | — | 3,3 V | Dirección 0x3C |
 | | SDA / SCL | **GPIO21 / GPIO22** | | |
 | Joystick KY-023 (opcional) | VRx / SW | GPIO32 / GPIO14 | 3,3 V | Cambia pantallas de la OLED. Activa `USAR_JOYSTICK 1` |
 
-**GPIO usados: 17** de ~25 disponibles. No se usan los pines de arranque (0, 2, 12, 15) ni los de la flash (6–11).
+**GPIO usados: 14** de ~25 disponibles. No se usan los pines de arranque (0, 2, 12, 15) ni los de la flash (6–11).
 
 **Descartados**: matriz LED 8x8 sin driver (16 GPIO) y display de 4 dígitos sin driver (12 GPIO): no caben con el resto y exigen multiplexado constante que compite con WiFi y MQTT. LCD 16x2: la OLED cumple la misma función con 2 pines.
 
 ## Alimentación
 
 ```
-Cargador 5 V / 2 A ──┬── riel +5 V ── servo, relé, HC-SR04, PIR
+Cargador 5 V / 2 A ──┬── riel +5 V ── servo, HC-SR04, PIR
                      │   (470–1000 µF entre +5 V y GND)
                      └── riel GND ──┬── GND del ESP32  ← GND COMÚN obligatorio
 USB (PC o power bank) ── ESP32 ── 3V3 ── OLED, DHT11, táctil, IR, humedad de suelo
 ```
 
 - No alimentes el servo desde el pin 3V3. Desde VIN solo sirve para pruebas cortas: el pico de corriente del servo reinicia el ESP32.
-- Con el relé solo se conmuta un buzzer o una baliza de 5 V. **No conectes 110 V** en la maqueta.
+- No hay sirena: la alerta se muestra con el LED rojo (fijo en naranja, intermitente en rojo). El relé queda libre; si después consigues una luz o buzzer de 5 V, se activa con `USAR_RELE 1`. **No conectes 110 V** en la maqueta.
 
 ## Lista de materiales
 
@@ -66,11 +61,10 @@ USB (PC o power bank) ── ESP32 ── 3V3 ── OLED, DHT11, táctil, IR, h
 |---|---|---|---|
 | ESP32 DevKit v1 | 1 | disponible | — |
 | HC-SR04, DHT11, PIR, humedad de suelo, IR, táctil | 1 c/u | disponible | — |
-| Servo SG90, relé 1 canal, OLED I2C | 1 c/u | disponible | — |
-| LEDs (verde, amarillo, naranja, rojo) + resistencias 220 Ω | 4 | disponible | — |
+| Servo SG90, OLED I2C | 1 c/u | disponible | — |
+| LED rojo y LED verde + resistencias 220 Ω | 2 | disponible | — |
 | Resistencias 1 kΩ y 2 kΩ (divisor) | 1 c/u | conseguir | 200 |
 | Condensador electrolítico 470–1000 µF / 16 V | 1 | conseguir | 1.000 |
-| Buzzer activo 5 V (sirena) | 1 | conseguir | 2.000 |
 | Protoboard + cables dupont | 1 | disponible | — |
 | Cargador de celular 5 V / 2 A (cable cortado o módulo USB) | 1 | reciclado | 0 |
 | MDF 3 mm (60×40 + laterales) | 1 lámina | conseguir | 12.000 |

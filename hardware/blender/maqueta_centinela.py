@@ -4,7 +4,7 @@ Centinela Cravo Sur · maqueta 3D realista con animación de armado (Blender 4.2
 Construye la maqueta a escala real (1 unidad = 1 cm), con materiales procedurales
 (MDF, balso, pasto pintado, asfalto, vidrio, agua, PCB) y una animación en 8 pasos:
 cada pieza baja a su lugar en el orden de construcción, y en el paso 8 el río crece,
-cambia el semáforo, baja la barrera y suena la sirena.
+cambian los LED del semáforo y baja la barrera.
 
 Uso (sin abrir la interfaz):
   blender -b -P maqueta_centinela.py -- --salida <carpeta> [--render] [--muestras 32] [--ancho 1280]
@@ -250,9 +250,6 @@ pieza(2, "Protoboard", *proto)
 pieza(2, "ESP32 DevKit v1", caja("ESP32 placa", 6, 1.2, 30.2, 5.5, 0.16, 2.8, MAT["negro"]),
       caja("ESP32 modulo", 6.3, 1.36, 30.6, 1.8, 0.3, 2.0, MAT["metal"]),
       caja("ESP32 usb", 11.1, 1.36, 31.2, 0.6, 0.3, 0.8, MAT["metal"]))
-pieza(2, "Relé", caja("Rele placa", 14, 1.2, 30, 5, 0.16, 2.6, MAT["pcb"]),
-      caja("Rele cubo", 15.3, 1.36, 30.4, 1.9, 1.5, 1.6, MAT["azul"]),
-      caja("Rele bornera", 17.6, 1.36, 30.3, 1.0, 1.0, 1.8, MAT["azul"]))
 pieza(2, "Fuente 5 V", caja("Fuente", 3, E, 35.5, 6, 2.5, 3, MAT["negro"]))
 pieza(2, "Puerta trasera", caja("Puerta", 3, 3, 40, 15, 10, E, MAT["mdf2"]),
       cilindro("Perilla", 16, 7.5, 40.6, 0.35, 0.6, MAT["metal"], eje="Z"))
@@ -300,13 +297,11 @@ pieza(5, "Viviendas", *casas)
 leds = {}
 sem = [cilindro("Poste semaforo", 5, T, 29, 0.4, 12, MAT["negro"]),
        caja("Cabeza semaforo", 4.1, T + 8, 28.2, 1.8, 5, 1.4, MAT["negro"])]
-for i, (clave, col) in enumerate((("rojo", "FF2A2A"), ("naranja", "FF7A1A"), ("amarillo", "FFD21A"), ("verde", "22E05A"))):
+for i, (clave, col) in enumerate((("rojo", "FF2A2A"), ("verde", "22E05A"))):
     m = material(f"LED {clave}", tuple(c * 0.08 for c in srgb(col)), 0.2, emision=srgb(col), intensidad=0.0)
     leds[clave] = m
-    sem.append(esfera(f"LED {clave}", B(5, T + 12.2 - i * 1.1, 28.1), 0.42, m))
-sirena_mat = material("Sirena", srgb("2A2F38"), 0.4, emision=srgb("FF2020"), intensidad=0.0)
-sem.append(cilindro("Buzzer", 5, T + 13.1, 29, 0.6, 0.8, sirena_mat))
-pieza(6, "Semáforo + sirena", *sem)
+    sem.append(esfera(f"LED {clave}", B(5, T + 11.9 - i * 2.2, 28.1), 0.5, m))
+pieza(6, "Semáforo 2 LED", *sem)
 
 pivote = bpy.data.objects.new("Pivote barrera", None)
 coleccion.objects.link(pivote)
@@ -410,15 +405,14 @@ def emision(m, cuadro, valor):
             kp.interpolation = "CONSTANT"
 
 f_sem = 5 * PASO + 10      # el semáforo se enciende en verde al instalarlo
-emision(leds["verde"], 1, 0); emision(leds["verde"], f_sem, 6); emision(leds["verde"], f_am, 0)
-emision(leds["amarillo"], 1, 0); emision(leds["amarillo"], f_am, 6); emision(leds["amarillo"], f_na, 0)
-emision(leds["naranja"], 1, 0); emision(leds["naranja"], f_na, 6); emision(leds["naranja"], f_ro, 0)
-emision(leds["rojo"], 1, 0)
-emision(sirena_mat, 1, 0)
+# Verde fijo = normal · verde intermitente = vigilancia · rojo fijo = barrera cerrada · rojo intermitente = alerta máxima
+emision(leds["verde"], 1, 0); emision(leds["verde"], f_sem, 6)
+for f in range(f_am, f_na, 8):
+    emision(leds["verde"], f, 6 if ((f - f_am) // 8) % 2 == 0 else 0)
+emision(leds["verde"], f_na, 0)
+emision(leds["rojo"], 1, 0); emision(leds["rojo"], f_na, 7)
 for f in range(f_ro, FIN + 1, 6):
-    on = ((f - f_ro) // 6) % 2 == 0
-    emision(leds["rojo"], f, 8 if on else 1.5)
-    emision(sirena_mat, f, 12 if on else 0)
+    emision(leds["rojo"], f, 8 if ((f - f_ro) // 6) % 2 == 0 else 0.4)
 
 clave(pivote, "rotation_euler", f_na)          # abierta hasta naranja
 pivote.rotation_euler = (0, 0, 0)              # cerrada
