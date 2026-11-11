@@ -85,7 +85,6 @@ Toca **Probar y guardar**.
 4. **Calibra** en `include/config.h` y vuelve a subir:
    - Toca el botón táctil para pasar a la página **Sensores** de la OLED.
    - `ALTURA_SENSOR_CM`: con el recipiente vacío, el valor `Dist` (cm). Con eso, el nivel marca ≈ 0.
-   - `SUELO_ADC_SECO` / `SUELO_ADC_MOJADO`: el valor `ADC` del sensor de suelo en el aire y dentro de un vaso de agua.
    - `SERVO_ABIERTA` / `SERVO_CERRADA`: ángulos según cómo pegaste el brazo.
 5. Después del primer USB, las siguientes subidas pueden ir por WiFi: `pio run -t upload --upload-port centinela-est01.local`.
 
@@ -110,6 +109,5 @@ Toca **Probar y guardar**.
 | `fallo (5)` | Usuario o clave de HiveMQ | Revisa las credenciales de `centinela-esp32` |
 | El ESP32 se reinicia al mover el servo | Servo alimentado desde el ESP32 | Usa la fuente externa de 5 V con GND común y el condensador |
 | Nivel salta mucho | Agua en movimiento o eco en las paredes | Disco de icopor flotando bajo el sensor; sensor centrado |
-| Humedad de suelo siempre 0 o 100 | Calibración | Ajusta `SUELO_ADC_SECO/MOJADO` |
 | App: "Sin conexión con el servidor" | Red distinta o firewall | Misma red; permite Node en el firewall; prueba `http://IP:3000/api/salud` en el navegador del celular |
 | Agente: "Falta o es inválida la ANTHROPIC_API_KEY" | Clave o créditos | Revisa `.env` y el saldo en la consola de Anthropic |

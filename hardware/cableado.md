@@ -15,27 +15,24 @@ Acompaña a [`plano-conexiones.svg`](plano-conexiones.svg). Los números de la c
 
 | N.º | Componente | Pin | Va a | Color sugerido | ✓ |
 |---|---|---|---|---|---|
-| 1 | Humedad de suelo | AO | GPIO34 | verde | ☐ |
-| 2 | Joystick KY-023 | VRx | GPIO32 | morado | ☐ |
-| 3 | Joystick KY-023 | SW | GPIO14 | cian | ☐ |
-| 4 | Táctil TTP223 | SIG | GPIO33 | amarillo | ☐ |
-| 5 | LED rojo | + | GPIO25 | rosado | ☐ |
-| 6 | IR de obstáculos | OUT | GPIO26 | azul | ☐ |
-| 7 | PIR HC-SR501 | OUT | GPIO27 | naranja | ☐ |
-| 8 | Servo SG90 | naranja | GPIO13 | turquesa | ☐ |
-| 9 | OLED SSD1306 | SCL | GPIO22 | violeta | ☐ |
-| 10 | OLED SSD1306 | SDA | GPIO21 | verde oliva | ☐ |
-| 11 | LED verde | + | GPIO19 | verde | ☐ |
-| 12 | HC-SR04 | ECHO | R1 1 kΩ → GPIO18; del punto entre R1 y GPIO18, R2 2 kΩ → GND | morado | ☐ |
-| 13 | HC-SR04 | TRIG | GPIO5 | cian | ☐ |
-| 14 | DHT11 | DATA | GPIO4 | amarillo | ☐ |
+| 1 | Joystick KY-023 | VRx | GPIO32 | verde | ☐ |
+| 2 | Joystick KY-023 | SW | GPIO14 | morado | ☐ |
+| 3 | Táctil TTP223 | SIG | GPIO33 | cian | ☐ |
+| 4 | LED rojo | + | GPIO25 | amarillo | ☐ |
+| 5 | IR de obstáculos | OUT | GPIO26 | rosado | ☐ |
+| 6 | PIR HC-SR501 | OUT | GPIO27 | azul | ☐ |
+| 7 | Servo SG90 | naranja | GPIO13 | naranja | ☐ |
+| 8 | OLED SSD1306 | SCL | GPIO22 | turquesa | ☐ |
+| 9 | OLED SSD1306 | SDA | GPIO21 | violeta | ☐ |
+| 10 | LED verde | + | GPIO19 | verde oliva | ☐ |
+| 11 | HC-SR04 | ECHO | R1 1 kΩ → GPIO18; del punto entre R1 y GPIO18, R2 2 kΩ → GND | verde | ☐ |
+| 12 | HC-SR04 | TRIG | GPIO5 | morado | ☐ |
+| 13 | DHT11 | DATA | GPIO4 | cian | ☐ |
 
 ## Alimentación de cada módulo
 
 | Componente | Pin | Va a | Color | ✓ |
 |---|---|---|---|---|
-| Humedad de suelo | VCC | +3,3 V (pin 3V3 del ESP32) | naranja | ☐ |
-| Humedad de suelo | GND | GND común | negro | ☐ |
 | Joystick KY-023 | +5V* | +3,3 V (pin 3V3 del ESP32) | naranja | ☐ |
 | Joystick KY-023 | GND | GND común | negro | ☐ |
 | Táctil TTP223 | VCC | +3,3 V (pin 3V3 del ESP32) | naranja | ☐ |
@@ -59,6 +56,6 @@ Acompaña a [`plano-conexiones.svg`](plano-conexiones.svg). Los números de la c
 
 1. Conecta solo el USB (sin fuente de 5 V) y abre el monitor serial: debe aparecer `Centinela Cravo Sur 1.0.0` y la OLED encendida.
 2. Conecta la fuente de 5 V: la barrera debe ir a 90° (abierta) y el LED verde encenderse.
-3. Toca el táctil: la OLED cambia a la página **Sensores**, con distancia, temperatura y valor ADC del suelo.
+3. Toca el táctil: la OLED cambia a la página **Sensores**, con distancia, temperatura y nivel.
 4. Acerca la mano al HC-SR04: la distancia cambia. Tapa el IR y pasa la mano frente al PIR: la página Sensores muestra `SI`.
 5. Vierte agua: el LED verde parpadea en amarillo; en naranja baja la barrera y se enciende el LED rojo; en rojo el LED rojo parpadea hasta que tocas el táctil.

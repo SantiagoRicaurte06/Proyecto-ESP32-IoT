@@ -21,8 +21,6 @@
 | HC-SR04 | VCC / GND | — | 5 V (riel externo) | |
 | | TRIG | **GPIO5** | | |
 | | ECHO | **GPIO18** | | **Divisor**: ECHO → 1 kΩ → GPIO18; GPIO18 → 2 kΩ → GND (5 V → 3,3 V) |
-| Humedad de suelo | VCC / GND | — | **3,3 V** | Con 3,3 V la salida AO nunca pasa de 3,3 V |
-| | AO | **GPIO34** | | ADC1 (funciona con WiFi). Solo entrada |
 | DHT11 | VCC / GND | — | 3,3 V | |
 | | DATA | **GPIO4** | | Resistencia de 10 kΩ a 3,3 V si el módulo no la trae |
 | PIR HC-SR501 | VCC / GND | — | 5 V | Salida de 3,3 V: va directo |
@@ -39,7 +37,7 @@
 | | SDA / SCL | **GPIO21 / GPIO22** | | |
 | Joystick KY-023 (opcional) | VRx / SW | GPIO32 / GPIO14 | 3,3 V | Cambia pantallas de la OLED. Activa `USAR_JOYSTICK 1` |
 
-**GPIO usados: 14** de ~25 disponibles. No se usan los pines de arranque (0, 2, 12, 15) ni los de la flash (6–11).
+**GPIO usados: 13** de ~25 disponibles. No se usan los pines de arranque (0, 2, 12, 15) ni los de la flash (6–11).
 
 **Descartados**: matriz LED 8x8 sin driver (16 GPIO) y display de 4 dígitos sin driver (12 GPIO): no caben con el resto y exigen multiplexado constante que compite con WiFi y MQTT. LCD 16x2: la OLED cumple la misma función con 2 pines.
 
@@ -49,7 +47,7 @@
 Cargador 5 V / 2 A ──┬── riel +5 V ── servo, HC-SR04, PIR
                      │   (470–1000 µF entre +5 V y GND)
                      └── riel GND ──┬── GND del ESP32  ← GND COMÚN obligatorio
-USB (PC o power bank) ── ESP32 ── 3V3 ── OLED, DHT11, táctil, IR, humedad de suelo
+USB (PC o power bank) ── ESP32 ── 3V3 ── OLED, DHT11, táctil, IR
 ```
 
 - No alimentes el servo desde el pin 3V3. Desde VIN solo sirve para pruebas cortas: el pico de corriente del servo reinicia el ESP32.
@@ -60,7 +58,7 @@ USB (PC o power bank) ── ESP32 ── 3V3 ── OLED, DHT11, táctil, IR, h
 | Ítem | Cant. | Estado | Costo aprox. (COP) |
 |---|---|---|---|
 | ESP32 DevKit v1 | 1 | disponible | — |
-| HC-SR04, DHT11, PIR, humedad de suelo, IR, táctil | 1 c/u | disponible | — |
+| HC-SR04, DHT11, PIR, IR, táctil | 1 c/u | disponible | — |
 | Servo SG90, OLED I2C | 1 c/u | disponible | — |
 | LED rojo y LED verde + resistencias 220 Ω | 2 | disponible | — |
 | Resistencias 1 kΩ y 2 kΩ (divisor) | 1 c/u | conseguir | 200 |

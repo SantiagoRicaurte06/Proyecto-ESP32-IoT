@@ -26,7 +26,7 @@ Proyecto formativo · **SENA – Tecnología en Análisis y Desarrollo de Softwa
 | Riesgo | Condición (maqueta) | La estación… | Notificación |
 |---|---|---|---|
 | 🟢 Verde | nivel < 5 cm | LED verde fijo, paso abierto | — |
-| 🟡 Amarillo | ≥ 5 cm o ribera saturada | LED verde intermitente | push |
+| 🟡 Amarillo | ≥ 5 cm | LED verde intermitente | push |
 | 🟠 Naranja | ≥ 8 cm | **cierra la barrera** y enciende el LED rojo | push + correo |
 | 🔴 Rojo | ≥ 11 cm | barrera cerrada y **LED rojo intermitente** hasta que alguien reconozca la alerta | push repetido + correo |
 
@@ -40,7 +40,7 @@ Si el agua sube a más de 2 cm/min, el riesgo sube un nivel extra. Además, el s
 
 ```mermaid
 flowchart LR
-  S["Sensores<br/>nivel · suelo · DHT11<br/>PIR · IR · táctil"] --> E["ESP32<br/>riesgo local"]
+  S["Sensores<br/>nivel · DHT11<br/>PIR · IR · táctil"] --> E["ESP32<br/>riesgo local"]
   E --> A["Barrera · LED rojo y verde<br/>OLED"]
   E <-->|MQTT TLS| B[("HiveMQ Cloud")]
   B <--> K["Backend Node.js"]

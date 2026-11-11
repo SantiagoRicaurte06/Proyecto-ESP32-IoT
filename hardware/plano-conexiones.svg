@@ -39,8 +39,8 @@
 <text x="600.0" y="584.0" font-size="10" fill="#9CA3AF" text-anchor="middle" font-weight="400">VP</text>
 <rect x="633" y="553" width="14" height="14" rx="2" fill="#4B5563"/>
 <text x="640.0" y="584.0" font-size="10" fill="#9CA3AF" text-anchor="middle" font-weight="400">VN</text>
-<rect x="673" y="553" width="14" height="14" rx="2" fill="#FBBF24"/>
-<text x="680.0" y="584.0" font-size="10" fill="#F9FAFB" text-anchor="middle" font-weight="700">34</text>
+<rect x="673" y="553" width="14" height="14" rx="2" fill="#4B5563"/>
+<text x="680.0" y="584.0" font-size="10" fill="#9CA3AF" text-anchor="middle" font-weight="400">34</text>
 <rect x="713" y="553" width="14" height="14" rx="2" fill="#4B5563"/>
 <text x="720.0" y="584.0" font-size="10" fill="#9CA3AF" text-anchor="middle" font-weight="400">35</text>
 <rect x="753" y="553" width="14" height="14" rx="2" fill="#FBBF24"/>
@@ -129,11 +129,11 @@
 <circle cx="34.0" cy="660.0" r="4" fill="#DC2626"/>
 <polyline points="96.0,688.0 66.0,688.0" fill="none" stroke="#111827" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
 <circle cx="66.0" cy="688.0" r="4" fill="#111827"/>
-<rect x="96.0" y="196.0" width="140.0" height="92.0" rx="8" fill="#ECFDF5" stroke="#9CA3AF" stroke-width="1.2"/>
-<text x="108.0" y="236.0" font-size="13" fill="#111827" text-anchor="start" font-weight="700">Humedad de suelo</text>
-<text x="108.0" y="253.0" font-size="10.5" fill="#6B7280" text-anchor="start" font-weight="400">módulo con comparador</text>
+<rect x="96.0" y="196.0" width="140.0" height="92.0" rx="8" fill="#ECFDF5" stroke="#9CA3AF" stroke-width="1.2" stroke-dasharray="6,4"/>
+<text x="108.0" y="236.0" font-size="13" fill="#111827" text-anchor="start" font-weight="700">Joystick KY-023</text>
+<text x="108.0" y="253.0" font-size="10.5" fill="#6B7280" text-anchor="start" font-weight="400">opcional · USAR_JOYSTICK 1</text>
 <rect x="116" y="190" width="12" height="12" rx="2" fill="#FBBF24" stroke="#92400E"/>
-<text x="122.0" y="216.0" font-size="10" fill="#111827" text-anchor="middle" font-weight="600">VCC</text>
+<text x="122.0" y="216.0" font-size="10" fill="#111827" text-anchor="middle" font-weight="600">+5V*</text>
 <polyline points="122.0,196.0 122.0,124.0" fill="none" stroke="#F59E0B" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
 <circle cx="122.0" cy="124.0" r="4" fill="#F59E0B"/>
 <rect x="156" y="190" width="12" height="12" rx="2" fill="#FBBF24" stroke="#92400E"/>
@@ -141,116 +141,99 @@
 <polyline points="162.0,196.0 162.0,148.0" fill="none" stroke="#111827" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
 <circle cx="162.0" cy="148.0" r="4" fill="#111827"/>
 <rect x="116" y="282" width="12" height="12" rx="2" fill="#FBBF24" stroke="#92400E"/>
-<text x="122.0" y="276.0" font-size="10" fill="#111827" text-anchor="middle" font-weight="600">AO</text>
-<rect x="343.3" y="196.0" width="140.0" height="92.0" rx="8" fill="#ECFDF5" stroke="#9CA3AF" stroke-width="1.2" stroke-dasharray="6,4"/>
-<text x="355.3" y="236.0" font-size="13" fill="#111827" text-anchor="start" font-weight="700">Joystick KY-023</text>
-<text x="355.3" y="253.0" font-size="10.5" fill="#6B7280" text-anchor="start" font-weight="400">opcional · USAR_JOYSTICK 1</text>
-<rect x="363.3333333333333" y="190" width="12" height="12" rx="2" fill="#FBBF24" stroke="#92400E"/>
-<text x="369.3" y="216.0" font-size="10" fill="#111827" text-anchor="middle" font-weight="600">+5V*</text>
-<polyline points="369.3,196.0 369.3,124.0" fill="none" stroke="#F59E0B" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
-<circle cx="369.3" cy="124.0" r="4" fill="#F59E0B"/>
-<rect x="403.3333333333333" y="190" width="12" height="12" rx="2" fill="#FBBF24" stroke="#92400E"/>
-<text x="409.3" y="216.0" font-size="10" fill="#111827" text-anchor="middle" font-weight="600">GND</text>
-<polyline points="409.3,196.0 409.3,148.0" fill="none" stroke="#111827" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
-<circle cx="409.3" cy="148.0" r="4" fill="#111827"/>
-<rect x="363.3333333333333" y="282" width="12" height="12" rx="2" fill="#FBBF24" stroke="#92400E"/>
-<text x="369.3" y="276.0" font-size="10" fill="#111827" text-anchor="middle" font-weight="600">VRx</text>
-<rect x="403.3333333333333" y="282" width="12" height="12" rx="2" fill="#FBBF24" stroke="#92400E"/>
-<text x="409.3" y="276.0" font-size="10" fill="#111827" text-anchor="middle" font-weight="600">SW</text>
-<rect x="590.7" y="196.0" width="140.0" height="92.0" rx="8" fill="#ECFDF5" stroke="#9CA3AF" stroke-width="1.2"/>
-<text x="602.7" y="236.0" font-size="13" fill="#111827" text-anchor="start" font-weight="700">Táctil TTP223</text>
-<text x="602.7" y="253.0" font-size="10.5" fill="#6B7280" text-anchor="start" font-weight="400">botón comunitario</text>
-<rect x="610.6666666666666" y="190" width="12" height="12" rx="2" fill="#FBBF24" stroke="#92400E"/>
-<text x="616.7" y="216.0" font-size="10" fill="#111827" text-anchor="middle" font-weight="600">VCC</text>
-<polyline points="616.7,196.0 616.7,124.0" fill="none" stroke="#F59E0B" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
-<circle cx="616.7" cy="124.0" r="4" fill="#F59E0B"/>
-<rect x="650.6666666666666" y="190" width="12" height="12" rx="2" fill="#FBBF24" stroke="#92400E"/>
-<text x="656.7" y="216.0" font-size="10" fill="#111827" text-anchor="middle" font-weight="600">GND</text>
-<polyline points="656.7,196.0 656.7,148.0" fill="none" stroke="#111827" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
-<circle cx="656.7" cy="148.0" r="4" fill="#111827"/>
-<rect x="610.6666666666666" y="282" width="12" height="12" rx="2" fill="#FBBF24" stroke="#92400E"/>
-<text x="616.7" y="276.0" font-size="10" fill="#111827" text-anchor="middle" font-weight="600">SIG</text>
-<rect x="838.0" y="196.0" width="140.0" height="92.0" rx="8" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.2"/>
-<text x="850.0" y="236.0" font-size="13" fill="#111827" text-anchor="start" font-weight="700">LED rojo</text>
-<text x="850.0" y="253.0" font-size="10.5" fill="#6B7280" text-anchor="start" font-weight="400">220 Ω en serie</text>
-<circle cx="956.0" cy="242" r="9" fill="#DC2626" stroke="#111827" stroke-width="1"/>
-<rect x="858.0" y="190" width="12" height="12" rx="2" fill="#FBBF24" stroke="#92400E"/>
-<text x="864.0" y="216.0" font-size="10" fill="#111827" text-anchor="middle" font-weight="600">−</text>
-<polyline points="864.0,196.0 864.0,148.0" fill="none" stroke="#111827" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
-<circle cx="864.0" cy="148.0" r="4" fill="#111827"/>
-<rect x="858.0" y="282" width="12" height="12" rx="2" fill="#FBBF24" stroke="#92400E"/>
-<text x="864.0" y="276.0" font-size="10" fill="#111827" text-anchor="middle" font-weight="600">+</text>
-<rect x="1085.3" y="196.0" width="140.0" height="92.0" rx="8" fill="#ECFDF5" stroke="#9CA3AF" stroke-width="1.2"/>
-<text x="1097.3" y="236.0" font-size="13" fill="#111827" text-anchor="start" font-weight="700">IR de obstáculos</text>
-<text x="1097.3" y="253.0" font-size="10.5" fill="#6B7280" text-anchor="start" font-weight="400">LOW = objeto</text>
-<rect x="1105.3333333333333" y="190" width="12" height="12" rx="2" fill="#FBBF24" stroke="#92400E"/>
-<text x="1111.3" y="216.0" font-size="10" fill="#111827" text-anchor="middle" font-weight="600">VCC</text>
-<polyline points="1111.3,196.0 1111.3,124.0" fill="none" stroke="#F59E0B" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
-<circle cx="1111.3" cy="124.0" r="4" fill="#F59E0B"/>
-<rect x="1145.3333333333333" y="190" width="12" height="12" rx="2" fill="#FBBF24" stroke="#92400E"/>
-<text x="1151.3" y="216.0" font-size="10" fill="#111827" text-anchor="middle" font-weight="600">GND</text>
-<polyline points="1151.3,196.0 1151.3,148.0" fill="none" stroke="#111827" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
-<circle cx="1151.3" cy="148.0" r="4" fill="#111827"/>
-<rect x="1105.3333333333333" y="282" width="12" height="12" rx="2" fill="#FBBF24" stroke="#92400E"/>
-<text x="1111.3" y="276.0" font-size="10" fill="#111827" text-anchor="middle" font-weight="600">OUT</text>
-<rect x="1332.7" y="196.0" width="140.0" height="92.0" rx="8" fill="#ECFDF5" stroke="#9CA3AF" stroke-width="1.2"/>
-<text x="1344.7" y="236.0" font-size="13" fill="#111827" text-anchor="start" font-weight="700">PIR HC-SR501</text>
-<text x="1344.7" y="253.0" font-size="10.5" fill="#6B7280" text-anchor="start" font-weight="400">tiempo al mínimo</text>
-<rect x="1352.6666666666665" y="190" width="12" height="12" rx="2" fill="#FBBF24" stroke="#92400E"/>
-<text x="1358.7" y="216.0" font-size="10" fill="#111827" text-anchor="middle" font-weight="600">VCC</text>
-<polyline points="1358.7,196.0 1358.7,100.0" fill="none" stroke="#DC2626" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
-<circle cx="1358.7" cy="100.0" r="4" fill="#DC2626"/>
-<rect x="1392.6666666666665" y="190" width="12" height="12" rx="2" fill="#FBBF24" stroke="#92400E"/>
-<text x="1398.7" y="216.0" font-size="10" fill="#111827" text-anchor="middle" font-weight="600">GND</text>
-<polyline points="1398.7,196.0 1398.7,148.0" fill="none" stroke="#111827" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
-<circle cx="1398.7" cy="148.0" r="4" fill="#111827"/>
-<rect x="1352.6666666666665" y="282" width="12" height="12" rx="2" fill="#FBBF24" stroke="#92400E"/>
-<text x="1358.7" y="276.0" font-size="10" fill="#111827" text-anchor="middle" font-weight="600">OUT</text>
+<text x="122.0" y="276.0" font-size="10" fill="#111827" text-anchor="middle" font-weight="600">VRx</text>
+<rect x="156" y="282" width="12" height="12" rx="2" fill="#FBBF24" stroke="#92400E"/>
+<text x="162.0" y="276.0" font-size="10" fill="#111827" text-anchor="middle" font-weight="600">SW</text>
+<rect x="392.8" y="196.0" width="140.0" height="92.0" rx="8" fill="#ECFDF5" stroke="#9CA3AF" stroke-width="1.2"/>
+<text x="404.8" y="236.0" font-size="13" fill="#111827" text-anchor="start" font-weight="700">Táctil TTP223</text>
+<text x="404.8" y="253.0" font-size="10.5" fill="#6B7280" text-anchor="start" font-weight="400">botón comunitario</text>
+<rect x="412.8" y="190" width="12" height="12" rx="2" fill="#FBBF24" stroke="#92400E"/>
+<text x="418.8" y="216.0" font-size="10" fill="#111827" text-anchor="middle" font-weight="600">VCC</text>
+<polyline points="418.8,196.0 418.8,124.0" fill="none" stroke="#F59E0B" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="418.8" cy="124.0" r="4" fill="#F59E0B"/>
+<rect x="452.8" y="190" width="12" height="12" rx="2" fill="#FBBF24" stroke="#92400E"/>
+<text x="458.8" y="216.0" font-size="10" fill="#111827" text-anchor="middle" font-weight="600">GND</text>
+<polyline points="458.8,196.0 458.8,148.0" fill="none" stroke="#111827" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="458.8" cy="148.0" r="4" fill="#111827"/>
+<rect x="412.8" y="282" width="12" height="12" rx="2" fill="#FBBF24" stroke="#92400E"/>
+<text x="418.8" y="276.0" font-size="10" fill="#111827" text-anchor="middle" font-weight="600">SIG</text>
+<rect x="689.6" y="196.0" width="140.0" height="92.0" rx="8" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.2"/>
+<text x="701.6" y="236.0" font-size="13" fill="#111827" text-anchor="start" font-weight="700">LED rojo</text>
+<text x="701.6" y="253.0" font-size="10.5" fill="#6B7280" text-anchor="start" font-weight="400">220 Ω en serie</text>
+<circle cx="807.6" cy="242" r="9" fill="#DC2626" stroke="#111827" stroke-width="1"/>
+<rect x="709.6" y="190" width="12" height="12" rx="2" fill="#FBBF24" stroke="#92400E"/>
+<text x="715.6" y="216.0" font-size="10" fill="#111827" text-anchor="middle" font-weight="600">−</text>
+<polyline points="715.6,196.0 715.6,148.0" fill="none" stroke="#111827" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="715.6" cy="148.0" r="4" fill="#111827"/>
+<rect x="709.6" y="282" width="12" height="12" rx="2" fill="#FBBF24" stroke="#92400E"/>
+<text x="715.6" y="276.0" font-size="10" fill="#111827" text-anchor="middle" font-weight="600">+</text>
+<rect x="986.4" y="196.0" width="140.0" height="92.0" rx="8" fill="#ECFDF5" stroke="#9CA3AF" stroke-width="1.2"/>
+<text x="998.4" y="236.0" font-size="13" fill="#111827" text-anchor="start" font-weight="700">IR de obstáculos</text>
+<text x="998.4" y="253.0" font-size="10.5" fill="#6B7280" text-anchor="start" font-weight="400">LOW = objeto</text>
+<rect x="1006.4000000000001" y="190" width="12" height="12" rx="2" fill="#FBBF24" stroke="#92400E"/>
+<text x="1012.4" y="216.0" font-size="10" fill="#111827" text-anchor="middle" font-weight="600">VCC</text>
+<polyline points="1012.4,196.0 1012.4,124.0" fill="none" stroke="#F59E0B" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="1012.4" cy="124.0" r="4" fill="#F59E0B"/>
+<rect x="1046.4" y="190" width="12" height="12" rx="2" fill="#FBBF24" stroke="#92400E"/>
+<text x="1052.4" y="216.0" font-size="10" fill="#111827" text-anchor="middle" font-weight="600">GND</text>
+<polyline points="1052.4,196.0 1052.4,148.0" fill="none" stroke="#111827" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="1052.4" cy="148.0" r="4" fill="#111827"/>
+<rect x="1006.4000000000001" y="282" width="12" height="12" rx="2" fill="#FBBF24" stroke="#92400E"/>
+<text x="1012.4" y="276.0" font-size="10" fill="#111827" text-anchor="middle" font-weight="600">OUT</text>
+<rect x="1283.2" y="196.0" width="140.0" height="92.0" rx="8" fill="#ECFDF5" stroke="#9CA3AF" stroke-width="1.2"/>
+<text x="1295.2" y="236.0" font-size="13" fill="#111827" text-anchor="start" font-weight="700">PIR HC-SR501</text>
+<text x="1295.2" y="253.0" font-size="10.5" fill="#6B7280" text-anchor="start" font-weight="400">tiempo al mínimo</text>
+<rect x="1303.2" y="190" width="12" height="12" rx="2" fill="#FBBF24" stroke="#92400E"/>
+<text x="1309.2" y="216.0" font-size="10" fill="#111827" text-anchor="middle" font-weight="600">VCC</text>
+<polyline points="1309.2,196.0 1309.2,100.0" fill="none" stroke="#DC2626" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="1309.2" cy="100.0" r="4" fill="#DC2626"/>
+<rect x="1343.2" y="190" width="12" height="12" rx="2" fill="#FBBF24" stroke="#92400E"/>
+<text x="1349.2" y="216.0" font-size="10" fill="#111827" text-anchor="middle" font-weight="600">GND</text>
+<polyline points="1349.2,196.0 1349.2,148.0" fill="none" stroke="#111827" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="1349.2" cy="148.0" r="4" fill="#111827"/>
+<rect x="1303.2" y="282" width="12" height="12" rx="2" fill="#FBBF24" stroke="#92400E"/>
+<text x="1309.2" y="276.0" font-size="10" fill="#111827" text-anchor="middle" font-weight="600">OUT</text>
 <rect x="1580.0" y="196.0" width="140.0" height="92.0" rx="8" fill="#ECFDF5" stroke="#9CA3AF" stroke-width="1.2"/>
 <text x="1592.0" y="236.0" font-size="13" fill="#111827" text-anchor="start" font-weight="700">Servo SG90</text>
 <text x="1592.0" y="253.0" font-size="10.5" fill="#6B7280" text-anchor="start" font-weight="400">barrera</text>
-<rect x="1599.9999999999998" y="190" width="12" height="12" rx="2" fill="#FBBF24" stroke="#92400E"/>
+<rect x="1600.0" y="190" width="12" height="12" rx="2" fill="#FBBF24" stroke="#92400E"/>
 <text x="1606.0" y="216.0" font-size="10" fill="#111827" text-anchor="middle" font-weight="600">rojo</text>
 <polyline points="1606.0,196.0 1606.0,100.0" fill="none" stroke="#DC2626" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
 <circle cx="1606.0" cy="100.0" r="4" fill="#DC2626"/>
-<rect x="1639.9999999999998" y="190" width="12" height="12" rx="2" fill="#FBBF24" stroke="#92400E"/>
+<rect x="1640.0" y="190" width="12" height="12" rx="2" fill="#FBBF24" stroke="#92400E"/>
 <text x="1646.0" y="216.0" font-size="10" fill="#111827" text-anchor="middle" font-weight="600">café</text>
 <polyline points="1646.0,196.0 1646.0,148.0" fill="none" stroke="#111827" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
 <circle cx="1646.0" cy="148.0" r="4" fill="#111827"/>
-<rect x="1599.9999999999998" y="282" width="12" height="12" rx="2" fill="#FBBF24" stroke="#92400E"/>
+<rect x="1600.0" y="282" width="12" height="12" rx="2" fill="#FBBF24" stroke="#92400E"/>
 <text x="1606.0" y="276.0" font-size="10" fill="#111827" text-anchor="middle" font-weight="600">naranja</text>
-<polyline points="122.0,288.0 122.0,526.0 680.0,526.0 680.0,560.0" fill="none" stroke="#16A34A" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
-<circle cx="680.0" cy="560.0" r="4.5" fill="#16A34A"/>
+<polyline points="122.0,288.0 122.0,526.0 760.0,526.0 760.0,560.0" fill="none" stroke="#16A34A" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="760.0" cy="560.0" r="4.5" fill="#16A34A"/>
 <circle cx="136.0" cy="407.0" r="9" fill="#16A34A"/>
 <text x="136.0" y="410.5" font-size="9.5" fill="#FFFFFF" text-anchor="middle" font-weight="700">1</text>
-<polyline points="369.3,288.0 369.3,504.0 760.0,504.0 760.0,560.0" fill="none" stroke="#9333EA" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
-<circle cx="760.0" cy="560.0" r="4.5" fill="#9333EA"/>
-<circle cx="383.3" cy="396.0" r="9" fill="#9333EA"/>
-<text x="383.3" y="399.5" font-size="9.5" fill="#FFFFFF" text-anchor="middle" font-weight="700">2</text>
-<polyline points="409.3,288.0 409.3,482.0 960.0,482.0 960.0,560.0" fill="none" stroke="#0891B2" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
-<circle cx="960.0" cy="560.0" r="4.5" fill="#0891B2"/>
-<circle cx="423.3" cy="385.0" r="9" fill="#0891B2"/>
-<text x="423.3" y="388.5" font-size="9.5" fill="#FFFFFF" text-anchor="middle" font-weight="700">3</text>
-<polyline points="616.7,288.0 616.7,460.0 800.0,460.0 800.0,560.0" fill="none" stroke="#CA8A04" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
-<circle cx="800.0" cy="560.0" r="4.5" fill="#CA8A04"/>
-<circle cx="630.7" cy="374.0" r="9" fill="#CA8A04"/>
-<text x="630.7" y="377.5" font-size="9.5" fill="#FFFFFF" text-anchor="middle" font-weight="700">4</text>
-<polyline points="864.0,288.0 864.0,372.0 840.0,372.0 840.0,560.0" fill="none" stroke="#DB2777" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
-<circle cx="840.0" cy="560.0" r="4.5" fill="#DB2777"/>
-<circle cx="878.0" cy="330.0" r="9" fill="#DB2777"/>
-<text x="878.0" y="333.5" font-size="9.5" fill="#FFFFFF" text-anchor="middle" font-weight="700">5</text>
-<polyline points="1111.3,288.0 1111.3,394.0 880.0,394.0 880.0,560.0" fill="none" stroke="#2563EB" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
-<circle cx="880.0" cy="560.0" r="4.5" fill="#2563EB"/>
-<circle cx="1125.3" cy="341.0" r="9" fill="#2563EB"/>
-<text x="1125.3" y="344.5" font-size="9.5" fill="#FFFFFF" text-anchor="middle" font-weight="700">6</text>
-<polyline points="1358.7,288.0 1358.7,416.0 920.0,416.0 920.0,560.0" fill="none" stroke="#EA580C" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
-<circle cx="920.0" cy="560.0" r="4.5" fill="#EA580C"/>
-<circle cx="1372.7" cy="352.0" r="9" fill="#EA580C"/>
-<text x="1372.7" y="355.5" font-size="9.5" fill="#FFFFFF" text-anchor="middle" font-weight="700">7</text>
-<polyline points="1606.0,288.0 1606.0,438.0 1080.0,438.0 1080.0,560.0" fill="none" stroke="#0D9488" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
-<circle cx="1080.0" cy="560.0" r="4.5" fill="#0D9488"/>
-<circle cx="1620.0" cy="363.0" r="9" fill="#0D9488"/>
-<text x="1620.0" y="366.5" font-size="9.5" fill="#FFFFFF" text-anchor="middle" font-weight="700">8</text>
+<polyline points="162.0,288.0 162.0,504.0 960.0,504.0 960.0,560.0" fill="none" stroke="#9333EA" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="960.0" cy="560.0" r="4.5" fill="#9333EA"/>
+<circle cx="176.0" cy="396.0" r="9" fill="#9333EA"/>
+<text x="176.0" y="399.5" font-size="9.5" fill="#FFFFFF" text-anchor="middle" font-weight="700">2</text>
+<polyline points="418.8,288.0 418.8,482.0 800.0,482.0 800.0,560.0" fill="none" stroke="#0891B2" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="800.0" cy="560.0" r="4.5" fill="#0891B2"/>
+<circle cx="432.8" cy="385.0" r="9" fill="#0891B2"/>
+<text x="432.8" y="388.5" font-size="9.5" fill="#FFFFFF" text-anchor="middle" font-weight="700">3</text>
+<polyline points="715.6,288.0 715.6,460.0 840.0,460.0 840.0,560.0" fill="none" stroke="#CA8A04" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="840.0" cy="560.0" r="4.5" fill="#CA8A04"/>
+<circle cx="729.6" cy="374.0" r="9" fill="#CA8A04"/>
+<text x="729.6" y="377.5" font-size="9.5" fill="#FFFFFF" text-anchor="middle" font-weight="700">4</text>
+<polyline points="1012.4,288.0 1012.4,394.0 880.0,394.0 880.0,560.0" fill="none" stroke="#DB2777" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="880.0" cy="560.0" r="4.5" fill="#DB2777"/>
+<circle cx="1026.4" cy="341.0" r="9" fill="#DB2777"/>
+<text x="1026.4" y="344.5" font-size="9.5" fill="#FFFFFF" text-anchor="middle" font-weight="700">5</text>
+<polyline points="1309.2,288.0 1309.2,416.0 920.0,416.0 920.0,560.0" fill="none" stroke="#2563EB" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="920.0" cy="560.0" r="4.5" fill="#2563EB"/>
+<circle cx="1323.2" cy="352.0" r="9" fill="#2563EB"/>
+<text x="1323.2" y="355.5" font-size="9.5" fill="#FFFFFF" text-anchor="middle" font-weight="700">6</text>
+<polyline points="1606.0,288.0 1606.0,438.0 1080.0,438.0 1080.0,560.0" fill="none" stroke="#EA580C" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="1080.0" cy="560.0" r="4.5" fill="#EA580C"/>
+<circle cx="1620.0" cy="363.0" r="9" fill="#EA580C"/>
+<text x="1620.0" y="366.5" font-size="9.5" fill="#FFFFFF" text-anchor="middle" font-weight="700">7</text>
 <rect x="96.0" y="950.0" width="140.0" height="92.0" rx="8" fill="#ECFDF5" stroke="#9CA3AF" stroke-width="1.2"/>
 <text x="108.0" y="990.0" font-size="13" fill="#111827" text-anchor="start" font-weight="700">OLED SSD1306</text>
 <text x="108.0" y="1007.0" font-size="10.5" fill="#6B7280" text-anchor="start" font-weight="400">I2C 0x3C</text>
@@ -304,19 +287,19 @@
 <circle cx="1646.0" cy="1086.0" r="4" fill="#111827"/>
 <rect x="1600.0000000000002" y="944" width="12" height="12" rx="2" fill="#FBBF24" stroke="#92400E"/>
 <text x="1606.0" y="970.0" font-size="10" fill="#111827" text-anchor="middle" font-weight="600">DATA</text>
-<polyline points="122.0,950.0 122.0,744.0 600.0,744.0 600.0,700.0" fill="none" stroke="#7C3AED" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
-<circle cx="600.0" cy="700.0" r="4.5" fill="#7C3AED"/>
-<circle cx="136.0" cy="847.0" r="9" fill="#7C3AED"/>
-<text x="136.0" y="850.5" font-size="9.5" fill="#FFFFFF" text-anchor="middle" font-weight="700">9</text>
-<polyline points="162.0,950.0 162.0,762.0 720.0,762.0 720.0,700.0" fill="none" stroke="#65A30D" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
-<circle cx="720.0" cy="700.0" r="4.5" fill="#65A30D"/>
-<circle cx="176.0" cy="856.0" r="9" fill="#65A30D"/>
-<text x="176.0" y="859.5" font-size="9.5" fill="#FFFFFF" text-anchor="middle" font-weight="700">10</text>
-<polyline points="616.7,950.0 616.7,780.0 800.0,780.0 800.0,700.0" fill="none" stroke="#16A34A" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
-<circle cx="800.0" cy="700.0" r="4.5" fill="#16A34A"/>
-<circle cx="630.7" cy="865.0" r="9" fill="#16A34A"/>
-<text x="630.7" y="868.5" font-size="9.5" fill="#FFFFFF" text-anchor="middle" font-weight="700">11</text>
-<polyline points="1111.3,950.0 1111.3,834.0 840.0,834.0 840.0,700.0" fill="none" stroke="#9333EA" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="122.0,950.0 122.0,744.0 600.0,744.0 600.0,700.0" fill="none" stroke="#0D9488" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="600.0" cy="700.0" r="4.5" fill="#0D9488"/>
+<circle cx="136.0" cy="847.0" r="9" fill="#0D9488"/>
+<text x="136.0" y="850.5" font-size="9.5" fill="#FFFFFF" text-anchor="middle" font-weight="700">8</text>
+<polyline points="162.0,950.0 162.0,762.0 720.0,762.0 720.0,700.0" fill="none" stroke="#7C3AED" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="720.0" cy="700.0" r="4.5" fill="#7C3AED"/>
+<circle cx="176.0" cy="856.0" r="9" fill="#7C3AED"/>
+<text x="176.0" y="859.5" font-size="9.5" fill="#FFFFFF" text-anchor="middle" font-weight="700">9</text>
+<polyline points="616.7,950.0 616.7,780.0 800.0,780.0 800.0,700.0" fill="none" stroke="#65A30D" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="800.0" cy="700.0" r="4.5" fill="#65A30D"/>
+<circle cx="630.7" cy="865.0" r="9" fill="#65A30D"/>
+<text x="630.7" y="868.5" font-size="9.5" fill="#FFFFFF" text-anchor="middle" font-weight="700">10</text>
+<polyline points="1111.3,950.0 1111.3,834.0 840.0,834.0 840.0,700.0" fill="none" stroke="#16A34A" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
 <rect x="1105.3" y="920.0" width="12" height="26" rx="3" fill="#FDF6E3" stroke="#111827" stroke-width="1.4"/>
 <text x="1101.3" y="937.0" font-size="10.5" fill="#111827" text-anchor="end" font-weight="600">R1 1 kΩ</text>
 <circle cx="1111.3" cy="914.0" r="4.5" fill="#111827"/>
@@ -324,24 +307,24 @@
 <rect x="1055.3" y="1007.0" width="12" height="26" rx="3" fill="#FDF6E3" stroke="#111827" stroke-width="1.4"/>
 <text x="1051.3" y="1024.0" font-size="10.5" fill="#111827" text-anchor="end" font-weight="600">R2 2 kΩ</text>
 <circle cx="1061.3" cy="1086.0" r="4" fill="#111827"/>
-<circle cx="840.0" cy="700.0" r="4.5" fill="#9333EA"/>
-<circle cx="1125.3" cy="874.0" r="9" fill="#9333EA"/>
-<text x="1125.3" y="877.5" font-size="9.5" fill="#FFFFFF" text-anchor="middle" font-weight="700">12</text>
-<polyline points="1151.3,950.0 1151.3,816.0 880.0,816.0 880.0,700.0" fill="none" stroke="#0891B2" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
-<circle cx="880.0" cy="700.0" r="4.5" fill="#0891B2"/>
-<circle cx="1165.3" cy="883.0" r="9" fill="#0891B2"/>
-<text x="1165.3" y="886.5" font-size="9.5" fill="#FFFFFF" text-anchor="middle" font-weight="700">13</text>
-<polyline points="1606.0,950.0 1606.0,798.0 1000.0,798.0 1000.0,700.0" fill="none" stroke="#CA8A04" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
-<circle cx="1000.0" cy="700.0" r="4.5" fill="#CA8A04"/>
-<circle cx="1620.0" cy="874.0" r="9" fill="#CA8A04"/>
-<text x="1620.0" y="877.5" font-size="9.5" fill="#FFFFFF" text-anchor="middle" font-weight="700">14</text>
+<circle cx="840.0" cy="700.0" r="4.5" fill="#16A34A"/>
+<circle cx="1125.3" cy="874.0" r="9" fill="#16A34A"/>
+<text x="1125.3" y="877.5" font-size="9.5" fill="#FFFFFF" text-anchor="middle" font-weight="700">11</text>
+<polyline points="1151.3,950.0 1151.3,816.0 880.0,816.0 880.0,700.0" fill="none" stroke="#9333EA" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="880.0" cy="700.0" r="4.5" fill="#9333EA"/>
+<circle cx="1165.3" cy="883.0" r="9" fill="#9333EA"/>
+<text x="1165.3" y="886.5" font-size="9.5" fill="#FFFFFF" text-anchor="middle" font-weight="700">12</text>
+<polyline points="1606.0,950.0 1606.0,798.0 1000.0,798.0 1000.0,700.0" fill="none" stroke="#0891B2" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="1000.0" cy="700.0" r="4.5" fill="#0891B2"/>
+<circle cx="1620.0" cy="874.0" r="9" fill="#0891B2"/>
+<text x="1620.0" y="877.5" font-size="9.5" fill="#FFFFFF" text-anchor="middle" font-weight="700">13</text>
 <rect x="90.0" y="1196.0" width="1630.0" height="186.0" rx="10" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
 <text x="110.0" y="1224.0" font-size="14" fill="#111827" text-anchor="start" font-weight="700">Cómo leer el plano</text>
 <text x="110.0" y="1250.0" font-size="12" fill="#111827" text-anchor="start" font-weight="400">• Rieles: rojo = 5 V de la fuente externa · naranja = 3,3 V del pin 3V3 del ESP32 · negro = GND común. Los rieles superior e inferior se unen con los puentes de la izquierda.</text>
 <text x="110.0" y="1269.0" font-size="12" fill="#111827" text-anchor="start" font-weight="400">• Cada cable de señal lleva un número (círculo) que corresponde a la tabla de cableado (hardware/cableado.md). Sigue el orden y márcalo al conectarlo.</text>
 <text x="110.0" y="1288.0" font-size="12" fill="#111827" text-anchor="start" font-weight="400">• HC-SR04: ECHO sale a 5 V. Pasa por R1 (1 kΩ) antes del GPIO18 y desde ese punto R2 (2 kΩ) va a GND: el ESP32 recibe 3,3 V.</text>
 <text x="110.0" y="1307.0" font-size="12" fill="#111827" text-anchor="start" font-weight="400">• LED: GPIO → resistencia 220 Ω → pata larga (+); pata corta (−) a GND. Solo hay 2 LED: verde (normal, intermitente = vigilancia) y rojo (barrera cerrada, intermitente = alerta máxima).</text>
-<text x="110.0" y="1326.0" font-size="12" fill="#111827" text-anchor="start" font-weight="400">• Sensores de 3,3 V (humedad, táctil, IR, OLED, DHT11, joystick) al riel naranja: así nunca envían más de 3,3 V al ESP32. *El joystick se alimenta a 3,3 V aunque diga +5V.</text>
+<text x="110.0" y="1326.0" font-size="12" fill="#111827" text-anchor="start" font-weight="400">• Sensores de 3,3 V (táctil, IR, OLED, DHT11, joystick) al riel naranja: así nunca envían más de 3,3 V al ESP32. *El joystick se alimenta a 3,3 V aunque diga +5V.</text>
 <text x="110.0" y="1345.0" font-size="12" fill="#111827" text-anchor="start" font-weight="400">• No unas el pin 5V del ESP32 con la fuente externa mientras esté conectado por USB. Lo único que se comparte es GND.</text>
 <text x="110.0" y="1364.0" font-size="12" fill="#6B7280" text-anchor="start" font-weight="400">• La serigrafía puede variar entre fabricantes: confirma el nombre de cada pin en tu placa antes de conectar.</text>
 </svg>

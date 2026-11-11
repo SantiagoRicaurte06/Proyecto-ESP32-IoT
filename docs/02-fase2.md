@@ -32,12 +32,12 @@ Las estaciones hidrológicas oficiales son pocas, costosas y no avisan directame
 
 ## 4. Planteamiento de la solución
 
-Una estación instalada en el puente mide cada 0,5 s la distancia al agua (HC-SR04) y la humedad del suelo de la ribera. Calcula la **tasa de ascenso** con regresión lineal sobre los últimos 30 s y clasifica el riesgo:
+Una estación instalada en el puente mide cada 0,5 s la distancia al agua (HC-SR04). Calcula la **tasa de ascenso** con regresión lineal sobre los últimos 30 s y clasifica el riesgo:
 
 | Nivel | Condición (maqueta) | Acción automática |
 |---|---|---|
 | Verde | nivel < 5 cm | LED verde fijo, paso abierto |
-| Amarillo | ≥ 5 cm, o suelo saturado ≥ 80 % | LED verde intermitente, push de vigilancia |
+| Amarillo | ≥ 5 cm | LED verde intermitente, push de vigilancia |
 | Naranja | ≥ 8 cm | **Barrera cerrada**, push + correo |
 | Rojo | ≥ 11 cm | Barrera cerrada y **LED rojo intermitente** hasta que alguien reconozca la alerta, push prioritario repetido cada 2 min + correo |
 
@@ -51,7 +51,7 @@ Toda la lógica de seguridad corre **en el ESP32**. Si se cae el WiFi, la estaci
 %%{init: {'theme':'base','themeVariables':{'primaryColor':'#FFFFFF','primaryBorderColor':'#D1D5DB','primaryTextColor':'#111827','lineColor':'#1D4ED8','fontFamily':'Inter, Arial','background':'#F3F4F6'}}}%%
 flowchart LR
   subgraph Estacion["Estación (maqueta)"]
-    S["Sensores<br/>HC-SR04 · suelo · DHT11<br/>PIR · IR · táctil"] --> E["ESP32<br/>filtro + tasa + riesgo"]
+    S["Sensores<br/>HC-SR04 · DHT11<br/>PIR · IR · táctil"] --> E["ESP32<br/>filtro + tasa + riesgo"]
     E --> A["Actuadores<br/>servo barrera · LED rojo y verde<br/>OLED"]
   end
   E <-->|"MQTT TLS :8883<br/>telemetría · eventos · cmd · LWT"| B[("HiveMQ Cloud")]
@@ -81,7 +81,6 @@ Ver [`hardware/README.md`](../hardware/README.md#tabla-de-conexiones) (component
 | GPIO | Componente | | GPIO | Componente |
 |---|---|---|---|---|
 | 5 / 18 | HC-SR04 TRIG / ECHO (divisor) | | 13 | Servo SG90 |
-| 34 | Humedad de suelo (ADC1) | | | |
 | 4 | DHT11 | | 19 / 25 | LED verde / rojo |
 | 27 | PIR | | 21 / 22 | OLED SDA / SCL |
 | 26 | IR obstáculos | | 32 / 14 | Joystick (opcional) |
@@ -93,7 +92,7 @@ Ver [`hardware/README.md`](../hardware/README.md#tabla-de-conexiones) (component
 
 Cable por cable, con casillas para marcar: [`hardware/cableado.md`](../hardware/cableado.md). Resumen por pin: [`hardware/plano-electrico.svg`](../hardware/plano-electrico.svg).
 
-Simulación: [`firmware/diagram.json`](../firmware/diagram.json) para Wokwi (en VS Code). El potenciómetro hace de sensor de suelo y los pulsadores hacen de IR y táctil.
+Simulación: [`firmware/diagram.json`](../firmware/diagram.json) para Wokwi (en VS Code). Los pulsadores hacen de IR y táctil.
 
 ## 8. Plano de la maqueta
 
@@ -134,14 +133,14 @@ Base: `centinela/est01`
 
 **Telemetría**
 ```json
-{ "ts": 1794342525, "nivel": 7.1, "dist": 15.9, "tasa": 3.99, "suelo": 73, "temp": 29.9, "hum": 77,
+{ "ts": 1794342525, "nivel": 7.1, "dist": 15.9, "tasa": 3.99, "temp": 29.9, "hum": 77,
   "riesgo": "naranja", "barrera": "cerrada", "alarma": false, "modo": "auto", "reconocida": false,
   "pir": false, "ir": false, "rssi": -55 }
 ```
 
 **Eventos** (todos llevan `tipo`, `ts`, `riesgo`, `nivel`)
 ```json
-{ "tipo": "cambio_riesgo", "de": "amarillo", "a": "naranja", "tasa": 6.34, "suelo": 68, "ts": 1794342506, "riesgo": "naranja", "nivel": 5.1 }
+{ "tipo": "cambio_riesgo", "de": "amarillo", "a": "naranja", "tasa": 6.34, "ts": 1794342506, "riesgo": "naranja", "nivel": 5.1 }
 { "tipo": "persona_zona", ... }        { "tipo": "vehiculo_barrera", ... }
 { "tipo": "boton_emergencia", "origen": "tactil", ... }
 { "tipo": "alerta_reconocida", "origen": "app" | "tactil", ... }
@@ -190,7 +189,7 @@ El APK se compila en **GitHub Actions** (`.github/workflows/apk.yml`) y se desca
 | `POST /api/comando` | **operador** | `{accion, valor}` validado → MQTT |
 | `POST /api/agente` | comunidad | `{historial:[{rol, texto}]}` → respuesta del agente (máx. 12/min por IP) |
 
-**Base de datos** (SQLite): `lecturas(ts, nivel, tasa, suelo, temp, hum, riesgo, barrera, alarma, modo, pir, ir)` con índice en `ts`; `eventos(id, ts, tipo, riesgo, nivel, datos JSON)` con índices `ts` y `(tipo, ts)`; `notificaciones(...)` como registro de envíos.
+**Base de datos** (SQLite): `lecturas(ts, nivel, tasa, temp, hum, riesgo, barrera, alarma, modo, pir, ir)` con índice en `ts`; `eventos(id, ts, tipo, riesgo, nivel, datos JSON)` con índices `ts` y `(tipo, ts)`; `notificaciones(...)` como registro de envíos.
 
 ## 11. Agente IA
 
@@ -245,7 +244,7 @@ El software ya está escrito y probado. Esto es lo que queda:
 | 1 h | Crear cuentas: HiveMQ Cloud (cluster + 2 usuarios), clave de Anthropic, app ntfy en el celular | |
 | 1 h | Simular en Wokwi y probar el backend + simulador + app (sin hardware) — ver [puesta en marcha](03-puesta-en-marcha.md) | |
 | 3 h | Cortar y armar la caja de MDF, empotrar y sellar el recipiente, pintar | |
-| 2 h | Cablear en la protoboard según el plano, subir firmware y calibrar (`ALTURA_SENSOR_CM`, suelo seco/mojado, ángulos del servo) | |
+| 2 h | Cablear en la protoboard según el plano, subir firmware y calibrar (`ALTURA_SENSOR_CM`, ángulos del servo) | |
 | 1 h | Montar postes, mástil, barrera, semáforo, ribera; pasar cables | |
 
 **Día 2 — Integración y sustentación**

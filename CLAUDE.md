@@ -9,7 +9,7 @@ Proyecto formativo SENA (ADSO), Yopal, Casanare. Todo en español: textos, ident
 - `backend/`: Node.js 22+ ESM, sin framework (`node:http`, `node:sqlite`), `mqtt`, `@anthropic-ai/sdk`, `nodemailer`. `npm test`; `npm run simular` simula la estación.
 - `app/`: Expo SDK 58 (React Native, JS). Antes de tocar APIs de Expo lee `app/AGENTS.md`. Instala paquetes con `npx expo install`. El APK se compila en GitHub Actions (`apk.yml`).
 - Si cambias un topic, un mensaje o una ruta, actualiza a la vez firmware, simulador, backend, app y `docs/02-fase2.md`.
-- Hardware disponible: DHT11, HC-SR04, PIR, humedad de suelo, IR de obstáculos, táctil capacitivo, SG90, relé 1 canal (sin uso: no hay sirena), OLED I2C, LCD 16x2, joystick KY-023 y **solo LED rojo y verde**. La alerta se muestra con los 2 LED y la barrera. Matriz 8x8 y display de 4 dígitos sin driver: descartados por consumo de GPIO.
+- Hardware disponible: DHT11, HC-SR04, PIR, IR de obstáculos, táctil capacitivo, SG90, relé 1 canal (sin uso: no hay sirena), OLED I2C, LCD 16x2, joystick KY-023 y **solo LED rojo y verde**. La alerta se muestra con los 2 LED y la barrera. El sensor de humedad de suelo se retiró del proyecto. Matriz 8x8 y display de 4 dígitos sin driver: descartados por consumo de GPIO.
 
 ## Reglas de hardware (no negociables)
 
