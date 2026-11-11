@@ -10,12 +10,12 @@ Guía paso a paso para tener el sistema completo funcionando. Sigue el orden: pr
 
 ## 1. Cuentas (30 min, todas gratis salvo la IA)
 
-### HiveMQ Cloud (broker MQTT)
-1. Entra a <https://console.hivemq.cloud> y crea un cluster **Serverless (Free)**.
-2. En *Access Management* crea dos credenciales con permiso de publicar y suscribirse:
+### EMQX Cloud (broker MQTT)
+1. Entra a <https://cloud-intl.emqx.com>, crea una cuenta y un despliegue **Serverless** (gratis).
+2. En *Access Control → Authentication* crea dos usuarios:
    - `centinela-esp32` (para el ESP32)
    - `centinela-backend` (para el backend)
-3. Copia el *Cluster URL* (algo como `abc123.s1.eu.hivemq.cloud`). Puerto TLS: **8883**.
+3. En *Overview* copia la **Address** (algo como `abc123.ala.us-east-1.emqxsl.com`). Puerto **MQTT over TLS: 8883**.
 
 ### Notificaciones push (ntfy)
 1. Instala **ntfy** desde Play Store.
@@ -39,7 +39,7 @@ npm start
 ```
 
 En `.env`:
-- `MQTT_URL=mqtts://<tu-cluster>.s1.eu.hivemq.cloud:8883`
+- `MQTT_URL=mqtts://<tu-address>.emqxsl.com:8883`
 - `MQTT_USER` / `MQTT_PASSWORD`: los de `centinela-backend`
 - `TOKEN_COMUNIDAD` y `TOKEN_OPERADOR`: genera cada uno con `node -e "console.log(crypto.randomUUID())"`
 
@@ -106,7 +106,7 @@ Toca **Probar y guardar**.
 | Síntoma | Causa probable | Solución |
 |---|---|---|
 | `[mqtt] fallo (-2)` en el ESP32 | WiFi sin internet o host mal escrito | Revisa `MQTT_HOST` (sin `mqtts://`) y que la red tenga salida |
-| `fallo (5)` | Usuario o clave de HiveMQ | Revisa las credenciales de `centinela-esp32` |
+| `fallo (5)` | Usuario o clave de EMQX | Revisa las credenciales de `centinela-esp32` |
 | El ESP32 se reinicia al mover el servo | Servo alimentado desde el ESP32 | Usa la fuente externa de 5 V con GND común y el condensador |
 | Nivel salta mucho | Agua en movimiento o eco en las paredes | Disco de icopor flotando bajo el sensor; sensor centrado |
 | App: "Sin conexión con el servidor" | Red distinta o firewall | Misma red; permite Node en el firewall; prueba `http://IP:3000/api/salud` en el navegador del celular |

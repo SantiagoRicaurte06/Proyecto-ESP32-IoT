@@ -9,7 +9,7 @@ Mide el nivel del río y **la velocidad a la que sube**, cierra el paso del puen
 Proyecto formativo · **SENA – Tecnología en Análisis y Desarrollo de Software (ADSO)** · Yopal, Casanare, Colombia
 
 ![ESP32](https://img.shields.io/badge/ESP32-DevKit%20v1-E7352C?logo=espressif&logoColor=white)
-![MQTT](https://img.shields.io/badge/MQTT-TLS%20%C2%B7%20HiveMQ-660066?logo=mqtt&logoColor=white)
+![MQTT](https://img.shields.io/badge/MQTT-TLS%20%C2%B7%20EMQX-660066?logo=mqtt&logoColor=white)
 ![Node.js](https://img.shields.io/badge/Backend-Node.js%20%2B%20SQLite-339933?logo=nodedotjs&logoColor=white)
 ![Expo](https://img.shields.io/badge/App-React%20Native%20%C2%B7%20Expo-000020?logo=expo&logoColor=white)
 ![IA](https://img.shields.io/badge/Agente%20IA-Claude%20tool%20calling-D97757)
@@ -42,7 +42,7 @@ Si el agua sube a más de 2 cm/min, el riesgo sube un nivel extra. Además, el s
 flowchart LR
   S["Sensores<br/>nivel · DHT11<br/>PIR · IR · táctil"] --> E["ESP32<br/>riesgo local"]
   E --> A["Barrera · LED rojo y verde<br/>OLED"]
-  E <-->|MQTT TLS| B[("HiveMQ Cloud")]
+  E <-->|MQTT TLS| B[("EMQX Cloud")]
   B <--> K["Backend Node.js"]
   K --> D[("SQLite")]
   K --> N["Push ntfy · correo"]

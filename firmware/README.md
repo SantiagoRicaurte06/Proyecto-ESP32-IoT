@@ -14,7 +14,7 @@ ESP32 DevKit v1 con PlatformIO (framework Arduino).
 ## Uso
 
 ```bash
-cp include/secrets.example.h include/secrets.h   # completa WiFi y HiveMQ
+cp include/secrets.example.h include/secrets.h   # completa WiFi y EMQX
 pio run -t upload                                 # compilar y subir
 pio device monitor                                # ver logs
 pio run -t upload --upload-port centinela-est01.local   # actualizar por WiFi (OTA)

@@ -17,7 +17,7 @@ Las estaciones hidrológicas oficiales son pocas, costosas y no avisan directame
 
 - **Social:** protege vidas y bienes en zonas ribereñas. El semáforo y la barrera actúan en sitio, mientras las alertas al celular llegan a quien no está cerca. El agente IA permite que cualquier persona pregunte en lenguaje natural sin saber leer gráficas.
 - **Técnica:** integra IoT (ESP32 con sensores y actuadores), comunicación MQTT con TLS, procesamiento en el borde (filtro, regresión, máquina de estados con histéresis), persistencia de series de tiempo, API REST, app móvil y un agente de IA con *tool calling*. Cubre las competencias del programa ADSO de punta a punta.
-- **Económica:** usa hardware que ya está disponible (costo adicional ≈ $30.000 COP) y servicios con capa gratuita (HiveMQ Cloud, ntfy, GitHub Actions). Una estación comercial cuesta millones de pesos. El diseño es replicable en cada puente o vado.
+- **Económica:** usa hardware que ya está disponible (costo adicional ≈ $30.000 COP) y servicios con capa gratuita (EMQX Cloud, ntfy, GitHub Actions). Una estación comercial cuesta millones de pesos. El diseño es replicable en cada puente o vado.
 
 ## 3. Objetivos
 
@@ -54,7 +54,7 @@ flowchart LR
     S["Sensores<br/>HC-SR04 · DHT11<br/>PIR · IR · táctil"] --> E["ESP32<br/>filtro + tasa + riesgo"]
     E --> A["Actuadores<br/>servo barrera · LED rojo y verde<br/>OLED"]
   end
-  E <-->|"MQTT TLS :8883<br/>telemetría · eventos · cmd · LWT"| B[("HiveMQ Cloud")]
+  E <-->|"MQTT TLS :8883<br/>telemetría · eventos · cmd · LWT"| B[("EMQX Cloud")]
   B <--> K["Backend Node.js<br/>predicción · reglas"]
   K --> D[("SQLite<br/>lecturas · eventos")]
   K -->|"push"| N1["ntfy → celular"]
@@ -67,7 +67,7 @@ flowchart LR
 | Capa | Tecnología | Por qué |
 |---|---|---|
 | Dispositivo | ESP32 + Arduino (PlatformIO) | WiFi integrado, ADC, PWM; librerías maduras |
-| Mensajería | MQTT sobre TLS (HiveMQ Cloud, gratis) | Liviano, QoS, *retained* y *Last Will* para saber si la estación cayó |
+| Mensajería | MQTT sobre TLS (EMQX Cloud Serverless, gratis) | Liviano, QoS, *retained* y *Last Will* para saber si la estación cayó |
 | Backend | Node.js 22+ (sin framework), `mqtt`, `node:sqlite` | Cero dependencias nativas, corre en cualquier PC |
 | Base de datos | SQLite (WAL) con índices por tiempo | Archivo único, suficiente para series de una estación |
 | Notificaciones | ntfy (push) + Gmail (correo) | ntfy no requiere cuenta ni Firebase |
@@ -161,7 +161,7 @@ Base: `centinela/est01`
 { "accion": "umbrales", "valor": { "amarillo": 5, "naranja": 8, "rojo": 11 } }
 ```
 
-**Seguridad:** TLS en el puerto 8883, con usuarios distintos en HiveMQ para el ESP32 y para el backend. La app **no** se conecta al broker: pasa por el backend con token, y el backend valida cada comando contra una lista permitida.
+**Seguridad:** TLS en el puerto 8883, con usuarios distintos en EMQX para el ESP32 y para el backend. La app **no** se conecta al broker: pasa por el backend con token, y el backend valida cada comando contra una lista permitida.
 
 ## 10. Stack de la app, backend y base de datos
 
@@ -241,7 +241,7 @@ El software ya está escrito y probado. Esto es lo que queda:
 
 | Hora | Tarea | Responsable |
 |---|---|---|
-| 1 h | Crear cuentas: HiveMQ Cloud (cluster + 2 usuarios), clave de Anthropic, app ntfy en el celular | |
+| 1 h | Crear cuentas: EMQX Cloud (despliegue Serverless + 2 usuarios), clave de Anthropic, app ntfy en el celular | |
 | 1 h | Simular en Wokwi y probar el backend + simulador + app (sin hardware) — ver [puesta en marcha](03-puesta-en-marcha.md) | |
 | 3 h | Cortar y armar la caja de MDF, empotrar y sellar el recipiente, pintar | |
 | 2 h | Cablear en la protoboard según el plano, subir firmware y calibrar (`ALTURA_SENSOR_CM`, ángulos del servo) | |
