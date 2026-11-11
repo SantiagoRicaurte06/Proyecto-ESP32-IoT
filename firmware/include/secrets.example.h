@@ -4,8 +4,8 @@
 #define WIFI_SSID      "TuRedWiFi"
 #define WIFI_PASSWORD  "TuClaveWiFi"
 
-// HiveMQ Cloud → Cluster → Access Management (crea un usuario solo para el ESP32)
-#define MQTT_HOST      "xxxxxxxxxxxxxxxx.s1.eu.hivemq.cloud"
+// EMQX Cloud Serverless → Overview: "Address" (sin mqtts:// ni puerto) · usuario en Access Control → Authentication
+#define MQTT_HOST      "xxxxxxxx.ala.us-east-1.emqxsl.com"
 #define MQTT_PORT      8883
 #define MQTT_USER      "centinela-esp32"
 #define MQTT_PASSWORD  "cambia-esta-clave"
