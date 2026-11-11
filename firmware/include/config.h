@@ -5,6 +5,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 #define FW_VERSION      "1.0.0"
+#define DIAGNOSTICO     1   // imprime cada 2 s el eco del HC-SR04 y el estado del táctil (pon 0 para la demo)
 #define ESTACION_ID     "est01"
 #define TOPIC_BASE      "centinela/" ESTACION_ID
 

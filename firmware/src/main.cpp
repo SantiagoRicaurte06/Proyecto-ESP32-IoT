@@ -12,6 +12,8 @@
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
+#include <LiquidCrystal_I2C.h>
+#include <stdarg.h>
 #include <DHT.h>
 #include <ESP32Servo.h>
 #include <deque>
@@ -43,6 +45,7 @@ WiFiClientSecure red;
 PubSubClient mqtt(red);
 DHT dht(PIN_DHT, TIPO_DHT);
 Adafruit_SSD1306 oled(128, 64, &Wire, -1);
+LiquidCrystal_I2C* lcd = nullptr;   // LCD 16x2 con módulo I2C (0x27 o 0x3F), se detecta al arrancar
 Servo barreraServo;
 Preferences prefs;
 
@@ -325,6 +328,32 @@ void dibujarOled() {
   oled.display();
 }
 
+// ── LCD 16x2 ─────────────────────────────────────────────────────────────────
+void lineaLcd(uint8_t fila, const char* formato, ...) {
+  char b[17];
+  va_list args; va_start(args, formato); vsnprintf(b, sizeof(b), formato, args); va_end(args);
+  size_t n = strlen(b);
+  while (n < 16) b[n++] = ' ';   // rellena con espacios: evita borrar la pantalla (sin parpadeo)
+  b[16] = 0;
+  lcd->setCursor(0, fila);
+  lcd->print(b);
+}
+
+void dibujarLcd() {
+  if (!lcd) return;
+  String r = NOMBRE_RIESGO[riesgo]; r.toUpperCase();
+  if (paginaOled == 0) {
+    lineaLcd(0, "%-8s%5.1fcm", r.c_str(), nivelCm);
+    lineaLcd(1, "%+.2fcm/m %s", tasaCmMin, barreraCerrada ? "CERRA" : "ABIER");
+  } else if (paginaOled == 1) {
+    lineaLcd(0, "Dist %.1f cm", distanciaCm);
+    lineaLcd(1, "%.1fC  Hum %.0f%%", temperatura, humedad);
+  } else {
+    lineaLcd(0, "%s", WiFi.isConnected() ? WiFi.localIP().toString().c_str() : "WiFi: sin red");
+    lineaLcd(1, "MQTT %s  v%s", mqtt.connected() ? "ok " : "no ", FW_VERSION);
+  }
+}
+
 // ── Lógica principal ─────────────────────────────────────────────────────────
 void actualizarNivel() {
   float d;
@@ -459,7 +488,28 @@ void setup() {
   barreraServo.write(SERVO_ABIERTA);
 
   dht.begin();
-  oledOk = oled.begin(SSD1306_SWITCHCAPVCC, 0x3C);
+  // Pantallas I2C: OLED (0x3C) y/o LCD 16x2 con módulo I2C (0x27 o 0x3F)
+  Wire.begin();
+  bool hayOled = false;
+  uint8_t dirLcd = 0;
+  Serial.print("[i2c] dispositivos:");
+  for (uint8_t dir = 1; dir < 127; dir++) {
+    Wire.beginTransmission(dir);
+    if (Wire.endTransmission() != 0) continue;
+    Serial.printf(" 0x%02X", dir);
+    if (dir == 0x3C) hayOled = true;
+    if (dir == 0x27 || dir == 0x3F) dirLcd = dir;
+  }
+  Serial.println(hayOled || dirLcd ? "" : " ninguno (revisa SDA 21, SCL 22, VCC y GND)");
+  if (dirLcd) {
+    lcd = new LiquidCrystal_I2C(dirLcd, 16, 2);
+    lcd->init();
+    lcd->backlight();
+    lineaLcd(0, "Centinela");
+    lineaLcd(1, "Cravo Sur v%s", FW_VERSION);
+    Serial.printf("[i2c] LCD 16x2 en 0x%02X\n", dirLcd);
+  }
+  oledOk = hayOled && oled.begin(SSD1306_SWITCHCAPVCC, 0x3C);
   if (oledOk) { oled.clearDisplay(); oled.setTextColor(SSD1306_WHITE); oled.setCursor(0, 0); oled.print("Centinela iniciando..."); oled.display(); }
 
   WiFi.mode(WIFI_STA);
@@ -504,4 +554,17 @@ void loop() {
   if (otaIniciado) ArduinoOTA.handle();
 
   if (ahora - tOled >= 250) { tOled = ahora; dibujarOled(); }
+  static unsigned long tLcd = 0;
+  if (ahora - tLcd >= 500) { tLcd = ahora; dibujarLcd(); }
+
+#if DIAGNOSTICO
+  static unsigned long tDiag = 0;
+  if (ahora - tDiag >= 2000) {
+    tDiag = ahora;
+    float d = leerDistanciaUnaVez();
+    if (d < 0) Serial.printf("[diag] HC-SR04: SIN ECO (revisa 5 V, TRIG=GPIO%d, ECHO=GPIO%d con divisor) · ", PIN_TRIG, PIN_ECHO);
+    else       Serial.printf("[diag] HC-SR04: %.1f cm · ", d);
+    Serial.printf("tactil GPIO%d = %d (1 = tocado) · nivel %.1f cm · riesgo %s\n", PIN_TACTIL, digitalRead(PIN_TACTIL), nivelCm, NOMBRE_RIESGO[riesgo]);
+  }
+#endif
 }
