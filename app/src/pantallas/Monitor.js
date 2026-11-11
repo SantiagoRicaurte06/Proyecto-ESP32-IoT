@@ -24,7 +24,7 @@ export default function Monitor({ datos, error, rol, onReconocer }) {
         <Text style={[s.riesgoEtiqueta, { color: r.fuerte }]}>ALERTA {nivelRiesgo.toUpperCase()}</Text>
         <Text style={s.riesgoTitulo}>{r.texto}</Text>
         <Text style={s.riesgoConsejo}>{r.consejo}</Text>
-        {t?.sirena ? <Text style={[s.sirena, { color: r.fuerte }]}>● Sirena activa</Text> : null}
+        {t?.alarma ? <Text style={[s.alarma, { color: r.fuerte }]}>● LED rojo en alerta: reconoce para detener la repetición</Text> : null}
         {t && !t.reconocida && rol === "operador" ? (
           <Boton texto="Reconocer alerta" tipo="peligro" onPress={onReconocer} estilo={{ marginTop: espacio.m }} />
         ) : null}
@@ -55,19 +55,19 @@ export default function Monitor({ datos, error, rol, onReconocer }) {
 
       <Tarjeta titulo="Sensores">
         <View style={s.grilla}>
-          <Dato etiqueta="Suelo ribera" valor={t?.suelo} unidad="%" />
+          <Dato etiqueta="Distancia al agua" valor={t?.dist} unidad="cm" />
           <Dato etiqueta="Temperatura" valor={t?.temp} unidad="°C" />
           <Dato etiqueta="Humedad aire" valor={t?.hum} unidad="%" />
-          <Dato etiqueta="Personas en ribera" valor={t ? (t.pir ? "Detectada" : "No") : null} />
+          <Dato etiqueta="Señal WiFi" valor={t?.rssi} unidad="dBm" />
         </View>
       </Tarjeta>
 
       <Tarjeta titulo="Actuadores">
         <View style={s.grilla}>
           <Dato etiqueta="Barrera" valor={t?.barrera === "cerrada" ? "Cerrada" : t ? "Abierta" : null} />
-          <Dato etiqueta="Sirena" valor={t ? (t.sirena ? "Encendida" : "Apagada") : null} />
+          <Dato etiqueta="LED de alerta" valor={t ? ({ verde: "Verde", amarillo: "Verde intermitente", naranja: "Rojo", rojo: "Rojo intermitente" }[t.riesgo] ?? "—") : null} />
           <Dato etiqueta="Modo" valor={t ? (t.modo === "manual" ? "Manual" : "Automático") : null} />
-          <Dato etiqueta="Vehículo en barrera" valor={t ? (t.ir ? "Sí" : "No") : null} />
+          <Dato etiqueta="Alerta" valor={t ? (t.reconocida === false ? "Sin reconocer" : "Atendida") : null} />
         </View>
       </Tarjeta>
 
@@ -85,7 +85,7 @@ const s = StyleSheet.create({
   riesgoEtiqueta: { fontSize: 13, fontWeight: "700", letterSpacing: 1 },
   riesgoTitulo: { fontSize: 28, fontWeight: "700", color: color.texto, marginTop: 2 },
   riesgoConsejo: { fontSize: 15, color: color.texto, marginTop: espacio.xs },
-  sirena: { fontWeight: "700", marginTop: espacio.s },
+  alarma: { fontWeight: "700", marginTop: espacio.s },
   filaNivel: { flexDirection: "row", alignItems: "center" },
   tubo: { width: 36, height: 110, borderRadius: 8, borderWidth: 1, borderColor: color.borde, backgroundColor: "#F9FAFB", justifyContent: "flex-end", overflow: "hidden" },
   agua: { width: "100%", opacity: 0.85 },

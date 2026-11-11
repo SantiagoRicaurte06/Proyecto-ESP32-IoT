@@ -81,7 +81,7 @@ export function alEvento(e, obtenerPrediccion) {
       } else if (e.a === "rojo") {
         const enviarRojo = () => notificar({
           titulo: "ALERTA ROJA · evacúe la ribera",
-          mensaje: `Nivel ${nivel}. Sirena activa. Aléjese del río y del puente.${textoPrediccion(obtenerPrediccion())}`,
+          mensaje: `Nivel ${nivel}. Barrera cerrada y LED rojo en alerta. Aléjese del río y del puente.${textoPrediccion(obtenerPrediccion())}`,
           prioridad: 5, tags: [EMOJI.rojo, "rotating_light"], porCorreo: true,
         });
         enviarRojo();
@@ -92,13 +92,7 @@ export function alEvento(e, obtenerPrediccion) {
     }
     case "alerta_reconocida":
       detenerRepeticion();
-      notificar({ titulo: "Alerta reconocida", mensaje: `Reconocida desde ${e.origen === "app" ? "la app" : "la estación (táctil)"}. Sirena silenciada.`, prioridad: 2, tags: ["white_check_mark"] });
-      return;
-    case "persona_zona":
-      notificar({ titulo: "Persona en zona de riesgo", mensaje: `Movimiento en la ribera con alerta ${e.riesgo}. Nivel ${nivel}.`, prioridad: 4, tags: ["walking", "warning"] });
-      return;
-    case "vehiculo_barrera":
-      notificar({ titulo: "Vehículo en la barrera", mensaje: `Un vehículo intenta cruzar con el paso cerrado (alerta ${e.riesgo}).`, prioridad: 4, tags: ["car", "no_entry"] });
+      notificar({ titulo: "Alerta reconocida", mensaje: `Reconocida desde ${e.origen === "app" ? "la app" : "la estación (táctil)"}. La alerta deja de repetirse.`, prioridad: 2, tags: ["white_check_mark"] });
       return;
     case "boton_emergencia":
       notificar({ titulo: "EMERGENCIA reportada en la estación", mensaje: `Alguien activó el botón comunitario. Riesgo ${e.riesgo}, nivel ${nivel}.`, prioridad: 5, tags: ["sos"], porCorreo: true });

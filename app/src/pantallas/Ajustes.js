@@ -36,7 +36,7 @@ export default function Ajustes({ alGuardar }) {
 
         <Text style={[s.etiqueta, { marginTop: espacio.l }]}>Token de acceso</Text>
         <TextInput style={s.input} value={token} onChangeText={setToken} autoCapitalize="none" autoCorrect={false} secureTextEntry placeholder="Token de comunidad u operador" />
-        <Text style={s.ayuda}>Comunidad: solo consulta. Operador: también controla la barrera y la sirena.</Text>
+        <Text style={s.ayuda}>Comunidad: solo consulta. Operador: también controla la barrera y reconoce alertas.</Text>
 
         <Boton texto="Probar y guardar" deshabilitado={probando} onPress={probarYGuardar} estilo={{ marginTop: espacio.l }} />
         {estado ? <Text style={[s.estado, { color: estado.startsWith("✓") ? "#15803D" : estado.startsWith("✖") ? color.error : color.suave }]}>{estado}</Text> : null}

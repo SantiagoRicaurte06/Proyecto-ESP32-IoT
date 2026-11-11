@@ -59,16 +59,14 @@ struct Umbrales { float amarillo, naranja, rojo; } umbrales;
 
 float nivelCm = 0, distanciaCm = 0, tasaCmMin = 0;
 float temperatura = NAN, humedad = NAN;
-int sueloPct = 0, sueloRaw = 0;
-bool pirActivo = false, irObstaculo = false;
 
 Riesgo riesgo = VERDE;
 unsigned long inicioBajadaMs = 0;
 bool alertaReconocida = true;
 
 bool modoManual = false;
-bool barreraCerradaManual = false, sirenaManual = false;
-bool barreraCerrada = false, sirenaEncendida = false;
+bool barreraCerradaManual = false;
+bool barreraCerrada = false, alarmaActiva = false;
 
 bool oledOk = false, otaIniciado = false, horaOk = false;
 uint8_t paginaOled = 0;
@@ -130,18 +128,19 @@ float calcularTasa() {
   return (float)((histN * sxy - sx * sy) / den);
 }
 
-Riesgo riesgoPara(float nivel, float tasa, int suelo) {
+Riesgo riesgoPara(float nivel, float tasa) {
   Riesgo r = VERDE;
   if (nivel >= umbrales.rojo) r = ROJO;
   else if (nivel >= umbrales.naranja) r = NARANJA;
   else if (nivel >= umbrales.amarillo) r = AMARILLO;
   if (tasa >= TASA_RAPIDA_CM_MIN && r < ROJO) r = (Riesgo)(r + 1);  // sube rápido: un nivel más
-  if (suelo >= SUELO_SATURADO_PCT && r == VERDE) r = AMARILLO;      // ribera saturada
   return r;
 }
 
 void ponerRele(bool on) {
+#if USAR_RELE
   digitalWrite(PIN_RELE, (on == RELE_ACTIVO_EN_ALTO) ? HIGH : LOW);
+#endif
 }
 
 // ── MQTT ─────────────────────────────────────────────────────────────────────
@@ -167,16 +166,13 @@ String telemetriaJson() {
   d["nivel"] = roundf(nivelCm * 10) / 10;
   d["dist"] = roundf(distanciaCm * 10) / 10;
   d["tasa"] = roundf(tasaCmMin * 100) / 100;
-  d["suelo"] = sueloPct;
   if (!isnan(temperatura)) d["temp"] = roundf(temperatura * 10) / 10;
   if (!isnan(humedad)) d["hum"] = roundf(humedad);
   d["riesgo"] = NOMBRE_RIESGO[riesgo];
   d["barrera"] = barreraCerrada ? "cerrada" : "abierta";
-  d["sirena"] = sirenaEncendida;
+  d["alarma"] = alarmaActiva;
   d["modo"] = modoManual ? "manual" : "auto";
   d["reconocida"] = alertaReconocida;
-  d["pir"] = pirActivo;
-  d["ir"] = irObstaculo;
   d["rssi"] = WiFi.RSSI();
   String s; serializeJson(d, s);
   return s;
@@ -210,14 +206,9 @@ void alRecibirMqtt(char* topic, byte* payload, unsigned int len) {
   if (!strcmp(accion, "barrera")) {
     modoManual = true;
     barreraCerradaManual = !strcmp(d["valor"] | "", "cerrar");
-    sirenaManual = sirenaEncendida;
-  } else if (!strcmp(accion, "sirena")) {
-    modoManual = true;
-    sirenaManual = d["valor"] | false;
-    barreraCerradaManual = barreraCerrada;
   } else if (!strcmp(accion, "modo")) {
     modoManual = !strcmp(d["valor"] | "auto", "manual");
-    barreraCerradaManual = barreraCerrada; sirenaManual = sirenaEncendida;
+    barreraCerradaManual = barreraCerrada;
   } else if (!strcmp(accion, "reconocer")) {
     reconocerAlerta("app");
     return;
@@ -239,8 +230,25 @@ void alRecibirMqtt(char* topic, byte* payload, unsigned int len) {
 }
 
 void gestionarConexion() {
-  static unsigned long ultimoIntento = 0;
-  if (WiFi.status() != WL_CONNECTED) return;
+  static unsigned long ultimoIntento = 0, ultimoAvisoWifi = 0;
+  static bool wifiAntes = false;
+  bool wifiAhora = WiFi.status() == WL_CONNECTED;
+  if (wifiAhora && !wifiAntes) Serial.printf("[wifi] conectado a \"%s\" · IP %s · RSSI %d dBm\n", WIFI_SSID, WiFi.localIP().toString().c_str(), WiFi.RSSI());
+  wifiAntes = wifiAhora;
+  if (!wifiAhora) {
+    if (millis() - ultimoAvisoWifi > 5000) {
+      ultimoAvisoWifi = millis();
+      const char* motivo;
+      switch (WiFi.status()) {
+        case WL_NO_SSID_AVAIL:  motivo = "no se encuentra la red (¿nombre mal escrito o red de 5 GHz?)"; break;
+        case WL_CONNECT_FAILED: motivo = "conexión rechazada (¿clave incorrecta?)"; break;
+        case WL_DISCONNECTED:   motivo = "intentando conectar..."; break;
+        default:                motivo = "sin conexión"; break;
+      }
+      Serial.printf("[wifi] \"%s\": %s (estado %d)\n", WIFI_SSID, motivo, WiFi.status());
+    }
+    return;
+  }
 
   if (!otaIniciado) {
     ArduinoOTA.setHostname("centinela-" ESTACION_ID);
@@ -302,11 +310,11 @@ void dibujarOled() {
     oled.drawRect(118, 11, 10, 53, SSD1306_WHITE);
     oled.fillRect(120, 62 - alto, 6, alto, SSD1306_WHITE);
   } else if (paginaOled == 1) {
-    // Página de sensores: también sirve para calibrar (Dist y ADC del suelo)
+    // Página de sensores: también sirve para calibrar (Dist = distancia al agua)
     oled.setCursor(0, 12); oled.printf("Dist: %.1f cm", distanciaCm);
     oled.setCursor(0, 22); oled.printf("Temp: %.1fC Hum: %.0f%%", temperatura, humedad);
-    oled.setCursor(0, 32); oled.printf("Suelo: %d%% (ADC %d)", sueloPct, sueloRaw);
-    oled.setCursor(0, 42); oled.printf("PIR:%s  IR:%s", pirActivo ? "SI" : "no", irObstaculo ? "SI" : "no");
+    oled.setCursor(0, 32); oled.printf("Nivel: %.1f cm", nivelCm);
+    oled.setCursor(0, 42); oled.printf("WiFi: %s", WiFi.isConnected() ? "conectado" : "sin conexion");
     oled.setCursor(0, 52); oled.printf("Toque corto: pagina");
   } else {
     oled.setCursor(0, 14); oled.printf("IP %s", WiFi.localIP().toString().c_str());
@@ -331,8 +339,6 @@ void actualizarNivel() {
 }
 
 void actualizarSensores() {
-  sueloRaw = analogRead(PIN_SUELO);
-  sueloPct = constrain(map(sueloRaw, SUELO_ADC_SECO, SUELO_ADC_MOJADO, 0, 100), 0, 100);
 
   static unsigned long ultimoDht = 0;
   if (millis() - ultimoDht > PERIODO_DHT_MS) {
@@ -344,7 +350,7 @@ void actualizarSensores() {
 }
 
 void evaluarRiesgo() {
-  Riesgo objetivo = riesgoPara(nivelCm, tasaCmMin, sueloPct);
+  Riesgo objetivo = riesgoPara(nivelCm, tasaCmMin);
   Riesgo anterior = riesgo;
 
   if (objetivo > riesgo) {
@@ -352,7 +358,7 @@ void evaluarRiesgo() {
     inicioBajadaMs = 0;
   } else if (objetivo < riesgo) {
     // bajar: con histéresis (como si el agua estuviera 1 cm más alta) y sostenido 10 s
-    Riesgo conMargen = riesgoPara(nivelCm + HISTERESIS_CM, tasaCmMin, sueloPct);
+    Riesgo conMargen = riesgoPara(nivelCm + HISTERESIS_CM, tasaCmMin);
     if (conMargen < riesgo) {
       if (!inicioBajadaMs) inicioBajadaMs = millis();
       if (millis() - inicioBajadaMs > TIEMPO_BAJADA_MS) { riesgo = conMargen; inicioBajadaMs = 0; }
@@ -370,48 +376,33 @@ void evaluarRiesgo() {
     e["de"] = NOMBRE_RIESGO[anterior];
     e["a"] = NOMBRE_RIESGO[riesgo];
     e["tasa"] = roundf(tasaCmMin * 100) / 100;
-    e["suelo"] = sueloPct;
     publicarEvento("cambio_riesgo", e);
   }
 }
 
 void aplicarActuadores() {
   bool cerrar = modoManual ? barreraCerradaManual : (riesgo >= NARANJA);
-  bool sirena = modoManual ? sirenaManual : (riesgo == ROJO && !alertaReconocida);
+  bool alarma = riesgo == ROJO && !alertaReconocida;   // rojo sin reconocer: LED rojo parpadea
 
   if (cerrar != barreraCerrada) {
     barreraCerrada = cerrar;
     barreraServo.write(cerrar ? SERVO_CERRADA : SERVO_ABIERTA);
   }
-  if (sirena != sirenaEncendida) {
-    sirenaEncendida = sirena;
-    ponerRele(sirena);
+  if (alarma != alarmaActiva) {
+    alarmaActiva = alarma;
+    ponerRele(alarma);
   }
 
   bool parpadeo = (millis() / 400) % 2;
-  digitalWrite(PIN_LED_VERDE,    riesgo == VERDE);
-  digitalWrite(PIN_LED_AMARILLO, riesgo == AMARILLO);
-  digitalWrite(PIN_LED_NARANJA,  riesgo == NARANJA);
-  digitalWrite(PIN_LED_ROJO,     riesgo == ROJO && (alertaReconocida || parpadeo));
+  bool parpadeoLento = (millis() / 700) % 2;
+  // verde fijo = normal · verde parpadeando = vigilancia · rojo fijo = barrera cerrada · rojo parpadeando = alerta máxima
+  digitalWrite(PIN_LED_VERDE, riesgo == VERDE || (riesgo == AMARILLO && parpadeoLento));
+  digitalWrite(PIN_LED_ROJO,  riesgo == NARANJA || (riesgo == ROJO && (alertaReconocida || parpadeo)));
 }
 
 void revisarEntradas() {
-  static unsigned long ultimoPir = 0, ultimoIr = 0, inicioToque = 0;
+  static unsigned long inicioToque = 0;
   static bool emergenciaEnviada = false;
-
-  bool pir = digitalRead(PIN_PIR) == HIGH;
-  if (pir && !pirActivo && riesgo >= NARANJA && millis() - ultimoPir > ANTIRREBOTE_EVENTO_MS) {
-    ultimoPir = millis();
-    JsonDocument e; publicarEvento("persona_zona", e);
-  }
-  pirActivo = pir;
-
-  bool ir = digitalRead(PIN_IR) == LOW;
-  if (ir && !irObstaculo && barreraCerrada && millis() - ultimoIr > ANTIRREBOTE_EVENTO_MS) {
-    ultimoIr = millis();
-    JsonDocument e; publicarEvento("vehiculo_barrera", e);
-  }
-  irObstaculo = ir;
 
   // Táctil: toque corto = silenciar/reconocer o cambiar pantalla; mantener 2 s = emergencia
   bool toque = digitalRead(PIN_TACTIL) == HIGH;
@@ -445,17 +436,17 @@ void setup() {
 
   pinMode(PIN_TRIG, OUTPUT);
   pinMode(PIN_ECHO, INPUT);
-  pinMode(PIN_PIR, INPUT);
-  pinMode(PIN_IR, INPUT_PULLUP);
   pinMode(PIN_TACTIL, INPUT_PULLDOWN);
+#if USAR_RELE
   pinMode(PIN_RELE, OUTPUT);
+#endif
   ponerRele(false);
-  for (int p : {PIN_LED_VERDE, PIN_LED_AMARILLO, PIN_LED_NARANJA, PIN_LED_ROJO}) pinMode(p, OUTPUT);
+  pinMode(PIN_LED_VERDE, OUTPUT);
+  pinMode(PIN_LED_ROJO, OUTPUT);
 #if USAR_JOYSTICK
   pinMode(PIN_JOY_SW, INPUT_PULLUP);
 #endif
   analogReadResolution(12);
-  analogSetPinAttenuation(PIN_SUELO, ADC_11db);
 
   prefs.begin("centinela", false);
   umbrales.amarillo = prefs.getFloat("amarillo", UMBRAL_AMARILLO_CM);

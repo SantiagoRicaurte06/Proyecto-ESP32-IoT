@@ -84,7 +84,6 @@ export function conectarMqtt() {
 
 const ACCIONES = {
   barrera: (v) => v === "abrir" || v === "cerrar",
-  sirena: (v) => typeof v === "boolean",
   modo: (v) => v === "auto" || v === "manual",
   reconocer: () => true,
   umbrales: (v) => v && [v.amarillo, v.naranja, v.rojo].every((x) => Number.isFinite(x) && x > 0)

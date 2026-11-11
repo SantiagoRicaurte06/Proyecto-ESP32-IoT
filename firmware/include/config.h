@@ -11,21 +11,22 @@
 // ── Pines ────────────────────────────────────────────────────────────────────
 #define PIN_TRIG        5    // HC-SR04 TRIG
 #define PIN_ECHO        18   // HC-SR04 ECHO (con divisor 1k/2k → 3,3 V)
-#define PIN_SUELO       34   // Humedad de suelo AO (ADC1, solo entrada)
 #define PIN_DHT         4    // DHT11 DATA
-#define PIN_PIR         27   // PIR OUT
-#define PIN_IR          26   // IR obstáculos OUT (LOW = obstáculo)
 #define PIN_TACTIL      33   // TTP223 SIG (HIGH = tocado)
 #define PIN_SERVO       13   // SG90 señal
-#define PIN_RELE        23   // Relé IN (sirena/baliza)
-#define PIN_LED_VERDE   19
-#define PIN_LED_AMARILLO 17
-#define PIN_LED_NARANJA 16
-#define PIN_LED_ROJO    25
+#define PIN_LED_VERDE   19   // 220 Ω en serie
+#define PIN_LED_ROJO    25   // 220 Ω en serie
+#define PIN_RELE        23   // opcional: alarma externa (luz o buzzer). Ver USAR_RELE
 #define PIN_JOY_X       32   // Joystick VRx (ADC1) · opcional
 #define PIN_JOY_SW      14   // Joystick SW · opcional
 // OLED I2C: SDA 21, SCL 22 (pines por defecto de Wire)
 
+// Señalización con 2 LED:
+//   verde fijo = normal · verde parpadeando = vigilancia (amarillo)
+//   rojo fijo = barrera cerrada (naranja) · rojo parpadeando = alerta máxima sin reconocer (rojo)
+#ifndef USAR_RELE
+#define USAR_RELE 0   // pon 1 si conectas una alarma externa al relé (se activa en rojo sin reconocer)
+#endif
 #ifndef RELE_ACTIVO_EN_ALTO
 #define RELE_ACTIVO_EN_ALTO false  // la mayoría de módulos con optoacoplador se activan con LOW; pon true si el tuyo se activa con HIGH
 #endif
@@ -42,11 +43,7 @@
 #define TIEMPO_BAJADA_MS   10000  // ...durante 10 s seguidos
 
 #define TASA_RAPIDA_CM_MIN 2.0f   // ascenso brusco: sube un nivel de riesgo
-#define SUELO_SATURADO_PCT 80     // ribera saturada: verde pasa a amarillo
 
-// Calibración del sensor de suelo (lectura ADC en seco y en agua)
-#define SUELO_ADC_SECO     3200
-#define SUELO_ADC_MOJADO   1300
 
 // Servo (grados)
 #define SERVO_ABIERTA      90
@@ -58,5 +55,4 @@
 #define PERIODO_TELEMETRIA_MS  2000
 #define PERIODO_BUFFER_MS      10000   // sin conexión: guarda una lectura cada 10 s
 #define BUFFER_MAX             240     // 40 min de respaldo sin internet
-#define ANTIRREBOTE_EVENTO_MS  15000   // mismo evento PIR/IR como máximo cada 15 s
 #define TACTIL_LARGO_MS        2000    // mantener 2 s = emergencia comunitaria

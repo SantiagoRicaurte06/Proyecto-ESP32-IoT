@@ -17,7 +17,7 @@ export const config = {
   get topicBase() { return `centinela/${this.estacion}`; },
 
   mqtt: {
-    url: env("MQTT_URL", ""), // ej: mqtts://xxxx.s1.eu.hivemq.cloud:8883
+    url: env("MQTT_URL", ""), // ej: mqtts://xxxxxxxx.ala.us-east-1.emqxsl.com:8883 (EMQX Cloud)
     usuario: env("MQTT_USER", ""),
     clave: env("MQTT_PASSWORD", ""),
   },

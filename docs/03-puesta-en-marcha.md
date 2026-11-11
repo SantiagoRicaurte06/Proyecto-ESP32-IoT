@@ -10,12 +10,12 @@ Guía paso a paso para tener el sistema completo funcionando. Sigue el orden: pr
 
 ## 1. Cuentas (30 min, todas gratis salvo la IA)
 
-### HiveMQ Cloud (broker MQTT)
-1. Entra a <https://console.hivemq.cloud> y crea un cluster **Serverless (Free)**.
-2. En *Access Management* crea dos credenciales con permiso de publicar y suscribirse:
+### EMQX Cloud (broker MQTT)
+1. Entra a <https://cloud-intl.emqx.com>, crea una cuenta y un despliegue **Serverless** (gratis).
+2. En *Access Control → Authentication* crea dos usuarios:
    - `centinela-esp32` (para el ESP32)
    - `centinela-backend` (para el backend)
-3. Copia el *Cluster URL* (algo como `abc123.s1.eu.hivemq.cloud`). Puerto TLS: **8883**.
+3. En *Overview* copia la **Address** (algo como `abc123.ala.us-east-1.emqxsl.com`). Puerto **MQTT over TLS: 8883**.
 
 ### Notificaciones push (ntfy)
 1. Instala **ntfy** desde Play Store.
@@ -39,7 +39,7 @@ npm start
 ```
 
 En `.env`:
-- `MQTT_URL=mqtts://<tu-cluster>.s1.eu.hivemq.cloud:8883`
+- `MQTT_URL=mqtts://<tu-address>.emqxsl.com:8883`
 - `MQTT_USER` / `MQTT_PASSWORD`: los de `centinela-backend`
 - `TOKEN_COMUNIDAD` y `TOKEN_OPERADOR`: genera cada uno con `node -e "console.log(crypto.randomUUID())"`
 
@@ -85,8 +85,6 @@ Toca **Probar y guardar**.
 4. **Calibra** en `include/config.h` y vuelve a subir:
    - Toca el botón táctil para pasar a la página **Sensores** de la OLED.
    - `ALTURA_SENSOR_CM`: con el recipiente vacío, el valor `Dist` (cm). Con eso, el nivel marca ≈ 0.
-   - `SUELO_ADC_SECO` / `SUELO_ADC_MOJADO`: el valor `ADC` del sensor de suelo en el aire y dentro de un vaso de agua.
-   - `RELE_ACTIVO_EN_ALTO`: si el relé queda pegado al revés, cámbialo.
    - `SERVO_ABIERTA` / `SERVO_CERRADA`: ángulos según cómo pegaste el brazo.
 5. Después del primer USB, las siguientes subidas pueden ir por WiFi: `pio run -t upload --upload-port centinela-est01.local`.
 
@@ -95,7 +93,7 @@ Toca **Probar y guardar**.
 ## 6. Lista de verificación antes de la sustentación
 
 - [ ] Verde con el recipiente vacío; amarillo, naranja y rojo al llenarlo a 5, 8 y 11 cm.
-- [ ] La barrera baja en naranja y la sirena suena en rojo. El táctil la silencia.
+- [ ] Verde fijo → verde intermitente (amarillo) → rojo fijo y barrera abajo (naranja) → rojo intermitente (rojo). El táctil deja el rojo fijo.
 - [ ] Llegan los push de ntfy en cada cambio y el correo en naranja y rojo.
 - [ ] La app muestra "Desborde estimado en ~N min" mientras se vierte agua.
 - [ ] Con el router apagado, la estación sigue actuando sola y llega "Estación DESCONECTADA". Al volver, el respaldo se envía.
@@ -108,9 +106,8 @@ Toca **Probar y guardar**.
 | Síntoma | Causa probable | Solución |
 |---|---|---|
 | `[mqtt] fallo (-2)` en el ESP32 | WiFi sin internet o host mal escrito | Revisa `MQTT_HOST` (sin `mqtts://`) y que la red tenga salida |
-| `fallo (5)` | Usuario o clave de HiveMQ | Revisa las credenciales de `centinela-esp32` |
+| `fallo (5)` | Usuario o clave de EMQX | Revisa las credenciales de `centinela-esp32` |
 | El ESP32 se reinicia al mover el servo | Servo alimentado desde el ESP32 | Usa la fuente externa de 5 V con GND común y el condensador |
 | Nivel salta mucho | Agua en movimiento o eco en las paredes | Disco de icopor flotando bajo el sensor; sensor centrado |
-| Humedad de suelo siempre 0 o 100 | Calibración | Ajusta `SUELO_ADC_SECO/MOJADO` |
 | App: "Sin conexión con el servidor" | Red distinta o firewall | Misma red; permite Node en el firewall; prueba `http://IP:3000/api/salud` en el navegador del celular |
 | Agente: "Falta o es inválida la ANTHROPIC_API_KEY" | Clave o créditos | Revisa `.env` y el saldo en la consola de Anthropic |
