@@ -11,7 +11,7 @@ const RANGO = {
   desde: { type: "string", description: "Inicio en hora de Colombia, formato YYYY-MM-DDTHH:mm. Por defecto: inicio de hoy." },
   hasta: { type: "string", description: "Fin en hora de Colombia, formato YYYY-MM-DDTHH:mm. Por defecto: ahora." },
 };
-const TIPOS_EVENTO = ["cambio_riesgo", "persona_zona", "vehiculo_barrera", "boton_emergencia", "alerta_reconocida", "comando", "arranque"];
+const TIPOS_EVENTO = ["cambio_riesgo", "boton_emergencia", "alerta_reconocida", "comando", "arranque"];
 
 const herramientas = [
   {
@@ -33,7 +33,7 @@ const herramientas = [
   },
   {
     name: "contar_eventos",
-    description: "Cuenta eventos por tipo en un rango. Tipos: cambio_riesgo (subidas/bajadas de alerta), persona_zona (movimiento en la ribera durante alerta), vehiculo_barrera (vehículo intentó cruzar con barrera cerrada), boton_emergencia, alerta_reconocida, comando (acciones desde la app), arranque (reinicios de la estación).",
+    description: "Cuenta eventos por tipo en un rango. Tipos: cambio_riesgo (subidas/bajadas de alerta), boton_emergencia, alerta_reconocida, comando (acciones desde la app), arranque (reinicios de la estación).",
     input_schema: { type: "object", properties: { tipo: { type: "string", enum: TIPOS_EVENTO }, ...RANGO } },
   },
   {
@@ -99,7 +99,7 @@ export function ejecutar(nombre, entrada = {}) {
 function sistema() {
   return `Eres el asistente de Centinela Cravo Sur, una estación de alerta temprana de crecientes instalada en una maqueta a escala de un puente sobre el río Cravo Sur (Yopal, Casanare, Colombia).
 
-La estación mide el nivel del agua (cm), la tasa de ascenso (cm/min), la temperatura y la humedad del aire. Clasifica el riesgo en verde (LED verde), amarillo (LED verde parpadeando), naranja (cierra la barrera del puente y enciende el LED rojo) y rojo (LED rojo parpadeando hasta que alguien reconozca la alerta). No hay sirena. También registra personas en la ribera durante alertas, vehículos que intentan cruzar con la barrera cerrada y el botón comunitario de emergencia.
+La estación mide el nivel del agua (cm), la tasa de ascenso (cm/min), la temperatura y la humedad del aire. Clasifica el riesgo en verde (LED verde), amarillo (LED verde parpadeando), naranja (cierra la barrera del puente y enciende el LED rojo) y rojo (LED rojo parpadeando hasta que alguien reconozca la alerta). No hay sirena. También registra el botón comunitario de emergencia (sensor táctil).
 
 Responde en español, breve y claro, a personas de la comunidad y a operadores de gestión del riesgo. Consulta siempre las herramientas antes de dar cifras y nunca inventes datos; si no hay datos para el periodo, dilo. Usa hora de Colombia (formato 12 h, ej. 3:40 p. m.) y redondea a una cifra decimal. Si el riesgo actual es naranja o rojo, empieza por la recomendación de seguridad. Cuando te pidan un reporte, organízalo con hora de inicio, pico, duración por nivel y acciones tomadas.
 

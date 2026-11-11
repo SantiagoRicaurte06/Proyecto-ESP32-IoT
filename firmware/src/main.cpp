@@ -59,7 +59,6 @@ struct Umbrales { float amarillo, naranja, rojo; } umbrales;
 
 float nivelCm = 0, distanciaCm = 0, tasaCmMin = 0;
 float temperatura = NAN, humedad = NAN;
-bool pirActivo = false, irObstaculo = false;
 
 Riesgo riesgo = VERDE;
 unsigned long inicioBajadaMs = 0;
@@ -174,8 +173,6 @@ String telemetriaJson() {
   d["alarma"] = alarmaActiva;
   d["modo"] = modoManual ? "manual" : "auto";
   d["reconocida"] = alertaReconocida;
-  d["pir"] = pirActivo;
-  d["ir"] = irObstaculo;
   d["rssi"] = WiFi.RSSI();
   String s; serializeJson(d, s);
   return s;
@@ -233,8 +230,25 @@ void alRecibirMqtt(char* topic, byte* payload, unsigned int len) {
 }
 
 void gestionarConexion() {
-  static unsigned long ultimoIntento = 0;
-  if (WiFi.status() != WL_CONNECTED) return;
+  static unsigned long ultimoIntento = 0, ultimoAvisoWifi = 0;
+  static bool wifiAntes = false;
+  bool wifiAhora = WiFi.status() == WL_CONNECTED;
+  if (wifiAhora && !wifiAntes) Serial.printf("[wifi] conectado a \"%s\" · IP %s · RSSI %d dBm\n", WIFI_SSID, WiFi.localIP().toString().c_str(), WiFi.RSSI());
+  wifiAntes = wifiAhora;
+  if (!wifiAhora) {
+    if (millis() - ultimoAvisoWifi > 5000) {
+      ultimoAvisoWifi = millis();
+      const char* motivo;
+      switch (WiFi.status()) {
+        case WL_NO_SSID_AVAIL:  motivo = "no se encuentra la red (¿nombre mal escrito o red de 5 GHz?)"; break;
+        case WL_CONNECT_FAILED: motivo = "conexión rechazada (¿clave incorrecta?)"; break;
+        case WL_DISCONNECTED:   motivo = "intentando conectar..."; break;
+        default:                motivo = "sin conexión"; break;
+      }
+      Serial.printf("[wifi] \"%s\": %s (estado %d)\n", WIFI_SSID, motivo, WiFi.status());
+    }
+    return;
+  }
 
   if (!otaIniciado) {
     ArduinoOTA.setHostname("centinela-" ESTACION_ID);
@@ -300,7 +314,7 @@ void dibujarOled() {
     oled.setCursor(0, 12); oled.printf("Dist: %.1f cm", distanciaCm);
     oled.setCursor(0, 22); oled.printf("Temp: %.1fC Hum: %.0f%%", temperatura, humedad);
     oled.setCursor(0, 32); oled.printf("Nivel: %.1f cm", nivelCm);
-    oled.setCursor(0, 42); oled.printf("PIR:%s  IR:%s", pirActivo ? "SI" : "no", irObstaculo ? "SI" : "no");
+    oled.setCursor(0, 42); oled.printf("WiFi: %s", WiFi.isConnected() ? "conectado" : "sin conexion");
     oled.setCursor(0, 52); oled.printf("Toque corto: pagina");
   } else {
     oled.setCursor(0, 14); oled.printf("IP %s", WiFi.localIP().toString().c_str());
@@ -387,22 +401,8 @@ void aplicarActuadores() {
 }
 
 void revisarEntradas() {
-  static unsigned long ultimoPir = 0, ultimoIr = 0, inicioToque = 0;
+  static unsigned long inicioToque = 0;
   static bool emergenciaEnviada = false;
-
-  bool pir = digitalRead(PIN_PIR) == HIGH;
-  if (pir && !pirActivo && riesgo >= NARANJA && millis() - ultimoPir > ANTIRREBOTE_EVENTO_MS) {
-    ultimoPir = millis();
-    JsonDocument e; publicarEvento("persona_zona", e);
-  }
-  pirActivo = pir;
-
-  bool ir = digitalRead(PIN_IR) == LOW;
-  if (ir && !irObstaculo && barreraCerrada && millis() - ultimoIr > ANTIRREBOTE_EVENTO_MS) {
-    ultimoIr = millis();
-    JsonDocument e; publicarEvento("vehiculo_barrera", e);
-  }
-  irObstaculo = ir;
 
   // Táctil: toque corto = silenciar/reconocer o cambiar pantalla; mantener 2 s = emergencia
   bool toque = digitalRead(PIN_TACTIL) == HIGH;
@@ -436,8 +436,6 @@ void setup() {
 
   pinMode(PIN_TRIG, OUTPUT);
   pinMode(PIN_ECHO, INPUT);
-  pinMode(PIN_PIR, INPUT);
-  pinMode(PIN_IR, INPUT_PULLUP);
   pinMode(PIN_TACTIL, INPUT_PULLDOWN);
 #if USAR_RELE
   pinMode(PIN_RELE, OUTPUT);

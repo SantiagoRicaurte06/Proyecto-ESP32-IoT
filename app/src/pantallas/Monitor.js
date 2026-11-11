@@ -58,7 +58,7 @@ export default function Monitor({ datos, error, rol, onReconocer }) {
           <Dato etiqueta="Distancia al agua" valor={t?.dist} unidad="cm" />
           <Dato etiqueta="Temperatura" valor={t?.temp} unidad="°C" />
           <Dato etiqueta="Humedad aire" valor={t?.hum} unidad="%" />
-          <Dato etiqueta="Personas en ribera" valor={t ? (t.pir ? "Detectada" : "No") : null} />
+          <Dato etiqueta="Señal WiFi" valor={t?.rssi} unidad="dBm" />
         </View>
       </Tarjeta>
 
@@ -67,7 +67,7 @@ export default function Monitor({ datos, error, rol, onReconocer }) {
           <Dato etiqueta="Barrera" valor={t?.barrera === "cerrada" ? "Cerrada" : t ? "Abierta" : null} />
           <Dato etiqueta="LED de alerta" valor={t ? ({ verde: "Verde", amarillo: "Verde intermitente", naranja: "Rojo", rojo: "Rojo intermitente" }[t.riesgo] ?? "—") : null} />
           <Dato etiqueta="Modo" valor={t ? (t.modo === "manual" ? "Manual" : "Automático") : null} />
-          <Dato etiqueta="Vehículo en barrera" valor={t ? (t.ir ? "Sí" : "No") : null} />
+          <Dato etiqueta="Alerta" valor={t ? (t.reconocida === false ? "Sin reconocer" : "Atendida") : null} />
         </View>
       </Tarjeta>
 

@@ -31,8 +31,6 @@ Proyecto formativo · **SENA – Tecnología en Análisis y Desarrollo de Softwa
 | 🔴 Rojo | ≥ 11 cm | barrera cerrada y **LED rojo intermitente** hasta que alguien reconozca la alerta | push repetido + correo |
 
 Si el agua sube a más de 2 cm/min, el riesgo sube un nivel extra. Además, el sistema avisa cuando:
-- hay personas en la ribera durante una alerta,
-- un vehículo intenta cruzar con la barrera cerrada,
 - alguien presiona el botón comunitario,
 - la estación se desconecta.
 
@@ -40,7 +38,7 @@ Si el agua sube a más de 2 cm/min, el riesgo sube un nivel extra. Además, el s
 
 ```mermaid
 flowchart LR
-  S["Sensores<br/>nivel · DHT11<br/>PIR · IR · táctil"] --> E["ESP32<br/>riesgo local"]
+  S["Sensores<br/>nivel · DHT11 · táctil"] --> E["ESP32<br/>riesgo local"]
   E --> A["Barrera · LED rojo y verde<br/>OLED"]
   E <-->|MQTT TLS| B[("EMQX Cloud")]
   B <--> K["Backend Node.js"]

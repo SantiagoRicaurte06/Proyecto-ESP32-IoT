@@ -319,9 +319,6 @@ pieza(6, "Barrera (servo)", caja("Taco servo", 14, T, 26.5, 2.3, 1.3, 1.2, MAT["
       caja("Servo SG90", 14, T + 1.3, 26.5, 2.3, 2.2, 1.2, MAT["azul"]),
       cilindro("Eje servo", 15.15, T + 3.5, 26.4, 0.25, 0.3, MAT["blanco"]), pivote)
 
-pieza(6, "Sensor IR", caja("IR placa", 11.2, T, 14.2, 1.6, 0.16, 3.2, MAT["pcb"]),
-      cilindro("IR led a", 11.6, T + 0.16, 16.9, 0.25, 0.6, MAT["negro"]),
-      cilindro("IR led b", 12.4, T + 0.16, 16.9, 0.25, 0.6, MAT["blanco"]))
 pieza(6, "Mástil", cilindro("Mastil", 40.5, T, 7, 0.4, 10, MAT["balso"]),
       caja("Brazo mastil", 31, T + 9.2, 6.6, 9.9, 0.6, 0.8, MAT["balso"]))
 pieza(6, "HC-SR04", caja("HC placa", 29.25, T + 8.4, 6, 4.5, 0.16, 2, MAT["azul"]),
@@ -329,16 +326,13 @@ pieza(6, "HC-SR04", caja("HC placa", 29.25, T + 8.4, 6, 4.5, 0.16, 2, MAT["azul"
       cilindro("HC rx", 32.6, T + 7.75, 7, 0.75, 0.65, MAT["metal"]),
       caja("HC cristal", 31.2, T + 8.1, 6.3, 0.6, 0.3, 0.3, MAT["metal"]))
 pieza(6, "DHT11", caja("DHT11", 40.9, T + 4, 6.2, 0.5, 2, 1.6, MAT["azul"]))
-pieza(6, "PIR", cilindro("Poste PIR", 55, T, 6, 0.4, 6, MAT["balso"]),
-      caja("PIR placa", 54.2, T + 6, 5.2, 1.6, 0.16, 1.6, MAT["pcb"]),
-      esfera("PIR domo", B(55, T + 6.16, 6), 0.75, MAT["blanco"], media=True))
 pieza(6, "Panel: OLED y táctil", caja("OLED marco", 5, 8, -0.25, 3, 2.1, 0.25, MAT["negro"]),
       caja("OLED pantalla", 5.15, 8.3, -0.3, 2.7, 1.5, 0.05, MAT["oled"], biselar=False),
       cilindro("Tactil", 13, 9, -0.15, 0.9, 0.3, MAT["azul"], eje="Z"))
 
 # Paso 7 · cableado (dupont de colores hasta el ESP32)
 esp = B(8.75, 1.7, 31.6)
-destinos = [(5, T, 29), (15, T, 27), (12, T, 15.5), (40.5, T, 7), (55, T, 6), (6.5, 9, 0.3), (13, 9, 0.3)]
+destinos = [(5, T, 29), (15, T, 27), (40.5, T, 7), (6.5, 9, 0.3), (13, 9, 0.3)]
 cs = []
 for i, (x, y, z) in enumerate(destinos):
     a = B(x + 0.6, y, z)

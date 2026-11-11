@@ -22,11 +22,9 @@
 <rect x="716.0" y="238.0" width="60.0" height="48.0" rx="1" fill="#FFFFFF" stroke="#374151" stroke-width="1"/>
 <text x="746.0" y="292.0" font-size="10" fill="#6B7280" text-anchor="middle" font-weight="400">viviendas</text>
 <circle cx="260.0" cy="280.0" r="9" fill="#1D4ED8"/><text x="260.0" y="284.0" font-size="10" fill="#fff" text-anchor="middle" font-weight="700">1</text><text x="274.0" y="284.0" font-size="11" fill="#111827" text-anchor="start" font-weight="400">Barrera (servo)</text>
-<circle cx="224.0" cy="424.0" r="9" fill="#1D4ED8"/><text x="224.0" y="428.0" font-size="10" fill="#fff" text-anchor="middle" font-weight="700">2</text><text x="238.0" y="440.0" font-size="11" fill="#111827" text-anchor="start" font-weight="400">IR obstáculos</text>
 <circle cx="140.0" cy="262.0" r="9" fill="#1D4ED8"/><text x="140.0" y="266.0" font-size="10" fill="#fff" text-anchor="middle" font-weight="700">3</text><text x="154.0" y="250.0" font-size="11" fill="#111827" text-anchor="start" font-weight="400">Semáforo 2 LED</text>
 <circle cx="458.0" cy="526.0" r="9" fill="#1D4ED8"/><text x="458.0" y="530.0" font-size="10" fill="#fff" text-anchor="middle" font-weight="700">4</text><text x="472.0" y="514.0" font-size="11" fill="#111827" text-anchor="start" font-weight="400">HC-SR04</text>
 <circle cx="566.0" cy="526.0" r="9" fill="#1D4ED8"/><text x="566.0" y="530.0" font-size="10" fill="#fff" text-anchor="middle" font-weight="700">5</text><text x="580.0" y="542.0" font-size="11" fill="#111827" text-anchor="start" font-weight="400">Mástil + DHT11</text>
-<circle cx="740.0" cy="538.0" r="9" fill="#1D4ED8"/><text x="740.0" y="542.0" font-size="10" fill="#fff" text-anchor="middle" font-weight="700">6</text><text x="754.0" y="554.0" font-size="11" fill="#111827" text-anchor="start" font-weight="400">PIR</text>
 <line x1="80.0" y1="638.0" x2="800.0" y2="638.0" stroke="#6B7280" stroke-width="1"/><line x1="80.0" y1="633.0" x2="80.0" y2="643.0" stroke="#6B7280" stroke-width="1"/><line x1="800.0" y1="633.0" x2="800.0" y2="643.0" stroke="#6B7280" stroke-width="1"/><text x="440.0" y="632.0" font-size="11" fill="#6B7280" text-anchor="middle" font-weight="400">60</text>
 <line x1="58.0" y1="130.0" x2="58.0" y2="610.0" stroke="#6B7280" stroke-width="1"/><line x1="53.0" y1="130.0" x2="63.0" y2="130.0" stroke="#6B7280" stroke-width="1"/><line x1="53.0" y1="610.0" x2="63.0" y2="610.0" stroke="#6B7280" stroke-width="1"/><text x="50.0" y="370.0" font-size="11" fill="#6B7280" text-anchor="middle" transform="rotate(-90 50.0 370.0)">40</text>
 <line x1="368.0" y1="240.0" x2="548.0" y2="240.0" stroke="#6B7280" stroke-width="1"/><line x1="368.0" y1="235.0" x2="368.0" y2="245.0" stroke="#6B7280" stroke-width="1"/><line x1="548.0" y1="235.0" x2="548.0" y2="245.0" stroke="#6B7280" stroke-width="1"/><text x="458.0" y="234.0" font-size="11" fill="#6B7280" text-anchor="middle" font-weight="400">15</text>
@@ -84,12 +82,10 @@
 <rect x="80.0" y="690.0" width="1140.0" height="390.0" rx="8" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
 <text x="100.0" y="720.0" font-size="14" fill="#111827" text-anchor="start" font-weight="700">Ubicación de componentes</text>
 <text x="100.0" y="746.0" font-size="12" fill="#111827" text-anchor="start" font-weight="400">1  Servo SG90 con brazo de balso rojo y blanco: barrera del puente</text>
-<text x="100.0" y="766.0" font-size="12" fill="#111827" text-anchor="start" font-weight="400">2  IR de obstáculos a 2 cm de la vía, apuntando al carril (detecta carros)</text>
-<text x="100.0" y="786.0" font-size="12" fill="#111827" text-anchor="start" font-weight="400">3  Poste del semáforo: LED rojo arriba y LED verde abajo</text>
-<text x="100.0" y="806.0" font-size="12" fill="#111827" text-anchor="start" font-weight="400">4  HC-SR04 mirando hacia abajo a 23 cm del fondo (ALTURA_SENSOR_CM)</text>
-<text x="100.0" y="826.0" font-size="12" fill="#111827" text-anchor="start" font-weight="400">5  DHT11 en el mástil; ESP32 y protoboard dentro de la caja</text>
-<text x="100.0" y="846.0" font-size="12" fill="#111827" text-anchor="start" font-weight="400">6  PIR en poste de 6 cm apuntando a la ribera (personas en riesgo)</text>
-<text x="100.0" y="866.0" font-size="12" fill="#111827" text-anchor="start" font-weight="400">   Ribera: bandeja de tierra de 10 × 10 cm (decorativa, zona que vigila el PIR)</text>
+<text x="100.0" y="766.0" font-size="12" fill="#111827" text-anchor="start" font-weight="400">3  Poste del semáforo: LED rojo arriba y LED verde abajo</text>
+<text x="100.0" y="786.0" font-size="12" fill="#111827" text-anchor="start" font-weight="400">4  HC-SR04 mirando hacia abajo a 23 cm del fondo (ALTURA_SENSOR_CM)</text>
+<text x="100.0" y="806.0" font-size="12" fill="#111827" text-anchor="start" font-weight="400">5  DHT11 en el mástil; ESP32 y protoboard dentro de la caja</text>
+<text x="100.0" y="826.0" font-size="12" fill="#111827" text-anchor="start" font-weight="400">   Ribera: bandeja de tierra de 10 × 10 cm (decorativa)</text>
 <text x="660.0" y="720.0" font-size="14" fill="#111827" text-anchor="start" font-weight="700">Materiales</text>
 <text x="660.0" y="746.0" font-size="12" fill="#111827" text-anchor="start" font-weight="400">• MDF 3 mm: tapa 60×40, frente y fondo 60×15, laterales 40×15</text>
 <text x="660.0" y="766.0" font-size="12" fill="#111827" text-anchor="start" font-weight="400">• Recipiente plástico transparente ~30×15×15 cm (o acrílico 3 mm)</text>

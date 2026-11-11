@@ -26,7 +26,7 @@ Calibra en `include/config.h`: `ALTURA_SENSOR_CM` (del fondo del cauce al sensor
 
 1. Instala la extensión **Wokwi Simulator** en VS Code.
 2. `pio run -e wokwi`
-3. Abre `diagram.json` y presiona ▶. Mueve la distancia del HC-SR04 para simular la creciente (distancia baja = agua alta); usa los botones como IR y táctil.
+3. Abre `diagram.json` y presiona ▶. Mueve la distancia del HC-SR04 para simular la creciente (distancia baja = agua alta); usa el botón como táctil.
 
 En la simulación se usa DHT22 (Wokwi no tiene DHT11) y la red `Wokwi-GUEST`.
 
@@ -35,7 +35,7 @@ En la simulación se usa DHT22 (Wokwi no tiene DHT11) y la red `Wokwi-GUEST`.
 | Topic | Dirección | QoS | Contenido |
 |---|---|---|---|
 | `centinela/est01/telemetria` | ESP32 → | 0 | Lectura cada 2 s |
-| `centinela/est01/evento` | ESP32 → | 0 | Cambios de riesgo, persona, vehículo, emergencia… |
+| `centinela/est01/evento` | ESP32 → | 0 | Cambios de riesgo, emergencia, reconocimiento… |
 | `centinela/est01/estado` | ESP32 → (retained) | 1 | `online`, IP, firmware, umbrales. LWT `{"online":false}` |
 | `centinela/est01/cmd` | → ESP32 | 1 | `{"accion":"barrera","valor":"cerrar"}` etc. |
 

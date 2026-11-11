@@ -12,8 +12,6 @@
 #define PIN_TRIG        5    // HC-SR04 TRIG
 #define PIN_ECHO        18   // HC-SR04 ECHO (con divisor 1k/2k → 3,3 V)
 #define PIN_DHT         4    // DHT11 DATA
-#define PIN_PIR         27   // PIR OUT
-#define PIN_IR          26   // IR obstáculos OUT (LOW = obstáculo)
 #define PIN_TACTIL      33   // TTP223 SIG (HIGH = tocado)
 #define PIN_SERVO       13   // SG90 señal
 #define PIN_LED_VERDE   19   // 220 Ω en serie
@@ -57,5 +55,4 @@
 #define PERIODO_TELEMETRIA_MS  2000
 #define PERIODO_BUFFER_MS      10000   // sin conexión: guarda una lectura cada 10 s
 #define BUFFER_MAX             240     // 40 min de respaldo sin internet
-#define ANTIRREBOTE_EVENTO_MS  15000   // mismo evento PIR/IR como máximo cada 15 s
 #define TACTIL_LARGO_MS        2000    // mantener 2 s = emergencia comunitaria

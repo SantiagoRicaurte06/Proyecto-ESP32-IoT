@@ -9,8 +9,6 @@ const RANGOS = [["15 min", 15], ["1 h", 60], ["6 h", 360], ["24 h", 1440]];
 
 const NOMBRE = {
   cambio_riesgo: "Cambio de alerta",
-  persona_zona: "Persona en la ribera",
-  vehiculo_barrera: "Vehículo en la barrera",
   boton_emergencia: "Botón de emergencia",
   alerta_reconocida: "Alerta reconocida",
   comando: "Comando",

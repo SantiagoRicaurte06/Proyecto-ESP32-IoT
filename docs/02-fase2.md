@@ -51,7 +51,7 @@ Toda la lógica de seguridad corre **en el ESP32**. Si se cae el WiFi, la estaci
 %%{init: {'theme':'base','themeVariables':{'primaryColor':'#FFFFFF','primaryBorderColor':'#D1D5DB','primaryTextColor':'#111827','lineColor':'#1D4ED8','fontFamily':'Inter, Arial','background':'#F3F4F6'}}}%%
 flowchart LR
   subgraph Estacion["Estación (maqueta)"]
-    S["Sensores<br/>HC-SR04 · DHT11<br/>PIR · IR · táctil"] --> E["ESP32<br/>filtro + tasa + riesgo"]
+    S["Sensores<br/>HC-SR04 · DHT11 · táctil"] --> E["ESP32<br/>filtro + tasa + riesgo"]
     E --> A["Actuadores<br/>servo barrera · LED rojo y verde<br/>OLED"]
   end
   E <-->|"MQTT TLS :8883<br/>telemetría · eventos · cmd · LWT"| B[("EMQX Cloud")]
@@ -82,8 +82,8 @@ Ver [`hardware/README.md`](../hardware/README.md#tabla-de-conexiones) (component
 |---|---|---|---|---|
 | 5 / 18 | HC-SR04 TRIG / ECHO (divisor) | | 13 | Servo SG90 |
 | 4 | DHT11 | | 19 / 25 | LED verde / rojo |
-| 27 | PIR | | 21 / 22 | OLED SDA / SCL |
-| 26 | IR obstáculos | | 32 / 14 | Joystick (opcional) |
+| 33 | Táctil | | 21 / 22 | OLED SDA / SCL |
+| | | | 32 / 14 | Joystick (opcional) |
 | 33 | Táctil | | | |
 
 ## 7. Plano eléctrico
@@ -92,7 +92,7 @@ Ver [`hardware/README.md`](../hardware/README.md#tabla-de-conexiones) (component
 
 Cable por cable, con casillas para marcar: [`hardware/cableado.md`](../hardware/cableado.md). Resumen por pin: [`hardware/plano-electrico.svg`](../hardware/plano-electrico.svg).
 
-Simulación: [`firmware/diagram.json`](../firmware/diagram.json) para Wokwi (en VS Code). Los pulsadores hacen de IR y táctil.
+Simulación: [`firmware/diagram.json`](../firmware/diagram.json) para Wokwi (en VS Code). El pulsador hace de botón táctil.
 
 ## 8. Plano de la maqueta
 
@@ -112,11 +112,9 @@ Simulación: [`firmware/diagram.json`](../firmware/diagram.json) para Wokwi (en 
 - **Sobre la tapa:**
   - Vía con puente de balso.
   - Barrera con el servo.
-  - Sensor IR en el carril.
   - Semáforo de 12 cm con LED rojo y LED verde.
   - Mástil de 10 cm con el brazo del HC-SR04 sobre el río (a 23 cm del fondo) y el DHT11.
   - Bandeja de tierra (ribera) con el sensor de humedad.
-  - PIR apuntando a la ribera.
   - Viviendas decorativas.
 - **Frente:** panel comunitario con la OLED y el botón táctil.
 
@@ -135,13 +133,12 @@ Base: `centinela/est01`
 ```json
 { "ts": 1794342525, "nivel": 7.1, "dist": 15.9, "tasa": 3.99, "temp": 29.9, "hum": 77,
   "riesgo": "naranja", "barrera": "cerrada", "alarma": false, "modo": "auto", "reconocida": false,
-  "pir": false, "ir": false, "rssi": -55 }
+  "rssi": -55 }
 ```
 
 **Eventos** (todos llevan `tipo`, `ts`, `riesgo`, `nivel`)
 ```json
 { "tipo": "cambio_riesgo", "de": "amarillo", "a": "naranja", "tasa": 6.34, "ts": 1794342506, "riesgo": "naranja", "nivel": 5.1 }
-{ "tipo": "persona_zona", ... }        { "tipo": "vehiculo_barrera", ... }
 { "tipo": "boton_emergencia", "origen": "tactil", ... }
 { "tipo": "alerta_reconocida", "origen": "app" | "tactil", ... }
 { "tipo": "comando", "accion": "barrera", "modo": "manual", ... }
@@ -189,7 +186,7 @@ El APK se compila en **GitHub Actions** (`.github/workflows/apk.yml`) y se desca
 | `POST /api/comando` | **operador** | `{accion, valor}` validado → MQTT |
 | `POST /api/agente` | comunidad | `{historial:[{rol, texto}]}` → respuesta del agente (máx. 12/min por IP) |
 
-**Base de datos** (SQLite): `lecturas(ts, nivel, tasa, temp, hum, riesgo, barrera, alarma, modo, pir, ir)` con índice en `ts`; `eventos(id, ts, tipo, riesgo, nivel, datos JSON)` con índices `ts` y `(tipo, ts)`; `notificaciones(...)` como registro de envíos.
+**Base de datos** (SQLite): `lecturas(ts, nivel, tasa, temp, hum, riesgo, barrera, alarma, modo)` con índice en `ts`; `eventos(id, ts, tipo, riesgo, nivel, datos JSON)` con índices `ts` y `(tipo, ts)`; `notificaciones(...)` como registro de envíos.
 
 ## 11. Agente IA
 
@@ -230,7 +227,7 @@ sequenceDiagram
 | ¿Cuántas alertas hubo hoy? | `contar_eventos` | "Hoy hubo 3 cambios de alerta: a amarillo a las 3:28 p. m., a naranja a las 3:28 p. m. y a rojo a las 3:29 p. m." |
 | ¿Cuál fue el nivel máximo hoy y a qué hora? | `estadisticas(nivel)` | "El máximo fue 12,6 cm a las 3:30 p. m." |
 | ¿Cuánto tiempo estuvimos en rojo? | `tiempo_por_riesgo` | "1,2 minutos en rojo, 2,1 en naranja y 0,8 en amarillo." |
-| ¿Alguien intentó cruzar el puente cerrado? | `contar_eventos(vehiculo_barrera)` | "Sí, 2 vehículos, a las 3:29 y 3:30 p. m." |
+| ¿Alguien presionó el botón de emergencia? | `contar_eventos(boton_emergencia)` | "Sí, una vez a las 3:29 p. m., con alerta roja." |
 | Genera el reporte del último evento | `listar_eventos`, `serie_nivel`, `tiempo_por_riesgo` | Reporte con inicio, pico, duración por nivel y acciones (barrera, LED de alerta, reconocimiento) |
 
 ## 12. Plan de trabajo (2 días) y materiales
@@ -260,7 +257,7 @@ El software ya está escrito y probado. Esto es lo que queda:
 1. Estado verde: mostrar la app y la OLED.
 2. Verter agua: sube a amarillo y llega el push.
 3. Seguir vertiendo: naranja. La barrera baja, llegan push y correo, y la app muestra el tiempo estimado al desborde.
-4. Rojo: el LED rojo parpadea. Pasar un carrito por el IR (alerta de vehículo) y reconocer la alerta con el táctil (el LED queda fijo).
+4. Rojo: el LED rojo parpadea. Reconocer la alerta con el táctil (el LED queda fijo).
 5. Desconectar el WiFi del ESP32: la estación sigue funcionando y llega "estación desconectada". Reconectar y mostrar que el respaldo se envió.
 6. Vaciar con la manguera: baja con histéresis a verde.
 7. Preguntar al agente: "¿Qué pasó en el último evento?" y "¿Cuánto tiempo estuvimos en rojo?".

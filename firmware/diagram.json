@@ -27,23 +27,6 @@
       "attrs": {}
     },
     {
-      "type": "wokwi-pir-motion-sensor",
-      "id": "pir",
-      "top": -150,
-      "left": 260,
-      "attrs": {}
-    },
-    {
-      "type": "wokwi-pushbutton",
-      "id": "ir",
-      "top": 240,
-      "left": 40,
-      "attrs": {
-        "color": "black",
-        "label": "IR obstaculo"
-      }
-    },
-    {
       "type": "wokwi-pushbutton",
       "id": "tactil",
       "top": 240,
@@ -139,36 +122,6 @@
       "dht:SDA",
       "esp:D4",
       "green",
-      []
-    ],
-    [
-      "pir:VCC",
-      "esp:VIN",
-      "red",
-      []
-    ],
-    [
-      "pir:GND",
-      "esp:GND.1",
-      "black",
-      []
-    ],
-    [
-      "pir:OUT",
-      "esp:D27",
-      "green",
-      []
-    ],
-    [
-      "ir:1.l",
-      "esp:D26",
-      "green",
-      []
-    ],
-    [
-      "ir:2.l",
-      "esp:GND.2",
-      "black",
       []
     ],
     [
