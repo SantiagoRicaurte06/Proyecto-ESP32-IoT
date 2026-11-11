@@ -67,8 +67,8 @@ unsigned long inicioBajadaMs = 0;
 bool alertaReconocida = true;
 
 bool modoManual = false;
-bool barreraCerradaManual = false, sirenaManual = false;
-bool barreraCerrada = false, sirenaEncendida = false;
+bool barreraCerradaManual = false;
+bool barreraCerrada = false, alarmaActiva = false;
 
 bool oledOk = false, otaIniciado = false, horaOk = false;
 uint8_t paginaOled = 0;
@@ -141,7 +141,9 @@ Riesgo riesgoPara(float nivel, float tasa, int suelo) {
 }
 
 void ponerRele(bool on) {
+#if USAR_RELE
   digitalWrite(PIN_RELE, (on == RELE_ACTIVO_EN_ALTO) ? HIGH : LOW);
+#endif
 }
 
 // ── MQTT ─────────────────────────────────────────────────────────────────────
@@ -172,7 +174,7 @@ String telemetriaJson() {
   if (!isnan(humedad)) d["hum"] = roundf(humedad);
   d["riesgo"] = NOMBRE_RIESGO[riesgo];
   d["barrera"] = barreraCerrada ? "cerrada" : "abierta";
-  d["sirena"] = sirenaEncendida;
+  d["alarma"] = alarmaActiva;
   d["modo"] = modoManual ? "manual" : "auto";
   d["reconocida"] = alertaReconocida;
   d["pir"] = pirActivo;
@@ -210,14 +212,9 @@ void alRecibirMqtt(char* topic, byte* payload, unsigned int len) {
   if (!strcmp(accion, "barrera")) {
     modoManual = true;
     barreraCerradaManual = !strcmp(d["valor"] | "", "cerrar");
-    sirenaManual = sirenaEncendida;
-  } else if (!strcmp(accion, "sirena")) {
-    modoManual = true;
-    sirenaManual = d["valor"] | false;
-    barreraCerradaManual = barreraCerrada;
   } else if (!strcmp(accion, "modo")) {
     modoManual = !strcmp(d["valor"] | "auto", "manual");
-    barreraCerradaManual = barreraCerrada; sirenaManual = sirenaEncendida;
+    barreraCerradaManual = barreraCerrada;
   } else if (!strcmp(accion, "reconocer")) {
     reconocerAlerta("app");
     return;
@@ -377,22 +374,22 @@ void evaluarRiesgo() {
 
 void aplicarActuadores() {
   bool cerrar = modoManual ? barreraCerradaManual : (riesgo >= NARANJA);
-  bool sirena = modoManual ? sirenaManual : (riesgo == ROJO && !alertaReconocida);
+  bool alarma = riesgo == ROJO && !alertaReconocida;   // rojo sin reconocer: LED rojo parpadea
 
   if (cerrar != barreraCerrada) {
     barreraCerrada = cerrar;
     barreraServo.write(cerrar ? SERVO_CERRADA : SERVO_ABIERTA);
   }
-  if (sirena != sirenaEncendida) {
-    sirenaEncendida = sirena;
-    ponerRele(sirena);
+  if (alarma != alarmaActiva) {
+    alarmaActiva = alarma;
+    ponerRele(alarma);
   }
 
   bool parpadeo = (millis() / 400) % 2;
-  digitalWrite(PIN_LED_VERDE,    riesgo == VERDE);
-  digitalWrite(PIN_LED_AMARILLO, riesgo == AMARILLO);
-  digitalWrite(PIN_LED_NARANJA,  riesgo == NARANJA);
-  digitalWrite(PIN_LED_ROJO,     riesgo == ROJO && (alertaReconocida || parpadeo));
+  bool parpadeoLento = (millis() / 700) % 2;
+  // verde fijo = normal · verde parpadeando = vigilancia · rojo fijo = barrera cerrada · rojo parpadeando = alerta máxima
+  digitalWrite(PIN_LED_VERDE, riesgo == VERDE || (riesgo == AMARILLO && parpadeoLento));
+  digitalWrite(PIN_LED_ROJO,  riesgo == NARANJA || (riesgo == ROJO && (alertaReconocida || parpadeo)));
 }
 
 void revisarEntradas() {
@@ -448,9 +445,12 @@ void setup() {
   pinMode(PIN_PIR, INPUT);
   pinMode(PIN_IR, INPUT_PULLUP);
   pinMode(PIN_TACTIL, INPUT_PULLDOWN);
+#if USAR_RELE
   pinMode(PIN_RELE, OUTPUT);
+#endif
   ponerRele(false);
-  for (int p : {PIN_LED_VERDE, PIN_LED_AMARILLO, PIN_LED_NARANJA, PIN_LED_ROJO}) pinMode(p, OUTPUT);
+  pinMode(PIN_LED_VERDE, OUTPUT);
+  pinMode(PIN_LED_ROJO, OUTPUT);
 #if USAR_JOYSTICK
   pinMode(PIN_JOY_SW, INPUT_PULLUP);
 #endif

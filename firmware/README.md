@@ -6,7 +6,7 @@ ESP32 DevKit v1 con PlatformIO (framework Arduino).
 
 - Mide el nivel del agua (HC-SR04, mediana de 5 lecturas) y calcula la **tasa de ascenso** (cm/min) con regresión lineal sobre los últimos 30 s.
 - Clasifica el riesgo (verde → amarillo → naranja → rojo) combinando nivel, tasa y saturación del suelo, con **histéresis** para bajar de nivel.
-- En modo automático: naranja cierra la barrera (servo); rojo activa la sirena (relé) hasta que alguien la reconozca (táctil o app).
+- Señalización con 2 LED: verde fijo (normal), verde intermitente (amarillo), rojo fijo con barrera cerrada (naranja) y rojo intermitente (rojo) hasta que alguien reconozca la alerta (táctil o app). Sin sirena; el relé queda opcional (`USAR_RELE`).
 - **Funciona sin internet**: la lógica corre en el ESP32. Si cae la conexión, guarda telemetría y eventos en memoria y los envía al reconectar.
 - MQTT con TLS, QoS 1 en comandos, estado *retained* y **Last Will** (`online:false`) para detectar la caída de la estación.
 - Actualización por WiFi (ArduinoOTA) y umbrales configurables desde la app (guardados en flash).

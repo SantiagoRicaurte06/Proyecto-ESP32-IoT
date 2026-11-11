@@ -17,15 +17,19 @@
 #define PIN_IR          26   // IR obstáculos OUT (LOW = obstáculo)
 #define PIN_TACTIL      33   // TTP223 SIG (HIGH = tocado)
 #define PIN_SERVO       13   // SG90 señal
-#define PIN_RELE        23   // Relé IN (sirena/baliza)
-#define PIN_LED_VERDE   19
-#define PIN_LED_AMARILLO 17
-#define PIN_LED_NARANJA 16
-#define PIN_LED_ROJO    25
+#define PIN_LED_VERDE   19   // 220 Ω en serie
+#define PIN_LED_ROJO    25   // 220 Ω en serie
+#define PIN_RELE        23   // opcional: alarma externa (luz o buzzer). Ver USAR_RELE
 #define PIN_JOY_X       32   // Joystick VRx (ADC1) · opcional
 #define PIN_JOY_SW      14   // Joystick SW · opcional
 // OLED I2C: SDA 21, SCL 22 (pines por defecto de Wire)
 
+// Señalización con 2 LED:
+//   verde fijo = normal · verde parpadeando = vigilancia (amarillo)
+//   rojo fijo = barrera cerrada (naranja) · rojo parpadeando = alerta máxima sin reconocer (rojo)
+#ifndef USAR_RELE
+#define USAR_RELE 0   // pon 1 si conectas una alarma externa al relé (se activa en rojo sin reconocer)
+#endif
 #ifndef RELE_ACTIVO_EN_ALTO
 #define RELE_ACTIVO_EN_ALTO false  // la mayoría de módulos con optoacoplador se activan con LOW; pon true si el tuyo se activa con HIGH
 #endif
