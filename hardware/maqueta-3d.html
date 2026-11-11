@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Maqueta Centinela 3D</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: video renderizado en Blender a la izquierda, guía de armado a la derecha; en teléfono se apilan. */
+:root {
+  --bg: #EEF1F5;
+  --panel: #FFFFFF;
+  --line: #D5DBE3;
+  --fg: #111827;
+  --muted: #5B6676;
+  --accent: #1D4ED8;
+  --accent-soft: #E0E8FB;
+  --stage: #DADFE6;
+  --f-display: "Space Grotesk", "Segoe UI", Arial, sans-serif;
+  --f-body: "Inter", "Segoe UI", Arial, sans-serif;
+  --f-mono: "JetBrains Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0E131B; --panel: #151C27; --line: #273243; --fg: #E6EBF2; --muted: #93A0B4;
+    --accent: #6E9BFF; --accent-soft: #1B2A47; --stage: #0B1018;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0E131B; --panel: #151C27; --line: #273243; --fg: #E6EBF2; --muted: #93A0B4;
+  --accent: #6E9BFF; --accent-soft: #1B2A47; --stage: #0B1018;
+  color-scheme: dark;
+}
+body { background: var(--bg); color: var(--fg); font-family: var(--f-body); font-size: 14px; }
+.envoltura { max-width: 1320px; margin: 0 auto; padding-block: 20px 32px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 16px; }
+header h1 { font-family: var(--f-display); font-size: clamp(20px, 3vw, 28px); margin: 0; letter-spacing: -0.01em; text-wrap: balance; }
+header p { margin: 4px 0 0; color: var(--muted); max-width: 70ch; line-height: 1.5; }
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 16px; align-items: start; }
+.escenario { min-width: 0; display: grid; gap: 10px; }
+.pantalla { position: relative; aspect-ratio: 16 / 9; max-width: 100%; background: var(--stage); border-radius: 12px; overflow: hidden; border: 1px solid var(--line); }
+.pantalla video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.pantalla video[hidden] { display: none !important; }
+.rotulo { position: absolute; left: 12px; top: 12px; display: flex; align-items: center; gap: 8px; background: rgba(15, 23, 42, 0.78); color: #fff; padding: 6px 12px; border-radius: 999px; font-weight: 600; font-size: 13px; backdrop-filter: blur(4px); }
+.rotulo b { font-family: var(--f-mono); font-weight: 500; opacity: 0.8; }
+.cargando { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); font-size: 13px; }
+.controles { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.btn { font: 600 14px var(--f-body); border-radius: 10px; padding: 11px 16px; cursor: pointer; border: 1px solid var(--line); background: var(--panel); color: var(--fg); display: inline-flex; align-items: center; gap: 8px; }
+.btn:hover:not(:disabled) { border-color: var(--accent); }
+.btn:disabled { opacity: 0.45; cursor: default; }
+.btn.primario { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn:focus-visible, .paso:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.espacio { flex: 1; }
+.linea { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; }
+.linea button { height: 8px; border-radius: 4px; border: 0; background: var(--line); cursor: pointer; padding: 0; }
+.linea button.hecho { background: var(--accent); }
+.linea button.actual { background: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+aside { min-width: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: grid; gap: 10px; }
+aside h2 { font-family: var(--f-display); font-size: 16px; margin: 0; }
+.paso { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 10px; text-align: left; font: inherit; color: inherit; background: none; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; cursor: pointer; }
+.paso:hover { border-color: var(--accent); }
+.paso[aria-current="step"] { border-color: var(--accent); background: var(--accent-soft); }
+.paso .n { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font: 700 12px var(--f-mono); background: var(--accent-soft); color: var(--accent); }
+.paso.hecho .n, .paso[aria-current="step"] .n { background: var(--accent); color: #fff; }
+.paso strong { display: block; font-family: var(--f-display); font-size: 14px; }
+.paso span { display: block; color: var(--muted); font-size: 12.5px; line-height: 1.45; margin-top: 2px; }
+.detalle { border-top: 1px solid var(--line); padding-top: 12px; display: grid; gap: 6px; }
+.detalle h3 { margin: 0; font-family: var(--f-display); font-size: 15px; }
+.detalle ul { margin: 0; padding-left: 18px; line-height: 1.55; font-size: 13px; }
+.detalle .material { font-size: 12.5px; color: var(--muted); }
+.detalle .material b { color: var(--fg); font-weight: 600; }
+.nota { margin: 0; font-size: 12.5px; color: var(--muted); line-height: 1.5; }
+kbd { font-family: var(--f-mono); font-size: 11px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; }
+@media (max-width: 900px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="envoltura">
+  <header>
+    <h1>Maqueta Centinela Cravo Sur · armado paso a paso</h1>
+    <p>Render realista en Blender a escala real (caja de MDF de 60 × 40 × 15 cm). Avanza con <b>Armar</b> para ver cómo baja cada pieza a su lugar, o retrocede con <b>Desarmar</b> para verla salir en orden inverso.</p>
+  </header>
+
+  <div class="grid">
+    <div class="escenario">
+      <div class="pantalla">
+        <div class="cargando" id="cargando">Cargando video…</div>
+        <video id="vAdelante" src="blender/armado.mp4" muted playsinline preload="auto"></video>
+        <video id="vAtras" src="blender/desarmado.mp4" muted playsinline preload="auto" hidden></video>
+        <div class="rotulo" id="rotulo"><b id="rotuloN">0/8</b><span id="rotuloT">Caja vacía</span></div>
+      </div>
+      <div class="linea" id="linea" aria-label="Progreso del armado"></div>
+      <div class="controles">
+        <button class="btn" id="btnDesarmar">◀ Desarmar paso</button>
+        <button class="btn primario" id="btnArmar">Armar paso ▶</button>
+        <span class="espacio"></span>
+        <button class="btn" id="btnTodo">Armar todo</button>
+        <button class="btn" id="btnReinicio">Desarmar todo</button>
+      </div>
+      <p class="nota">Teclado: <kbd>→</kbd> armar · <kbd>←</kbd> desarmar · toca un paso de la lista para saltar a él.</p>
+    </div>
+
+    <aside>
+      <h2>Pasos</h2>
+      <div id="pasos" style="display:grid; gap:8px"></div>
+      <div class="detalle" id="detalle"></div>
+    </aside>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  const FPS = 24, CUADROS_PASO = 48, TOTAL = 456;
+  // Fin de cada paso en segundos (paso 0 = caja vacía). Los pasos 1–7 duran 2 s; la prueba con agua, 5 s.
+  const FIN = [0, 1, 2, 3, 4, 5, 6, 7].map((p) => (p * CUADROS_PASO) / FPS).concat([TOTAL / FPS]);
+  const DUR = TOTAL / FPS;
+
+  const PASOS = [
+    { t: "Caja de MDF", d: "Fondo, frentes, laterales y pared trasera.",
+      l: ["Corta fondo de 60 × 40 y paredes de 15 cm de alto.", "Deja la ventana del río de 15 cm entre x = 24 y x = 39 del frente.", "Abre la puerta trasera de 15 × 10 cm y un agujero para el USB.", "Pega con silicona y refuerza esquinas con balso."],
+      m: "MDF 3 mm: fondo 60×40, frente 24×15 y 21×15, trasera 60×15, laterales 39,4×15" },
+    { t: "Compartimiento de electrónica", d: "Esquina trasera izquierda, separada del agua.",
+      l: ["Pega las divisiones de 21,2 y 13,2 cm.", "Fija la protoboard con el ESP32 y el relé; la fuente de 5 V al fondo.", "Conecta según el plano eléctrico y prueba antes de cerrar.", "Pon la puerta trasera con bisagras."],
+      m: "MDF 3 mm, protoboard 830, ESP32, relé, cargador 5 V / 2 A" },
+    { t: "Río", d: "Recipiente transparente de 30 × 15 × 15 cm.",
+      l: ["Ubícalo en x = 24–39, pegado al frente.", "Sella todo el contorno con silicona.", "Pega la regla en cm en la cara frontal.", "Marca 5, 8, 11 y 14 cm con cinta de colores."],
+      m: "Recipiente plástico o acrílico 3 mm, silicona, regla impresa" },
+    { t: "Tapa (terreno)", d: "Tres piezas a ras del borde del río.",
+      l: ["Pinta de verde antes de montar.", "Perfora Ø 8 mm junto a cada poste para los cables.", "Atornilla la tapa izquierda (no la pegues): se abre para revisar la electrónica."],
+      m: "MDF 3 mm: 24×40, 21×40 y 15×10 · pintura acrílica verde" },
+    { t: "Vía, puente y ribera", d: "El escenario que se protege.",
+      l: ["Pega los dos tramos de vía (8 cm de ancho) con línea blanca.", "Arma el puente de balso de 19 × 9 cm con barandas.", "Pon la bandeja de tierra a la derecha del río.", "Ubica las viviendas al fondo."],
+      m: "Cartón paja gris, balso, bandeja + tierra, cartón paja blanco" },
+    { t: "Sensores y actuadores", d: "Cada uno en su punto, cable por su perforación.",
+      l: ["Semáforo con 4 LED y buzzer en (5, 29); barrera con servo en (15, 27).", "IR en (12, 15,5) apuntando al carril.", "Mástil en (40,5, 7): HC-SR04 sobre el río a 23 cm del fondo, DHT11 en el poste.", "Humedad en la ribera; PIR en (55, 6) mirando al río.", "OLED y botón táctil en el frente izquierdo."],
+      m: "Balso para postes, 4 LED + 220 Ω, SG90, HC-SR04, DHT11, PIR, IR, TTP223, OLED" },
+    { t: "Cableado", d: "Todo baja al compartimiento por debajo de la tapa.",
+      l: ["Baja cada cable por su perforación.", "Los del lado derecho van por detrás del río, nunca por dentro.", "Agrupa con bridas y etiqueta cada cable.", "Revisa GND común entre ESP32 y fuente de 5 V."],
+      m: "Dupont macho-hembra 20–30 cm, bridas, cinta para etiquetar" },
+    { t: "Prueba con agua", d: "Verde → amarillo → naranja → rojo.",
+      l: ["Vierte agua poco a poco.", "A 8 cm baja la barrera y se enciende el LED naranja.", "A 11 cm suena la sirena y parpadea el LED rojo.", "Silencia con el botón táctil y vacía con la manguera."],
+      m: "Jarra con agua, manguera con pinza o jeringa" },
+  ];
+
+  const vA = document.getElementById("vAdelante"), vR = document.getElementById("vAtras");
+  const bArmar = document.getElementById("btnArmar"), bDesarmar = document.getElementById("btnDesarmar");
+  const bTodo = document.getElementById("btnTodo"), bReinicio = document.getElementById("btnReinicio");
+  const contPasos = document.getElementById("pasos"), detalle = document.getElementById("detalle"), linea = document.getElementById("linea");
+  const rotuloN = document.getElementById("rotuloN"), rotuloT = document.getElementById("rotuloT");
+
+  let paso = 0, ocupado = false, metaPaso = null;
+
+  PASOS.forEach((p, i) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "paso";
+    b.innerHTML = `<span class="n">${i + 1}</span><div><strong>${p.t}</strong><span>${p.d}</span></div>`;
+    b.addEventListener("click", () => saltar(i + 1));
+    contPasos.appendChild(b);
+    const s = document.createElement("button");
+    s.type = "button"; s.title = `Paso ${i + 1}: ${p.t}`; s.setAttribute("aria-label", s.title);
+    s.addEventListener("click", () => saltar(i + 1));
+    linea.appendChild(s);
+  });
+
+  function pintar() {
+    [...contPasos.children].forEach((b, i) => {
+      b.classList.toggle("hecho", i + 1 < paso);
+      if (i + 1 === paso) b.setAttribute("aria-current", "step"); else b.removeAttribute("aria-current");
+    });
+    [...linea.children].forEach((s, i) => { s.className = i + 1 < paso ? "hecho" : i + 1 === paso ? "actual" : ""; });
+    rotuloN.textContent = `${paso}/8`;
+    rotuloT.textContent = paso ? PASOS[paso - 1].t : "Caja vacía";
+    const p = PASOS[Math.max(paso, 1) - 1];
+    detalle.innerHTML = paso
+      ? `<h3>Paso ${paso} · ${p.t}</h3><ul>${p.l.map((x) => `<li>${x}</li>`).join("")}</ul><p class="material"><b>Material:</b> ${p.m}</p>`
+      : `<h3>Antes de empezar</h3><p class="nota">Toca <b>Armar paso</b> para ver el paso 1. Cada paso muestra solo las piezas nuevas bajando a su lugar.</p>`;
+    bDesarmar.disabled = ocupado || paso === 0;
+    bArmar.disabled = ocupado || paso === 8;
+    bTodo.disabled = ocupado || paso === 8;
+    bReinicio.disabled = ocupado || paso === 0;
+  }
+
+  function mostrar(v) { vA.hidden = v !== vA; vR.hidden = v !== vR; }
+
+  // Reproduce un video hasta un tiempo y se detiene exacto ahí
+  function reproducirHasta(video, desde, hasta, alTerminar) {
+    ocupado = true; pintar();
+    video.currentTime = desde;
+    mostrar(video);
+    const vigilar = () => {
+      if (video.currentTime >= hasta - 0.02 || video.ended) {
+        video.pause(); video.currentTime = hasta; ocupado = false; alTerminar(); return;
+      }
+      requestAnimationFrame(vigilar);
+    };
+    video.play().then(() => requestAnimationFrame(vigilar)).catch(() => { video.currentTime = hasta; ocupado = false; alTerminar(); });
+  }
+
+  function armar(hastaPaso) {
+    if (ocupado || paso >= 8) return;
+    const meta = Math.min(hastaPaso ?? paso + 1, 8);
+    reproducirHasta(vA, FIN[paso], FIN[meta], () => { paso = meta; pintar(); });
+  }
+
+  function desarmar(hastaPaso) {
+    if (ocupado || paso <= 0) return;
+    const meta = Math.max(hastaPaso ?? paso - 1, 0);
+    reproducirHasta(vR, DUR - FIN[paso], DUR - FIN[meta], () => {
+      paso = meta;
+      vA.currentTime = FIN[paso];   // deja el video de armado listo en el mismo punto
+      const volver = () => { mostrar(vA); vA.removeEventListener("seeked", volver); };
+      vA.addEventListener("seeked", volver);
+      pintar();
+    });
+  }
+
+  function saltar(n) {
+    if (ocupado || n === paso) return;
+    if (Math.abs(n - paso) === 1) return n > paso ? armar(n) : desarmar(n);
+    vA.pause(); vR.pause();
+    paso = n; vA.currentTime = FIN[n]; mostrar(vA); pintar();
+  }
+
+  bArmar.addEventListener("click", () => armar());
+  bDesarmar.addEventListener("click", () => desarmar());
+  bTodo.addEventListener("click", () => armar(8));
+  bReinicio.addEventListener("click", () => desarmar(0));
+  document.addEventListener("keydown", (e) => {
+    if (e.target.closest("input, textarea")) return;
+    if (e.key === "ArrowRight") { e.preventDefault(); armar(); }
+    if (e.key === "ArrowLeft") { e.preventDefault(); desarmar(); }
+  });
+
+  const quitarCarga = () => { document.getElementById("cargando").hidden = true; };
+  vA.addEventListener("loadeddata", () => { quitarCarga(); vA.currentTime = FIN[paso]; });
+  vA.addEventListener("error", () => { document.getElementById("cargando").textContent = "No se pudo cargar el video. Recarga la página."; });
+
+  pintar();
+})();
+</script>
+
+</body>
+</html>

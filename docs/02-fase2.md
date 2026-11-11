@@ -89,13 +89,24 @@ Ver [`hardware/README.md`](../hardware/README.md#tabla-de-conexiones) (component
 
 ## 7. Plano eléctrico
 
-![Plano eléctrico](../hardware/plano-electrico.svg)
+![Plano de conexiones](../hardware/plano-conexiones.svg)
+
+Cable por cable, con casillas para marcar: [`hardware/cableado.md`](../hardware/cableado.md). Resumen por pin: [`hardware/plano-electrico.svg`](../hardware/plano-electrico.svg).
 
 Simulación: [`firmware/diagram.json`](../firmware/diagram.json) para Wokwi (en VS Code). El potenciómetro hace de sensor de suelo y los pulsadores hacen de IR y táctil.
 
 ## 8. Plano de la maqueta
 
 ![Maqueta](../hardware/maqueta.svg)
+
+**Armado paso a paso (render en Blender):** [`hardware/maqueta-3d.html`](../hardware/maqueta-3d.html) · video para la presentación: [`armado-con-titulos.mp4`](../hardware/blender/armado-con-titulos.mp4) · imágenes por paso: [`hardware/blender/pasos/`](../hardware/blender/pasos/).
+
+| | | | |
+|---|---|---|---|
+| ![1](../hardware/blender/pasos/paso-1.jpg) | ![2](../hardware/blender/pasos/paso-2.jpg) | ![3](../hardware/blender/pasos/paso-3.jpg) | ![4](../hardware/blender/pasos/paso-4.jpg) |
+| 1. Caja | 2. Electrónica | 3. Río | 4. Tapa |
+| ![5](../hardware/blender/pasos/paso-5.jpg) | ![6](../hardware/blender/pasos/paso-6.jpg) | ![7](../hardware/blender/pasos/paso-7.jpg) | ![8](../hardware/blender/pasos/paso-8.jpg) |
+| 5. Vía y ribera | 6. Sensores | 7. Cableado | 8. Prueba con agua |
 
 - **Base:** caja de MDF 3 mm de 60 × 40 × 15 cm. Adentro, el compartimiento de electrónica, con acceso por una puerta trasera.
 - **Río:** recipiente transparente de 30 × 15 × 15 cm empotrado en la tapa, con una ventana frontal y una regla en cm. El desborde está a 14 cm.

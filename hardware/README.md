@@ -2,11 +2,17 @@
 
 | Archivo | Contenido |
 |---|---|
+| [`plano-conexiones.svg`](plano-conexiones.svg) | **Plano de conexiones cable por cable**: rieles de 5 V, 3,3 V y GND, cada módulo con sus pines, divisor del HC-SR04 y 17 cables numerados |
+| [`cableado.md`](cableado.md) | Tabla de cableado con casillas para marcar cada cable y prueba antes de cerrar la caja |
 | [`plano-electrico.svg`](plano-electrico.svg) | Conexiones de cada componente al ESP32 y alimentación |
 | [`maqueta.svg`](maqueta.svg) | Vista superior y frontal con medidas, ubicación de componentes y materiales |
+| [`maqueta-3d.html`](maqueta-3d.html) | **Armado paso a paso** con render realista de Blender: botones Armar / Desarmar para seguir los 8 pasos. Ábrelo con doble clic |
+| [`blender/`](blender/) | Modelo `.blend`, script que lo genera, videos (con y sin títulos) e imágenes de cada paso |
 | [`../firmware/diagram.json`](../firmware/diagram.json) | Circuito para simular en **Wokwi** (VS Code) |
 
-![Plano eléctrico](plano-electrico.svg)
+![Maqueta terminada](blender/pasos/paso-8.jpg)
+
+![Plano de conexiones](plano-conexiones.svg)
 
 ## Tabla de conexiones
 
