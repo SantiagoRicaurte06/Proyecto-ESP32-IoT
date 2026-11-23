@@ -12,6 +12,7 @@ const NOMBRE = {
   boton_emergencia: "Botón de emergencia",
   alerta_reconocida: "Alerta reconocida",
   comando: "Comando",
+  calibracion: "Sensor calibrado",
   arranque: "Estación reiniciada",
 };
 

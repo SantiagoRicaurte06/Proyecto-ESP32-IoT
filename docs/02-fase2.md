@@ -156,6 +156,7 @@ Base: `centinela/est01`
 { "accion": "modo",    "valor": "auto" | "manual" }
 { "accion": "reconocer" }                                 // el LED rojo queda fijo y la alerta deja de repetirse
 { "accion": "umbrales", "valor": { "amarillo": 5, "naranja": 8, "rojo": 11 } }
+{ "accion": "calibrar" }                                  // la distancia actual (recipiente vacío) pasa a ser nivel 0
 ```
 
 **Seguridad:** TLS en el puerto 8883, con usuarios distintos en EMQX para el ESP32 y para el backend. La app **no** se conecta al broker: pasa por el backend con token, y el backend valida cada comando contra una lista permitida.

@@ -5,13 +5,18 @@ import { estadisticas, contarEventos, listarEventos, serie, tiempoPorRiesgo } fr
 import { estado, prediccion } from "./estacion.js";
 import { aLocal, rango } from "./tiempo.js";
 
-const cliente = new Anthropic(); // lee ANTHROPIC_API_KEY del entorno
+let clienteClaude = null;  // se crea al primer uso (lee ANTHROPIC_API_KEY del entorno)
+const claude = () => (clienteClaude ??= new Anthropic());
+
+class ErrorGemini extends Error {
+  constructor(estado, mensaje) { super(mensaje); this.estado = estado; }
+}
 
 const RANGO = {
   desde: { type: "string", description: "Inicio en hora de Colombia, formato YYYY-MM-DDTHH:mm. Por defecto: inicio de hoy." },
   hasta: { type: "string", description: "Fin en hora de Colombia, formato YYYY-MM-DDTHH:mm. Por defecto: ahora." },
 };
-const TIPOS_EVENTO = ["cambio_riesgo", "boton_emergencia", "alerta_reconocida", "comando", "arranque"];
+const TIPOS_EVENTO = ["cambio_riesgo", "boton_emergencia", "alerta_reconocida", "comando", "calibracion", "arranque"];
 
 const herramientas = [
   {
@@ -111,11 +116,69 @@ Fecha y hora actual en Colombia: ${aLocal(Date.now())}.`;
  * @returns {Promise<{respuesta: string, herramientas: string[]}>}
  */
 export async function preguntar(historial) {
+  return config.ia.proveedor === "gemini" ? preguntarGemini(historial) : preguntarClaude(historial);
+}
+
+// Gemini (Google AI Studio, capa gratuita) con llamadas a funciones sobre las mismas herramientas
+const declaracionesGemini = herramientas.map((h) => {
+  const props = h.input_schema.properties ?? {};
+  const decl = { name: h.name, description: h.description };
+  if (Object.keys(props).length) {
+    decl.parameters = { type: "object", properties: props };
+    if (h.input_schema.required) decl.parameters.required = h.input_schema.required;
+  }
+  return decl;
+});
+
+async function preguntarGemini(historial) {
+  const clave = process.env.GEMINI_API_KEY;
+  if (!clave) throw new ErrorGemini(401, "Falta GEMINI_API_KEY");
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${config.ia.geminiModelo}:generateContent`;
+  const contents = historial.map((m) => ({ role: m.rol === "agente" ? "model" : "user", parts: [{ text: m.texto }] }));
+  const usadas = [];
+
+  for (let vuelta = 0; vuelta < 8; vuelta++) {
+    const r = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-goog-api-key": clave },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: sistema() }] },
+        contents,
+        tools: [{ functionDeclarations: declaracionesGemini }],
+      }),
+      signal: AbortSignal.timeout(60_000),
+    });
+    const datos = await r.json().catch(() => ({}));
+    if (!r.ok) throw new ErrorGemini(r.status, datos.error?.message ?? `HTTP ${r.status}`);
+
+    const contenido = datos.candidates?.[0]?.content;
+    const partes = contenido?.parts ?? [];
+    const llamadas = partes.filter((p) => p.functionCall);
+    if (!llamadas.length) {
+      const texto = partes.map((p) => p.text ?? "").join("").trim();
+      return { respuesta: texto || "No obtuve respuesta, intenta de nuevo.", herramientas: usadas };
+    }
+
+    contents.push(contenido);   // el turno del modelo, tal cual, con sus llamadas
+    contents.push({
+      role: "user",
+      parts: llamadas.map(({ functionCall: f }) => {
+        usadas.push(f.name);
+        let resultado;
+        try { resultado = ejecutar(f.name, f.args ?? {}); } catch (e) { resultado = { error: e.message }; }
+        return { functionResponse: { name: f.name, response: { resultado } } };
+      }),
+    });
+  }
+  return { respuesta: "La consulta fue demasiado larga. Intenta una pregunta más concreta.", herramientas: usadas };
+}
+
+async function preguntarClaude(historial) {
   const messages = historial.map((m) => ({ role: m.rol === "agente" ? "assistant" : "user", content: m.texto }));
   const usadas = [];
 
   for (let vuelta = 0; vuelta < 8; vuelta++) {
-    const respuesta = await cliente.beta.messages.create({
+    const respuesta = await claude().beta.messages.create({
       model: config.ia.modelo,
       max_tokens: 16000,
       system: sistema(),
@@ -155,6 +218,14 @@ export async function preguntar(historial) {
 }
 
 export function errorAgente(e) {
+  if (e instanceof ErrorGemini) {
+    if (e.estado === 400 && /API key/i.test(e.message)) return "La GEMINI_API_KEY del backend no es válida.";
+    if (e.estado === 401 || e.estado === 403) return "Falta o es inválida la GEMINI_API_KEY del backend.";
+    if (e.estado === 404) return `El modelo ${config.ia.geminiModelo} no existe; cambia GEMINI_MODEL en el .env.`;
+    if (e.estado === 429) return "Se alcanzó el límite gratuito de Gemini; espera un minuto.";
+    return `Error del servicio de IA (Gemini ${e.estado}).`;
+  }
+  if (e?.name === "TimeoutError") return "La IA tardó demasiado en responder.";
   if (e instanceof Anthropic.AuthenticationError) return "Falta o es inválida la ANTHROPIC_API_KEY del backend.";
   if (e instanceof Anthropic.RateLimitError) return "El agente está ocupado, intenta en unos segundos.";
   if (e instanceof Anthropic.APIConnectionError) return "El backend no tiene conexión a internet para consultar la IA.";

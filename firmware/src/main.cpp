@@ -80,6 +80,9 @@ float histNivel[VENTANA];
 unsigned long histMs[VENTANA];
 int histIdx = 0, histN = 0;
 
+// Distancia del sensor al fondo vacío (nivel 0). Se calibra desde la app y queda en flash.
+float alturaSensor = ALTURA_SENSOR_CM;
+
 // Respaldo de mensajes mientras no hay conexión (store-and-forward)
 struct Pendiente { bool esEvento; String payload; };
 std::deque<Pendiente> pendientes;
@@ -189,6 +192,7 @@ void publicarEstado() {
   JsonObject u = d["umbrales"].to<JsonObject>();
   u["amarillo"] = umbrales.amarillo; u["naranja"] = umbrales.naranja; u["rojo"] = umbrales.rojo;
   d["desborde"] = NIVEL_DESBORDE_CM;
+  d["alturaSensor"] = roundf(alturaSensor * 10) / 10;
   String s; serializeJson(d, s);
   mqtt.publish(TOPIC_ESTADO, s.c_str(), true);  // retained
 }
@@ -212,6 +216,23 @@ void alRecibirMqtt(char* topic, byte* payload, unsigned int len) {
   } else if (!strcmp(accion, "modo")) {
     modoManual = !strcmp(d["valor"] | "auto", "manual");
     barreraCerradaManual = barreraCerrada;
+  } else if (!strcmp(accion, "calibrar")) {
+    // Toma la distancia actual (recipiente vacío) como fondo: nivel = 0
+    float d;
+    if (leerDistancia(d) && d > 3 && d < 200) {
+      alturaSensor = d;
+      prefs.putFloat("altura", d);
+      histN = 0; histIdx = 0; tasaCmMin = 0;   // reinicia la tasa para no ver un salto falso
+      nivelCm = 0;
+      JsonDocument e; e["alturaSensor"] = roundf(d * 10) / 10;
+      publicarEvento("calibracion", e);
+      publicarEstado();
+      Serial.printf("[cal] fondo fijado a %.1f cm del sensor\n", d);
+    } else {
+      JsonDocument e; e["error"] = "sin lectura valida del HC-SR04";
+      publicarEvento("calibracion", e);
+    }
+    return;
   } else if (!strcmp(accion, "reconocer")) {
     reconocerAlerta("app");
     return;
@@ -219,7 +240,7 @@ void alRecibirMqtt(char* topic, byte* payload, unsigned int len) {
     float a = d["valor"]["amarillo"] | umbrales.amarillo;
     float n = d["valor"]["naranja"] | umbrales.naranja;
     float r = d["valor"]["rojo"] | umbrales.rojo;
-    if (a > 0 && a < n && n < r && r <= ALTURA_SENSOR_CM) {
+    if (a > 0 && a < n && n < r && r <= alturaSensor) {
       umbrales = {a, n, r};
       prefs.putFloat("amarillo", a); prefs.putFloat("naranja", n); prefs.putFloat("rojo", r);
       publicarEstado();
@@ -359,7 +380,7 @@ void actualizarNivel() {
   float d;
   if (!leerDistancia(d)) return;  // conserva el último valor válido
   distanciaCm = d;
-  nivelCm = constrain(ALTURA_SENSOR_CM - d, 0.0f, ALTURA_SENSOR_CM);
+  nivelCm = constrain(alturaSensor - d, 0.0f, alturaSensor);
   histNivel[histIdx] = nivelCm;
   histMs[histIdx] = millis();
   histIdx = (histIdx + 1) % VENTANA;
@@ -481,6 +502,7 @@ void setup() {
   umbrales.amarillo = prefs.getFloat("amarillo", UMBRAL_AMARILLO_CM);
   umbrales.naranja  = prefs.getFloat("naranja", UMBRAL_NARANJA_CM);
   umbrales.rojo     = prefs.getFloat("rojo", UMBRAL_ROJO_CM);
+  alturaSensor      = prefs.getFloat("altura", ALTURA_SENSOR_CM);
 
   ESP32PWM::allocateTimer(0);
   barreraServo.setPeriodHertz(50);

@@ -80,6 +80,16 @@ export default function Control({ datos, rol, alCambiar }) {
         <Boton texto="Reconocer alerta" tipo="peligro" deshabilitado={enviando || t?.reconocida !== false} onPress={() => enviar("reconocer", undefined, "Alerta reconocida")} estilo={{ marginTop: espacio.m }} />
       </Tarjeta>
 
+      <Tarjeta titulo="Calibrar el sensor de nivel">
+        <Text style={s.texto}>
+          Con el recipiente vacío debajo del sensor, toca el botón: esa distancia queda como nivel 0.
+        </Text>
+        <Text style={[s.texto, { marginTop: espacio.s }]}>
+          Ahora el sensor mide {t?.dist ?? "—"} cm · fondo guardado: {datos?.estacion?.alturaSensor ?? "—"} cm
+        </Text>
+        <Boton texto="Calibrar fondo (recipiente vacío)" deshabilitado={enviando} onPress={() => enviar("calibrar", undefined, "Fondo calibrado")} estilo={{ marginTop: espacio.m }} />
+      </Tarjeta>
+
       <Tarjeta titulo="Umbrales de alerta (cm)">
         <View style={s.fila}>
           {["amarillo", "naranja", "rojo"].map((k) => (

@@ -64,6 +64,7 @@ cliente.on("message", (_t, buf) => {
   console.log("[cmd]", c);
   if (c.accion === "barrera") { modoManual = true; barreraManual = c.valor === "cerrar"; }
   else if (c.accion === "modo") { modoManual = c.valor === "manual"; barreraManual = barrera; }
+  else if (c.accion === "calibrar") { evento("calibracion", { alturaSensor: 23 }); return; }
   else if (c.accion === "reconocer") { if (!reconocida) { reconocida = true; evento("alerta_reconocida", { origen: "app" }); } return; }
   else if (c.accion === "umbrales") { Object.assign(U, c.valor); pub("estado", { online: true, fw: "sim-1.0.0", ip: "simulador", umbrales: U, desborde: DESBORDE }, { retain: true, qos: 1 }); return; }
   else return;
