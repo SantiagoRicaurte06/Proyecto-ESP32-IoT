@@ -34,7 +34,7 @@ export const config = {
     proveedor: env("LLM_PROVIDER", process.env.GEMINI_API_KEY && !process.env.ANTHROPIC_API_KEY ? "gemini" : "anthropic"),
     modelo: env("CLAUDE_MODEL", "claude-opus-5-5"),
     esfuerzo: env("CLAUDE_EFFORT", "low"),
-    geminiModelo: env("GEMINI_MODEL", "gemini-flash-latest"),
+    geminiModelo: env("GEMINI_MODEL", "gemini-2.5-flash"),
   },
 
   notificaciones: {

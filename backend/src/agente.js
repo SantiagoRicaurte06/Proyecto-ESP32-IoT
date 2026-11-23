@@ -133,23 +133,34 @@ const declaracionesGemini = herramientas.map((h) => {
 async function preguntarGemini(historial) {
   const clave = process.env.GEMINI_API_KEY;
   if (!clave) throw new ErrorGemini(401, "Falta GEMINI_API_KEY");
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${config.ia.geminiModelo}:generateContent`;
+  // Si un modelo está saturado (503) se prueba el siguiente
+  const modelos = [...new Set([config.ia.geminiModelo, "gemini-2.5-flash", "gemini-3.5-flash", "gemini-flash-latest"])];
+  const llamar = async (cuerpo) => {
+    let ultimo;
+    for (const m of modelos) {
+      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-goog-api-key": clave },
+        body: JSON.stringify(cuerpo),
+        signal: AbortSignal.timeout(60_000),
+      });
+      const datos = await r.json().catch(() => ({}));
+      if (r.ok) return datos;
+      ultimo = new ErrorGemini(r.status, datos.error?.message ?? `HTTP ${r.status}`);
+      if (r.status !== 503 && r.status !== 404) throw ultimo;
+      console.warn(`[agente] ${m} no disponible (${r.status}), probando otro modelo`);
+    }
+    throw ultimo;
+  };
   const contents = historial.map((m) => ({ role: m.rol === "agente" ? "model" : "user", parts: [{ text: m.texto }] }));
   const usadas = [];
 
   for (let vuelta = 0; vuelta < 8; vuelta++) {
-    const r = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "x-goog-api-key": clave },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: sistema() }] },
-        contents,
-        tools: [{ functionDeclarations: declaracionesGemini }],
-      }),
-      signal: AbortSignal.timeout(60_000),
+    const datos = await llamar({
+      systemInstruction: { parts: [{ text: sistema() }] },
+      contents,
+      tools: [{ functionDeclarations: declaracionesGemini }],
     });
-    const datos = await r.json().catch(() => ({}));
-    if (!r.ok) throw new ErrorGemini(r.status, datos.error?.message ?? `HTTP ${r.status}`);
 
     const contenido = datos.candidates?.[0]?.content;
     const partes = contenido?.parts ?? [];
