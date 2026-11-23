@@ -12,6 +12,8 @@
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
+#include <LiquidCrystal_I2C.h>
+#include <stdarg.h>
 #include <DHT.h>
 #include <ESP32Servo.h>
 #include <deque>
@@ -43,6 +45,7 @@ WiFiClientSecure red;
 PubSubClient mqtt(red);
 DHT dht(PIN_DHT, TIPO_DHT);
 Adafruit_SSD1306 oled(128, 64, &Wire, -1);
+LiquidCrystal_I2C* lcd = nullptr;   // LCD 16x2 con módulo I2C (0x27 o 0x3F), se detecta al arrancar
 Servo barreraServo;
 Preferences prefs;
 
@@ -59,16 +62,14 @@ struct Umbrales { float amarillo, naranja, rojo; } umbrales;
 
 float nivelCm = 0, distanciaCm = 0, tasaCmMin = 0;
 float temperatura = NAN, humedad = NAN;
-int sueloPct = 0, sueloRaw = 0;
-bool pirActivo = false, irObstaculo = false;
 
 Riesgo riesgo = VERDE;
 unsigned long inicioBajadaMs = 0;
 bool alertaReconocida = true;
 
 bool modoManual = false;
-bool barreraCerradaManual = false, sirenaManual = false;
-bool barreraCerrada = false, sirenaEncendida = false;
+bool barreraCerradaManual = false;
+bool barreraCerrada = false, alarmaActiva = false;
 
 bool oledOk = false, otaIniciado = false, horaOk = false;
 uint8_t paginaOled = 0;
@@ -78,6 +79,9 @@ const int VENTANA = 60;
 float histNivel[VENTANA];
 unsigned long histMs[VENTANA];
 int histIdx = 0, histN = 0;
+
+// Distancia del sensor al fondo vacío (nivel 0). Se calibra desde la app y queda en flash.
+float alturaSensor = ALTURA_SENSOR_CM;
 
 // Respaldo de mensajes mientras no hay conexión (store-and-forward)
 struct Pendiente { bool esEvento; String payload; };
@@ -130,18 +134,19 @@ float calcularTasa() {
   return (float)((histN * sxy - sx * sy) / den);
 }
 
-Riesgo riesgoPara(float nivel, float tasa, int suelo) {
+Riesgo riesgoPara(float nivel, float tasa) {
   Riesgo r = VERDE;
   if (nivel >= umbrales.rojo) r = ROJO;
   else if (nivel >= umbrales.naranja) r = NARANJA;
   else if (nivel >= umbrales.amarillo) r = AMARILLO;
   if (tasa >= TASA_RAPIDA_CM_MIN && r < ROJO) r = (Riesgo)(r + 1);  // sube rápido: un nivel más
-  if (suelo >= SUELO_SATURADO_PCT && r == VERDE) r = AMARILLO;      // ribera saturada
   return r;
 }
 
 void ponerRele(bool on) {
+#if USAR_RELE
   digitalWrite(PIN_RELE, (on == RELE_ACTIVO_EN_ALTO) ? HIGH : LOW);
+#endif
 }
 
 // ── MQTT ─────────────────────────────────────────────────────────────────────
@@ -167,16 +172,13 @@ String telemetriaJson() {
   d["nivel"] = roundf(nivelCm * 10) / 10;
   d["dist"] = roundf(distanciaCm * 10) / 10;
   d["tasa"] = roundf(tasaCmMin * 100) / 100;
-  d["suelo"] = sueloPct;
   if (!isnan(temperatura)) d["temp"] = roundf(temperatura * 10) / 10;
   if (!isnan(humedad)) d["hum"] = roundf(humedad);
   d["riesgo"] = NOMBRE_RIESGO[riesgo];
   d["barrera"] = barreraCerrada ? "cerrada" : "abierta";
-  d["sirena"] = sirenaEncendida;
+  d["alarma"] = alarmaActiva;
   d["modo"] = modoManual ? "manual" : "auto";
   d["reconocida"] = alertaReconocida;
-  d["pir"] = pirActivo;
-  d["ir"] = irObstaculo;
   d["rssi"] = WiFi.RSSI();
   String s; serializeJson(d, s);
   return s;
@@ -190,6 +192,7 @@ void publicarEstado() {
   JsonObject u = d["umbrales"].to<JsonObject>();
   u["amarillo"] = umbrales.amarillo; u["naranja"] = umbrales.naranja; u["rojo"] = umbrales.rojo;
   d["desborde"] = NIVEL_DESBORDE_CM;
+  d["alturaSensor"] = roundf(alturaSensor * 10) / 10;
   String s; serializeJson(d, s);
   mqtt.publish(TOPIC_ESTADO, s.c_str(), true);  // retained
 }
@@ -210,14 +213,26 @@ void alRecibirMqtt(char* topic, byte* payload, unsigned int len) {
   if (!strcmp(accion, "barrera")) {
     modoManual = true;
     barreraCerradaManual = !strcmp(d["valor"] | "", "cerrar");
-    sirenaManual = sirenaEncendida;
-  } else if (!strcmp(accion, "sirena")) {
-    modoManual = true;
-    sirenaManual = d["valor"] | false;
-    barreraCerradaManual = barreraCerrada;
   } else if (!strcmp(accion, "modo")) {
     modoManual = !strcmp(d["valor"] | "auto", "manual");
-    barreraCerradaManual = barreraCerrada; sirenaManual = sirenaEncendida;
+    barreraCerradaManual = barreraCerrada;
+  } else if (!strcmp(accion, "calibrar")) {
+    // Toma la distancia actual (recipiente vacío) como fondo: nivel = 0
+    float d;
+    if (leerDistancia(d) && d > 3 && d < 200) {
+      alturaSensor = d;
+      prefs.putFloat("altura", d);
+      histN = 0; histIdx = 0; tasaCmMin = 0;   // reinicia la tasa para no ver un salto falso
+      nivelCm = 0;
+      JsonDocument e; e["alturaSensor"] = roundf(d * 10) / 10;
+      publicarEvento("calibracion", e);
+      publicarEstado();
+      Serial.printf("[cal] fondo fijado a %.1f cm del sensor\n", d);
+    } else {
+      JsonDocument e; e["error"] = "sin lectura valida del HC-SR04";
+      publicarEvento("calibracion", e);
+    }
+    return;
   } else if (!strcmp(accion, "reconocer")) {
     reconocerAlerta("app");
     return;
@@ -225,7 +240,7 @@ void alRecibirMqtt(char* topic, byte* payload, unsigned int len) {
     float a = d["valor"]["amarillo"] | umbrales.amarillo;
     float n = d["valor"]["naranja"] | umbrales.naranja;
     float r = d["valor"]["rojo"] | umbrales.rojo;
-    if (a > 0 && a < n && n < r && r <= ALTURA_SENSOR_CM) {
+    if (a > 0 && a < n && n < r && r <= alturaSensor) {
       umbrales = {a, n, r};
       prefs.putFloat("amarillo", a); prefs.putFloat("naranja", n); prefs.putFloat("rojo", r);
       publicarEstado();
@@ -239,8 +254,25 @@ void alRecibirMqtt(char* topic, byte* payload, unsigned int len) {
 }
 
 void gestionarConexion() {
-  static unsigned long ultimoIntento = 0;
-  if (WiFi.status() != WL_CONNECTED) return;
+  static unsigned long ultimoIntento = 0, ultimoAvisoWifi = 0;
+  static bool wifiAntes = false;
+  bool wifiAhora = WiFi.status() == WL_CONNECTED;
+  if (wifiAhora && !wifiAntes) Serial.printf("[wifi] conectado a \"%s\" · IP %s · RSSI %d dBm\n", WIFI_SSID, WiFi.localIP().toString().c_str(), WiFi.RSSI());
+  wifiAntes = wifiAhora;
+  if (!wifiAhora) {
+    if (millis() - ultimoAvisoWifi > 5000) {
+      ultimoAvisoWifi = millis();
+      const char* motivo;
+      switch (WiFi.status()) {
+        case WL_NO_SSID_AVAIL:  motivo = "no se encuentra la red (¿nombre mal escrito o red de 5 GHz?)"; break;
+        case WL_CONNECT_FAILED: motivo = "conexión rechazada (¿clave incorrecta?)"; break;
+        case WL_DISCONNECTED:   motivo = "intentando conectar..."; break;
+        default:                motivo = "sin conexión"; break;
+      }
+      Serial.printf("[wifi] \"%s\": %s (estado %d)\n", WIFI_SSID, motivo, WiFi.status());
+    }
+    return;
+  }
 
   if (!otaIniciado) {
     ArduinoOTA.setHostname("centinela-" ESTACION_ID);
@@ -302,11 +334,11 @@ void dibujarOled() {
     oled.drawRect(118, 11, 10, 53, SSD1306_WHITE);
     oled.fillRect(120, 62 - alto, 6, alto, SSD1306_WHITE);
   } else if (paginaOled == 1) {
-    // Página de sensores: también sirve para calibrar (Dist y ADC del suelo)
+    // Página de sensores: también sirve para calibrar (Dist = distancia al agua)
     oled.setCursor(0, 12); oled.printf("Dist: %.1f cm", distanciaCm);
     oled.setCursor(0, 22); oled.printf("Temp: %.1fC Hum: %.0f%%", temperatura, humedad);
-    oled.setCursor(0, 32); oled.printf("Suelo: %d%% (ADC %d)", sueloPct, sueloRaw);
-    oled.setCursor(0, 42); oled.printf("PIR:%s  IR:%s", pirActivo ? "SI" : "no", irObstaculo ? "SI" : "no");
+    oled.setCursor(0, 32); oled.printf("Nivel: %.1f cm", nivelCm);
+    oled.setCursor(0, 42); oled.printf("WiFi: %s", WiFi.isConnected() ? "conectado" : "sin conexion");
     oled.setCursor(0, 52); oled.printf("Toque corto: pagina");
   } else {
     oled.setCursor(0, 14); oled.printf("IP %s", WiFi.localIP().toString().c_str());
@@ -317,12 +349,38 @@ void dibujarOled() {
   oled.display();
 }
 
+// ── LCD 16x2 ─────────────────────────────────────────────────────────────────
+void lineaLcd(uint8_t fila, const char* formato, ...) {
+  char b[17];
+  va_list args; va_start(args, formato); vsnprintf(b, sizeof(b), formato, args); va_end(args);
+  size_t n = strlen(b);
+  while (n < 16) b[n++] = ' ';   // rellena con espacios: evita borrar la pantalla (sin parpadeo)
+  b[16] = 0;
+  lcd->setCursor(0, fila);
+  lcd->print(b);
+}
+
+void dibujarLcd() {
+  if (!lcd) return;
+  String r = NOMBRE_RIESGO[riesgo]; r.toUpperCase();
+  if (paginaOled == 0) {
+    lineaLcd(0, "%-8s%5.1fcm", r.c_str(), nivelCm);
+    lineaLcd(1, "%+.2fcm/m %s", tasaCmMin, barreraCerrada ? "CERRA" : "ABIER");
+  } else if (paginaOled == 1) {
+    lineaLcd(0, "Dist %.1f cm", distanciaCm);
+    lineaLcd(1, "%.1fC  Hum %.0f%%", temperatura, humedad);
+  } else {
+    lineaLcd(0, "%s", WiFi.isConnected() ? WiFi.localIP().toString().c_str() : "WiFi: sin red");
+    lineaLcd(1, "MQTT %s  v%s", mqtt.connected() ? "ok " : "no ", FW_VERSION);
+  }
+}
+
 // ── Lógica principal ─────────────────────────────────────────────────────────
 void actualizarNivel() {
   float d;
   if (!leerDistancia(d)) return;  // conserva el último valor válido
   distanciaCm = d;
-  nivelCm = constrain(ALTURA_SENSOR_CM - d, 0.0f, ALTURA_SENSOR_CM);
+  nivelCm = constrain(alturaSensor - d, 0.0f, alturaSensor);
   histNivel[histIdx] = nivelCm;
   histMs[histIdx] = millis();
   histIdx = (histIdx + 1) % VENTANA;
@@ -331,8 +389,6 @@ void actualizarNivel() {
 }
 
 void actualizarSensores() {
-  sueloRaw = analogRead(PIN_SUELO);
-  sueloPct = constrain(map(sueloRaw, SUELO_ADC_SECO, SUELO_ADC_MOJADO, 0, 100), 0, 100);
 
   static unsigned long ultimoDht = 0;
   if (millis() - ultimoDht > PERIODO_DHT_MS) {
@@ -344,7 +400,7 @@ void actualizarSensores() {
 }
 
 void evaluarRiesgo() {
-  Riesgo objetivo = riesgoPara(nivelCm, tasaCmMin, sueloPct);
+  Riesgo objetivo = riesgoPara(nivelCm, tasaCmMin);
   Riesgo anterior = riesgo;
 
   if (objetivo > riesgo) {
@@ -352,7 +408,7 @@ void evaluarRiesgo() {
     inicioBajadaMs = 0;
   } else if (objetivo < riesgo) {
     // bajar: con histéresis (como si el agua estuviera 1 cm más alta) y sostenido 10 s
-    Riesgo conMargen = riesgoPara(nivelCm + HISTERESIS_CM, tasaCmMin, sueloPct);
+    Riesgo conMargen = riesgoPara(nivelCm + HISTERESIS_CM, tasaCmMin);
     if (conMargen < riesgo) {
       if (!inicioBajadaMs) inicioBajadaMs = millis();
       if (millis() - inicioBajadaMs > TIEMPO_BAJADA_MS) { riesgo = conMargen; inicioBajadaMs = 0; }
@@ -370,48 +426,33 @@ void evaluarRiesgo() {
     e["de"] = NOMBRE_RIESGO[anterior];
     e["a"] = NOMBRE_RIESGO[riesgo];
     e["tasa"] = roundf(tasaCmMin * 100) / 100;
-    e["suelo"] = sueloPct;
     publicarEvento("cambio_riesgo", e);
   }
 }
 
 void aplicarActuadores() {
   bool cerrar = modoManual ? barreraCerradaManual : (riesgo >= NARANJA);
-  bool sirena = modoManual ? sirenaManual : (riesgo == ROJO && !alertaReconocida);
+  bool alarma = riesgo == ROJO && !alertaReconocida;   // rojo sin reconocer: LED rojo parpadea
 
   if (cerrar != barreraCerrada) {
     barreraCerrada = cerrar;
     barreraServo.write(cerrar ? SERVO_CERRADA : SERVO_ABIERTA);
   }
-  if (sirena != sirenaEncendida) {
-    sirenaEncendida = sirena;
-    ponerRele(sirena);
+  if (alarma != alarmaActiva) {
+    alarmaActiva = alarma;
+    ponerRele(alarma);
   }
 
   bool parpadeo = (millis() / 400) % 2;
-  digitalWrite(PIN_LED_VERDE,    riesgo == VERDE);
-  digitalWrite(PIN_LED_AMARILLO, riesgo == AMARILLO);
-  digitalWrite(PIN_LED_NARANJA,  riesgo == NARANJA);
-  digitalWrite(PIN_LED_ROJO,     riesgo == ROJO && (alertaReconocida || parpadeo));
+  bool parpadeoLento = (millis() / 700) % 2;
+  // verde fijo = normal · verde parpadeando = vigilancia · rojo fijo = barrera cerrada · rojo parpadeando = alerta máxima
+  digitalWrite(PIN_LED_VERDE, riesgo == VERDE || (riesgo == AMARILLO && parpadeoLento));
+  digitalWrite(PIN_LED_ROJO,  riesgo == NARANJA || (riesgo == ROJO && (alertaReconocida || parpadeo)));
 }
 
 void revisarEntradas() {
-  static unsigned long ultimoPir = 0, ultimoIr = 0, inicioToque = 0;
+  static unsigned long inicioToque = 0;
   static bool emergenciaEnviada = false;
-
-  bool pir = digitalRead(PIN_PIR) == HIGH;
-  if (pir && !pirActivo && riesgo >= NARANJA && millis() - ultimoPir > ANTIRREBOTE_EVENTO_MS) {
-    ultimoPir = millis();
-    JsonDocument e; publicarEvento("persona_zona", e);
-  }
-  pirActivo = pir;
-
-  bool ir = digitalRead(PIN_IR) == LOW;
-  if (ir && !irObstaculo && barreraCerrada && millis() - ultimoIr > ANTIRREBOTE_EVENTO_MS) {
-    ultimoIr = millis();
-    JsonDocument e; publicarEvento("vehiculo_barrera", e);
-  }
-  irObstaculo = ir;
 
   // Táctil: toque corto = silenciar/reconocer o cambiar pantalla; mantener 2 s = emergencia
   bool toque = digitalRead(PIN_TACTIL) == HIGH;
@@ -445,22 +486,23 @@ void setup() {
 
   pinMode(PIN_TRIG, OUTPUT);
   pinMode(PIN_ECHO, INPUT);
-  pinMode(PIN_PIR, INPUT);
-  pinMode(PIN_IR, INPUT_PULLUP);
   pinMode(PIN_TACTIL, INPUT_PULLDOWN);
+#if USAR_RELE
   pinMode(PIN_RELE, OUTPUT);
+#endif
   ponerRele(false);
-  for (int p : {PIN_LED_VERDE, PIN_LED_AMARILLO, PIN_LED_NARANJA, PIN_LED_ROJO}) pinMode(p, OUTPUT);
+  pinMode(PIN_LED_VERDE, OUTPUT);
+  pinMode(PIN_LED_ROJO, OUTPUT);
 #if USAR_JOYSTICK
   pinMode(PIN_JOY_SW, INPUT_PULLUP);
 #endif
   analogReadResolution(12);
-  analogSetPinAttenuation(PIN_SUELO, ADC_11db);
 
   prefs.begin("centinela", false);
   umbrales.amarillo = prefs.getFloat("amarillo", UMBRAL_AMARILLO_CM);
   umbrales.naranja  = prefs.getFloat("naranja", UMBRAL_NARANJA_CM);
   umbrales.rojo     = prefs.getFloat("rojo", UMBRAL_ROJO_CM);
+  alturaSensor      = prefs.getFloat("altura", ALTURA_SENSOR_CM);
 
   ESP32PWM::allocateTimer(0);
   barreraServo.setPeriodHertz(50);
@@ -468,7 +510,28 @@ void setup() {
   barreraServo.write(SERVO_ABIERTA);
 
   dht.begin();
-  oledOk = oled.begin(SSD1306_SWITCHCAPVCC, 0x3C);
+  // Pantallas I2C: OLED (0x3C) y/o LCD 16x2 con módulo I2C (0x27 o 0x3F)
+  Wire.begin();
+  bool hayOled = false;
+  uint8_t dirLcd = 0;
+  Serial.print("[i2c] dispositivos:");
+  for (uint8_t dir = 1; dir < 127; dir++) {
+    Wire.beginTransmission(dir);
+    if (Wire.endTransmission() != 0) continue;
+    Serial.printf(" 0x%02X", dir);
+    if (dir == 0x3C) hayOled = true;
+    if (dir == 0x27 || dir == 0x3F) dirLcd = dir;
+  }
+  Serial.println(hayOled || dirLcd ? "" : " ninguno (revisa SDA 21, SCL 22, VCC y GND)");
+  if (dirLcd) {
+    lcd = new LiquidCrystal_I2C(dirLcd, 16, 2);
+    lcd->init();
+    lcd->backlight();
+    lineaLcd(0, "Centinela");
+    lineaLcd(1, "Cravo Sur v%s", FW_VERSION);
+    Serial.printf("[i2c] LCD 16x2 en 0x%02X\n", dirLcd);
+  }
+  oledOk = hayOled && oled.begin(SSD1306_SWITCHCAPVCC, 0x3C);
   if (oledOk) { oled.clearDisplay(); oled.setTextColor(SSD1306_WHITE); oled.setCursor(0, 0); oled.print("Centinela iniciando..."); oled.display(); }
 
   WiFi.mode(WIFI_STA);
@@ -513,4 +576,17 @@ void loop() {
   if (otaIniciado) ArduinoOTA.handle();
 
   if (ahora - tOled >= 250) { tOled = ahora; dibujarOled(); }
+  static unsigned long tLcd = 0;
+  if (ahora - tLcd >= 500) { tLcd = ahora; dibujarLcd(); }
+
+#if DIAGNOSTICO
+  static unsigned long tDiag = 0;
+  if (ahora - tDiag >= 2000) {
+    tDiag = ahora;
+    float d = leerDistanciaUnaVez();
+    if (d < 0) Serial.printf("[diag] HC-SR04: SIN ECO (revisa 5 V, TRIG=GPIO%d, ECHO=GPIO%d con divisor) · ", PIN_TRIG, PIN_ECHO);
+    else       Serial.printf("[diag] HC-SR04: %.1f cm · ", d);
+    Serial.printf("tactil GPIO%d = %d (1 = tocado) · nivel %.1f cm · riesgo %s\n", PIN_TACTIL, digitalRead(PIN_TACTIL), nivelCm, NOMBRE_RIESGO[riesgo]);
+  }
+#endif
 }

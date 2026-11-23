@@ -110,6 +110,8 @@ Contexto: proyecto formativo SENA (Tecnología en ADSO), Yopal, Casanare. ESP32 
 
 ## 6. Centinela Cravo Sur: alerta temprana de crecientes (nivel avanzado) ⭐
 
+> **Actualización:** la versión construida no tiene sirena ni LED amarillo o naranja. La alerta se muestra con 2 LED (verde y rojo) y la barrera. Ver [`02-fase2.md`](02-fase2.md).
+
 **Problema.** En invierno (abr–nov) el río Cravo Sur y las quebradas urbanas de Yopal crecen en pocas horas. Las familias ribereñas y los conductores que cruzan puentes y vados se enteran tarde, porque nadie avisa con datos a tiempo. Una alerta temprana barata protege vidas, no solo cultivos.
 
 **Qué hace.** Mide el nivel del agua y **la velocidad a la que sube**. Clasifica el riesgo en 4 niveles (verde, amarillo, naranja, rojo). Si sube el nivel de alerta, cierra la barrera del paso vehicular, activa sirena y baliza, y avisa a la comunidad y a gestión del riesgo. Sigue funcionando **sin internet**.

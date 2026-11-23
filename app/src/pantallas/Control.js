@@ -57,7 +57,7 @@ export default function Control({ datos, rol, alCambiar }) {
 
       <Tarjeta titulo="Modo de operación">
         <Text style={s.texto}>
-          {manual ? "MANUAL: la barrera y la sirena siguen tus órdenes." : "AUTOMÁTICO: la estación decide según el nivel de riesgo."}
+          {manual ? "MANUAL: la barrera sigue tus órdenes." : "AUTOMÁTICO: la estación decide según el nivel de riesgo."}
         </Text>
         <Boton
           texto={manual ? "Volver a automático" : "Pasar a manual"}
@@ -75,12 +75,19 @@ export default function Control({ datos, rol, alCambiar }) {
         </View>
       </Tarjeta>
 
-      <Tarjeta titulo={`Sirena · ${t?.sirena ? "encendida" : "apagada"}`}>
-        <View style={s.fila}>
-          <Boton texto="Encender" tipo="peligro" deshabilitado={enviando || t?.sirena} onPress={() => enviar("sirena", true, "Sirena encendida")} estilo={s.mitad} />
-          <Boton texto="Apagar" tipo="secundario" deshabilitado={enviando || !t?.sirena} onPress={() => enviar("sirena", false, "Sirena apagada")} estilo={s.mitad} />
-        </View>
-        <Boton texto="Reconocer alerta" tipo="secundario" deshabilitado={enviando || t?.reconocida !== false} onPress={() => enviar("reconocer", undefined, "Alerta reconocida")} estilo={{ marginTop: espacio.s }} />
+      <Tarjeta titulo={`Alerta · ${t?.alarma ? "LED rojo parpadeando" : t?.reconocida === false ? "sin reconocer" : "sin alerta pendiente"}`}>
+        <Text style={s.texto}>Reconocer la alerta deja el LED rojo fijo y detiene la repetición de notificaciones. La barrera sigue cerrada mientras el riesgo sea naranja o rojo.</Text>
+        <Boton texto="Reconocer alerta" tipo="peligro" deshabilitado={enviando || t?.reconocida !== false} onPress={() => enviar("reconocer", undefined, "Alerta reconocida")} estilo={{ marginTop: espacio.m }} />
+      </Tarjeta>
+
+      <Tarjeta titulo="Calibrar el sensor de nivel">
+        <Text style={s.texto}>
+          Con el recipiente vacío debajo del sensor, toca el botón: esa distancia queda como nivel 0.
+        </Text>
+        <Text style={[s.texto, { marginTop: espacio.s }]}>
+          Ahora el sensor mide {t?.dist ?? "—"} cm · fondo guardado: {datos?.estacion?.alturaSensor ?? "—"} cm
+        </Text>
+        <Boton texto="Calibrar fondo (recipiente vacío)" deshabilitado={enviando} onPress={() => enviar("calibrar", undefined, "Fondo calibrado")} estilo={{ marginTop: espacio.m }} />
       </Tarjeta>
 
       <Tarjeta titulo="Umbrales de alerta (cm)">

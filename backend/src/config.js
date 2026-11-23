@@ -17,7 +17,7 @@ export const config = {
   get topicBase() { return `centinela/${this.estacion}`; },
 
   mqtt: {
-    url: env("MQTT_URL", ""), // ej: mqtts://xxxx.s1.eu.hivemq.cloud:8883
+    url: env("MQTT_URL", ""), // ej: mqtts://xxxxxxxx.ala.us-east-1.emqxsl.com:8883 (EMQX Cloud)
     usuario: env("MQTT_USER", ""),
     clave: env("MQTT_PASSWORD", ""),
   },
@@ -30,8 +30,11 @@ export const config = {
   },
 
   ia: {
+    // "gemini" (capa gratuita de Google) o "anthropic" (Claude). Por defecto: el que tenga clave.
+    proveedor: env("LLM_PROVIDER", process.env.GEMINI_API_KEY && !process.env.ANTHROPIC_API_KEY ? "gemini" : "anthropic"),
     modelo: env("CLAUDE_MODEL", "claude-opus-5-5"),
     esfuerzo: env("CLAUDE_EFFORT", "low"),
+    geminiModelo: env("GEMINI_MODEL", "gemini-2.5-flash"),
   },
 
   notificaciones: {
@@ -58,6 +61,13 @@ export function validarConfig() {
     console.error(`✖ Faltan variables en backend/.env: ${faltan.join(", ")} (copia .env.example)`);
     process.exit(1);
   }
-  if (!process.env.ANTHROPIC_API_KEY) console.warn("⚠ Sin ANTHROPIC_API_KEY: el agente IA no responderá.");
+  if (config.ia.proveedor === "gemini") {
+    if (!process.env.GEMINI_API_KEY) console.warn("⚠ Sin GEMINI_API_KEY: el agente IA no responderá.");
+    else console.log(`Agente IA: Gemini (${config.ia.geminiModelo})`);
+  } else if (!process.env.ANTHROPIC_API_KEY) {
+    console.warn("⚠ Sin ANTHROPIC_API_KEY ni GEMINI_API_KEY: el agente IA no responderá.");
+  } else {
+    console.log(`Agente IA: Claude (${config.ia.modelo})`);
+  }
   if (!config.notificaciones.ntfyTopic) console.warn("⚠ Sin NTFY_TOPIC: no se enviarán notificaciones push.");
 }

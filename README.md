@@ -4,12 +4,12 @@
 
 **Sistema IoT de alerta temprana de crecientes** · ESP32 + MQTT + App Android + Agente IA
 
-Mide el nivel del río y **la velocidad a la que sube**, cierra el paso del puente, activa la sirena, avisa al celular y responde en lenguaje natural qué está pasando. Funciona aunque se caiga internet.
+Mide el nivel del río y **la velocidad a la que sube**, cierra el paso del puente, enciende la alerta en el semáforo, avisa al celular y responde en lenguaje natural qué está pasando. Funciona aunque se caiga internet.
 
 Proyecto formativo · **SENA – Tecnología en Análisis y Desarrollo de Software (ADSO)** · Yopal, Casanare, Colombia
 
 ![ESP32](https://img.shields.io/badge/ESP32-DevKit%20v1-E7352C?logo=espressif&logoColor=white)
-![MQTT](https://img.shields.io/badge/MQTT-TLS%20%C2%B7%20HiveMQ-660066?logo=mqtt&logoColor=white)
+![MQTT](https://img.shields.io/badge/MQTT-TLS%20%C2%B7%20EMQX-660066?logo=mqtt&logoColor=white)
 ![Node.js](https://img.shields.io/badge/Backend-Node.js%20%2B%20SQLite-339933?logo=nodedotjs&logoColor=white)
 ![Expo](https://img.shields.io/badge/App-React%20Native%20%C2%B7%20Expo-000020?logo=expo&logoColor=white)
 ![IA](https://img.shields.io/badge/Agente%20IA-Claude%20tool%20calling-D97757)
@@ -25,14 +25,12 @@ Proyecto formativo · **SENA – Tecnología en Análisis y Desarrollo de Softwa
 
 | Riesgo | Condición (maqueta) | La estación… | Notificación |
 |---|---|---|---|
-| 🟢 Verde | nivel < 5 cm | paso abierto | — |
-| 🟡 Amarillo | ≥ 5 cm o ribera saturada | vigila | push |
-| 🟠 Naranja | ≥ 8 cm | **cierra la barrera** | push + correo |
-| 🔴 Rojo | ≥ 11 cm | **sirena** hasta que alguien la reconozca | push repetido + correo |
+| 🟢 Verde | nivel < 5 cm | LED verde fijo, paso abierto | — |
+| 🟡 Amarillo | ≥ 5 cm | LED verde intermitente | push |
+| 🟠 Naranja | ≥ 8 cm | **cierra la barrera** y enciende el LED rojo | push + correo |
+| 🔴 Rojo | ≥ 11 cm | barrera cerrada y **LED rojo intermitente** hasta que alguien reconozca la alerta | push repetido + correo |
 
 Si el agua sube a más de 2 cm/min, el riesgo sube un nivel extra. Además, el sistema avisa cuando:
-- hay personas en la ribera durante una alerta,
-- un vehículo intenta cruzar con la barrera cerrada,
 - alguien presiona el botón comunitario,
 - la estación se desconecta.
 
@@ -40,9 +38,9 @@ Si el agua sube a más de 2 cm/min, el riesgo sube un nivel extra. Además, el s
 
 ```mermaid
 flowchart LR
-  S["Sensores<br/>nivel · suelo · DHT11<br/>PIR · IR · táctil"] --> E["ESP32<br/>riesgo local"]
-  E --> A["Barrera · sirena<br/>semáforo · OLED"]
-  E <-->|MQTT TLS| B[("HiveMQ Cloud")]
+  S["Sensores<br/>nivel · DHT11 · táctil"] --> E["ESP32<br/>riesgo local"]
+  E --> A["Barrera · LED rojo y verde<br/>OLED"]
+  E <-->|MQTT TLS| B[("EMQX Cloud")]
   B <--> K["Backend Node.js"]
   K --> D[("SQLite")]
   K --> N["Push ntfy · correo"]

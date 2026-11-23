@@ -5,18 +5,23 @@ import { estadisticas, contarEventos, listarEventos, serie, tiempoPorRiesgo } fr
 import { estado, prediccion } from "./estacion.js";
 import { aLocal, rango } from "./tiempo.js";
 
-const cliente = new Anthropic(); // lee ANTHROPIC_API_KEY del entorno
+let clienteClaude = null;  // se crea al primer uso (lee ANTHROPIC_API_KEY del entorno)
+const claude = () => (clienteClaude ??= new Anthropic());
+
+class ErrorGemini extends Error {
+  constructor(estado, mensaje) { super(mensaje); this.estado = estado; }
+}
 
 const RANGO = {
   desde: { type: "string", description: "Inicio en hora de Colombia, formato YYYY-MM-DDTHH:mm. Por defecto: inicio de hoy." },
   hasta: { type: "string", description: "Fin en hora de Colombia, formato YYYY-MM-DDTHH:mm. Por defecto: ahora." },
 };
-const TIPOS_EVENTO = ["cambio_riesgo", "persona_zona", "vehiculo_barrera", "boton_emergencia", "alerta_reconocida", "comando", "arranque"];
+const TIPOS_EVENTO = ["cambio_riesgo", "boton_emergencia", "alerta_reconocida", "comando", "calibracion", "arranque"];
 
 const herramientas = [
   {
     name: "estado_actual",
-    description: "Lectura más reciente de la estación: nivel del agua (cm), tasa de ascenso (cm/min), humedad del suelo (%), temperatura (°C), humedad del aire (%), nivel de riesgo, barrera, sirena, modo y si la estación está en línea. También los umbrales configurados.",
+    description: "Lectura más reciente de la estación: nivel del agua (cm), tasa de ascenso (cm/min), temperatura (°C), humedad del aire (%), nivel de riesgo, barrera, alarma (rojo sin reconocer), modo y si la estación está en línea. También los umbrales configurados.",
     input_schema: { type: "object", properties: {} },
   },
   {
@@ -25,7 +30,7 @@ const herramientas = [
     input_schema: {
       type: "object",
       properties: {
-        variable: { type: "string", enum: ["nivel", "tasa", "temp", "hum", "suelo"], description: "nivel=cm de agua, tasa=cm/min, temp=°C, hum=% aire, suelo=% humedad del suelo" },
+        variable: { type: "string", enum: ["nivel", "tasa", "temp", "hum"], description: "nivel=cm de agua, tasa=cm/min, temp=°C, hum=% humedad del aire" },
         ...RANGO,
       },
       required: ["variable"],
@@ -33,7 +38,7 @@ const herramientas = [
   },
   {
     name: "contar_eventos",
-    description: "Cuenta eventos por tipo en un rango. Tipos: cambio_riesgo (subidas/bajadas de alerta), persona_zona (movimiento en la ribera durante alerta), vehiculo_barrera (vehículo intentó cruzar con barrera cerrada), boton_emergencia, alerta_reconocida, comando (acciones desde la app), arranque (reinicios de la estación).",
+    description: "Cuenta eventos por tipo en un rango. Tipos: cambio_riesgo (subidas/bajadas de alerta), boton_emergencia, alerta_reconocida, comando (acciones desde la app), arranque (reinicios de la estación).",
     input_schema: { type: "object", properties: { tipo: { type: "string", enum: TIPOS_EVENTO }, ...RANGO } },
   },
   {
@@ -99,7 +104,7 @@ export function ejecutar(nombre, entrada = {}) {
 function sistema() {
   return `Eres el asistente de Centinela Cravo Sur, una estación de alerta temprana de crecientes instalada en una maqueta a escala de un puente sobre el río Cravo Sur (Yopal, Casanare, Colombia).
 
-La estación mide el nivel del agua (cm), la tasa de ascenso (cm/min), la humedad del suelo de la ribera, la temperatura y la humedad del aire. Clasifica el riesgo en verde, amarillo, naranja (cierra la barrera del puente) y rojo (sirena). También registra personas en la ribera durante alertas, vehículos que intentan cruzar con la barrera cerrada y el botón comunitario de emergencia.
+La estación mide el nivel del agua (cm), la tasa de ascenso (cm/min), la temperatura y la humedad del aire. Clasifica el riesgo en verde (LED verde), amarillo (LED verde parpadeando), naranja (cierra la barrera del puente y enciende el LED rojo) y rojo (LED rojo parpadeando hasta que alguien reconozca la alerta). No hay sirena. También registra el botón comunitario de emergencia (sensor táctil).
 
 Responde en español, breve y claro, a personas de la comunidad y a operadores de gestión del riesgo. Consulta siempre las herramientas antes de dar cifras y nunca inventes datos; si no hay datos para el periodo, dilo. Usa hora de Colombia (formato 12 h, ej. 3:40 p. m.) y redondea a una cifra decimal. Si el riesgo actual es naranja o rojo, empieza por la recomendación de seguridad. Cuando te pidan un reporte, organízalo con hora de inicio, pico, duración por nivel y acciones tomadas.
 
@@ -111,11 +116,80 @@ Fecha y hora actual en Colombia: ${aLocal(Date.now())}.`;
  * @returns {Promise<{respuesta: string, herramientas: string[]}>}
  */
 export async function preguntar(historial) {
+  return config.ia.proveedor === "gemini" ? preguntarGemini(historial) : preguntarClaude(historial);
+}
+
+// Gemini (Google AI Studio, capa gratuita) con llamadas a funciones sobre las mismas herramientas
+const declaracionesGemini = herramientas.map((h) => {
+  const props = h.input_schema.properties ?? {};
+  const decl = { name: h.name, description: h.description };
+  if (Object.keys(props).length) {
+    decl.parameters = { type: "object", properties: props };
+    if (h.input_schema.required) decl.parameters.required = h.input_schema.required;
+  }
+  return decl;
+});
+
+async function preguntarGemini(historial) {
+  const clave = process.env.GEMINI_API_KEY;
+  if (!clave) throw new ErrorGemini(401, "Falta GEMINI_API_KEY");
+  // Si un modelo está saturado (503) se prueba el siguiente
+  const modelos = [...new Set([config.ia.geminiModelo, "gemini-2.5-flash", "gemini-3.5-flash", "gemini-flash-latest"])];
+  const llamar = async (cuerpo) => {
+    let ultimo;
+    for (const m of modelos) {
+      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-goog-api-key": clave },
+        body: JSON.stringify(cuerpo),
+        signal: AbortSignal.timeout(60_000),
+      });
+      const datos = await r.json().catch(() => ({}));
+      if (r.ok) return datos;
+      ultimo = new ErrorGemini(r.status, datos.error?.message ?? `HTTP ${r.status}`);
+      if (r.status !== 503 && r.status !== 404) throw ultimo;
+      console.warn(`[agente] ${m} no disponible (${r.status}), probando otro modelo`);
+    }
+    throw ultimo;
+  };
+  const contents = historial.map((m) => ({ role: m.rol === "agente" ? "model" : "user", parts: [{ text: m.texto }] }));
+  const usadas = [];
+
+  for (let vuelta = 0; vuelta < 8; vuelta++) {
+    const datos = await llamar({
+      systemInstruction: { parts: [{ text: sistema() }] },
+      contents,
+      tools: [{ functionDeclarations: declaracionesGemini }],
+    });
+
+    const contenido = datos.candidates?.[0]?.content;
+    const partes = contenido?.parts ?? [];
+    const llamadas = partes.filter((p) => p.functionCall);
+    if (!llamadas.length) {
+      const texto = partes.map((p) => p.text ?? "").join("").trim();
+      return { respuesta: texto || "No obtuve respuesta, intenta de nuevo.", herramientas: usadas };
+    }
+
+    contents.push(contenido);   // el turno del modelo, tal cual, con sus llamadas
+    contents.push({
+      role: "user",
+      parts: llamadas.map(({ functionCall: f }) => {
+        usadas.push(f.name);
+        let resultado;
+        try { resultado = ejecutar(f.name, f.args ?? {}); } catch (e) { resultado = { error: e.message }; }
+        return { functionResponse: { name: f.name, response: { resultado } } };
+      }),
+    });
+  }
+  return { respuesta: "La consulta fue demasiado larga. Intenta una pregunta más concreta.", herramientas: usadas };
+}
+
+async function preguntarClaude(historial) {
   const messages = historial.map((m) => ({ role: m.rol === "agente" ? "assistant" : "user", content: m.texto }));
   const usadas = [];
 
   for (let vuelta = 0; vuelta < 8; vuelta++) {
-    const respuesta = await cliente.beta.messages.create({
+    const respuesta = await claude().beta.messages.create({
       model: config.ia.modelo,
       max_tokens: 16000,
       system: sistema(),
@@ -155,6 +229,14 @@ export async function preguntar(historial) {
 }
 
 export function errorAgente(e) {
+  if (e instanceof ErrorGemini) {
+    if (e.estado === 400 && /API key/i.test(e.message)) return "La GEMINI_API_KEY del backend no es válida.";
+    if (e.estado === 401 || e.estado === 403) return "Falta o es inválida la GEMINI_API_KEY del backend.";
+    if (e.estado === 404) return `El modelo ${config.ia.geminiModelo} no existe; cambia GEMINI_MODEL en el .env.`;
+    if (e.estado === 429) return "Se alcanzó el límite gratuito de Gemini; espera un minuto.";
+    return `Error del servicio de IA (Gemini ${e.estado}).`;
+  }
+  if (e?.name === "TimeoutError") return "La IA tardó demasiado en responder.";
   if (e instanceof Anthropic.AuthenticationError) return "Falta o es inválida la ANTHROPIC_API_KEY del backend.";
   if (e instanceof Anthropic.RateLimitError) return "El agente está ocupado, intenta en unos segundos.";
   if (e instanceof Anthropic.APIConnectionError) return "El backend no tiene conexión a internet para consultar la IA.";

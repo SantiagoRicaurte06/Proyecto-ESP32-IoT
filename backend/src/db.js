@@ -12,9 +12,8 @@ db.exec(`
 
   CREATE TABLE IF NOT EXISTS lecturas (
     ts      INTEGER NOT NULL,      -- ms UTC
-    nivel   REAL, tasa REAL, suelo INTEGER, temp REAL, hum REAL,
-    riesgo  TEXT, barrera TEXT, sirena INTEGER, modo TEXT,
-    pir     INTEGER, ir INTEGER
+    nivel   REAL, tasa REAL, temp REAL, hum REAL,
+    riesgo  TEXT, barrera TEXT, alarma INTEGER, modo TEXT
   );
   CREATE INDEX IF NOT EXISTS idx_lecturas_ts ON lecturas(ts);
 
@@ -35,8 +34,8 @@ db.exec(`
 `);
 
 const insLectura = db.prepare(`INSERT INTO lecturas
-  (ts, nivel, tasa, suelo, temp, hum, riesgo, barrera, sirena, modo, pir, ir)
-  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
+  (ts, nivel, tasa, temp, hum, riesgo, barrera, alarma, modo)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`);
 const insEvento = db.prepare(`INSERT INTO eventos (ts, tipo, riesgo, nivel, datos) VALUES (?, ?, ?, ?, ?)`);
 const insNotif = db.prepare(`INSERT INTO notificaciones (ts, canal, titulo, mensaje, prioridad, ok) VALUES (?, ?, ?, ?, ?, ?)`);
 
@@ -45,8 +44,8 @@ const bool = (v) => (typeof v === "boolean" ? Number(v) : null);
 const txt = (v) => (typeof v === "string" ? v.slice(0, 40) : null);
 
 export function guardarLectura(ts, t) {
-  insLectura.run(ts, num(t.nivel), num(t.tasa), num(t.suelo), num(t.temp), num(t.hum),
-    txt(t.riesgo), txt(t.barrera), bool(t.sirena), txt(t.modo), bool(t.pir), bool(t.ir));
+  insLectura.run(ts, num(t.nivel), num(t.tasa), num(t.temp), num(t.hum),
+    txt(t.riesgo), txt(t.barrera), bool(t.alarma), txt(t.modo));
 }
 
 export function guardarEvento(ts, e) {
@@ -60,7 +59,7 @@ export function guardarNotificacion(canal, titulo, mensaje, prioridad, ok) {
 
 // ── Consultas (usadas por la API y por las herramientas del agente) ──────────
 
-const VARIABLES = new Set(["nivel", "tasa", "temp", "hum", "suelo"]);
+const VARIABLES = new Set(["nivel", "tasa", "temp", "hum"]);
 
 export function estadisticas(variable, desde, hasta) {
   if (!VARIABLES.has(variable)) throw new Error(`Variable no válida: ${variable}`);
